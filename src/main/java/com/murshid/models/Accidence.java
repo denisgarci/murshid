@@ -1,4 +1,4 @@
-package com.murshid.ingestor.wikitionary.models;
+package com.murshid.models;
 
 public enum Accidence {
     MASCULINE("masculine gender"), FEMININE("feminine gender"), GENDER_INCOMPLETE("gender incomplete"),

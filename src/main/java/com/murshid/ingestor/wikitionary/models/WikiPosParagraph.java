@@ -1,5 +1,7 @@
 package com.murshid.ingestor.wikitionary.models;
 
+import com.murshid.models.Accidence;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;

@@ -1,7 +1,7 @@
 package com.murshid.ingestor.wikitionary;
 
 
-import com.murshid.ingestor.wikitionary.models.Accidence;
+import com.murshid.models.Accidence;
 import com.murshid.ingestor.wikitionary.models.WikiEntry;
 import com.murshid.ingestor.wikitionary.models.WikiPartOfSpeech;
 import com.murshid.ingestor.wikitionary.models.WikiPosParagraph;

@@ -15,7 +15,7 @@ public class Practice {
     }
 
     public static void main(String[] args) throws IOException {
-        String fileName = "kamli.txt";
+        String fileName = "alvida.txt";
         BufferedReader br = new BufferedReader(new InputStreamReader(new FileInputStream("/Users/gonzalodiaz/dev/ingestor/src/main/resources/songs/" + fileName ), "UTF-8"));
         String line = null;
         StringBuilder sb = new StringBuilder();

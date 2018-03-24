@@ -10,14 +10,29 @@ import java.io.Serializable;
 @Embeddable
 public class CanonicalKey implements Serializable{
     @Column(name = "canonical_word", nullable = true)
-    private String word;
+    public String word;
 
     @Column(name = "canonical_word_index", nullable = true)
-    private int wordIndex;
+    public int wordIndex;
 
 
     @Enumerated
     @Column(name ="dictionary_source", nullable = true)
-    private DictionarySource dictionarySource;
+    public DictionarySource dictionarySource;
+
+    public CanonicalKey setWord(String word) {
+        this.word = word;
+        return this;
+    }
+
+    public CanonicalKey setWordIndex(int wordIndex) {
+        this.wordIndex = wordIndex;
+        return this;
+    }
+
+    public CanonicalKey setDictionarySource(DictionarySource dictionarySource) {
+        this.dictionarySource = dictionarySource;
+        return this;
+    }
 
 }

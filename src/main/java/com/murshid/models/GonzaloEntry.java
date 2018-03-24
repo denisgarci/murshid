@@ -1,8 +1,9 @@
 package com.murshid.models;
 
-import com.murshid.DictionarySource;
+import com.murshid.persistence.AccidenceConverter;
 
 import javax.persistence.*;
+import java.util.List;
 
 @Entity(name = "gonzalo")
 public class GonzaloEntry {
@@ -13,20 +14,15 @@ public class GonzaloEntry {
     @Column(name = "urdu_word", nullable = true)
     private String urduWord;
 
-    private String accidence;
+    @Column
+    @Convert (converter = AccidenceConverter.class)
+    private List<Accidence> accidence;
 
     private String meaning;
 
-    @Column(name = "canonical_word", nullable = true)
-    private String canonicalWord;
+    @Embedded
+    private CanonicalKey canonicalKey;
 
-    @Column(name = "canonical_word_index", nullable = true)
-    private int canonicalWordIndex;
-
-
-    @Enumerated
-    @Column(name ="dictionary_source", nullable = true)
-    private DictionarySource dictionarySource;
 
     public DictionaryKey getDictionaryKey() {
         return dictionaryKey;
@@ -46,11 +42,11 @@ public class GonzaloEntry {
         return this;
     }
 
-    public String getAccidence() {
+    public List<Accidence> getAccidence() {
         return accidence;
     }
 
-    public GonzaloEntry setAccidence(String accidence) {
+    public GonzaloEntry setAccidence(List<Accidence> accidence) {
         this.accidence = accidence;
         return this;
     }
@@ -64,30 +60,13 @@ public class GonzaloEntry {
         return this;
     }
 
-    public String getCanonicalWord() {
-        return canonicalWord;
+    public CanonicalKey getCanonicalKey() {
+        return canonicalKey;
     }
 
-    public GonzaloEntry setCanonicalWord(String canonicalWord) {
-        this.canonicalWord = canonicalWord;
+    public GonzaloEntry setCanonicalKey(CanonicalKey canonicalKey) {
+        this.canonicalKey = canonicalKey;
         return this;
     }
 
-    public int getCanonicalWordIndex() {
-        return canonicalWordIndex;
-    }
-
-    public GonzaloEntry setCanonicalWordIndex(int canonicalWordIndex) {
-        this.canonicalWordIndex = canonicalWordIndex;
-        return this;
-    }
-
-    public DictionarySource getDictionarySource() {
-        return dictionarySource;
-    }
-
-    public GonzaloEntry setDictionarySource(DictionarySource dictionarySource) {
-        this.dictionarySource = dictionarySource;
-        return this;
-    }
 }

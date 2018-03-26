@@ -1,7 +1,7 @@
 package com.murshid;
 
 
-import com.murshid.mysql.domain.HindiWord;
+import com.murshid.persistence.domain.HindiWord;
 import com.murshid.services.HindiWordsService;
 import com.murshid.services.SongProcesspor;
 import org.springframework.boot.SpringApplication;

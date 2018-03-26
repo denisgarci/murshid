@@ -1,7 +1,7 @@
 package com.murshid.services;
 
-import com.murshid.mysql.domain.HindiWord;
-import com.murshid.mysql.repo.HindiWordsRepository;
+import com.murshid.persistence.domain.HindiWord;
+import com.murshid.persistence.repo.HindiWordsRepository;
 
 import javax.annotation.Nonnull;
 import javax.inject.Inject;

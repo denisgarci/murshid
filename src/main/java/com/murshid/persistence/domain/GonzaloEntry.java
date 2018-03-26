@@ -1,9 +1,9 @@
-package com.murshid.mysql.domain;
+package com.murshid.persistence.domain;
 
 import com.murshid.models.DictionaryKey;
 import com.murshid.models.enums.Accidence;
 import com.murshid.models.enums.PartOfSpeech;
-import com.murshid.mysql.repo.AccidenceConverter;
+import com.murshid.persistence.AccidenceColumnConverter;
 
 import javax.persistence.*;
 import java.util.List;
@@ -18,7 +18,7 @@ public class GonzaloEntry {
     private String urduWord;
 
     @Column
-    @Convert (converter = AccidenceConverter.class)
+    @Convert (converter = AccidenceColumnConverter.class)
     private List<Accidence> accidence;
 
     private String meaning;

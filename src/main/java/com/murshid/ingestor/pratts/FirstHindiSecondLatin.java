@@ -1,8 +1,8 @@
 package com.murshid.ingestor.pratts;
 
 import com.google.common.base.Strings;
-import com.murshid.ingestor.Scripts;
-import com.murshid.ingestor.utils.WordUtils;
+import com.murshid.ingestor.enums.Scripts;
+import com.murshid.ingestor.utils.IngestorWordUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -46,8 +46,8 @@ public class FirstHindiSecondLatin {
                     continue;
                 }
 
-                if (WordUtils.scriptType(tokens[0]) != Scripts.DEVANAGARI
-                        || WordUtils.scriptType(tokens[1]) != Scripts.LATIN){
+                if (IngestorWordUtils.scriptType(tokens[0]) != Scripts.DEVANAGARI
+                        || IngestorWordUtils.scriptType(tokens[1]) != Scripts.LATIN){
                     continue;
                 }
 

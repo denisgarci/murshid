@@ -4,7 +4,7 @@ import com.amazonaws.services.dynamodbv2.document.Item;
 import com.amazonaws.services.dynamodbv2.document.Table;
 import com.google.common.collect.Sets;
 import com.murshid.dynamo.DynamoAccessor;
-import com.murshid.mysql.repo.HindiWordsRepository;
+import com.murshid.persistence.repo.HindiWordsRepository;
 import com.murshid.utils.SongUtils;
 
 import javax.annotation.Nonnull;

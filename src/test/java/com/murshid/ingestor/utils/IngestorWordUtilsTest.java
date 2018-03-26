@@ -1,6 +1,6 @@
 package com.murshid.ingestor.utils;
 
-import com.murshid.ingestor.Scripts;
+import com.murshid.ingestor.enums.Scripts;
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

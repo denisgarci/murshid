@@ -1,4 +1,4 @@
-package com.murshid.mysql.repo;
+package com.murshid.persistence;
 
 import com.murshid.models.enums.Accidence;
 
@@ -10,7 +10,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 @Converter
-public class AccidenceConverter implements AttributeConverter<List<Accidence>, String>{
+public class AccidenceColumnConverter implements AttributeConverter<List<Accidence>, String>{
 
     @Override
     public String convertToDatabaseColumn(List<Accidence> appData) {

@@ -1,4 +1,4 @@
-package com.murshid.mysql.domain;
+package com.murshid.persistence.domain;
 
 import com.murshid.models.enums.DictionarySource;
 import com.murshid.models.enums.Language;

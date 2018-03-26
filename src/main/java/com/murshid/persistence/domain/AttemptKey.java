@@ -1,4 +1,4 @@
-package com.murshid.mysql.domain;
+package com.murshid.persistence.domain;
 
 import javax.persistence.Column;
 import javax.persistence.Embeddable;

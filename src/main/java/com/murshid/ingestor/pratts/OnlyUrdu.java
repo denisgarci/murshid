@@ -1,8 +1,8 @@
 package com.murshid.ingestor.pratts;
 
 import com.google.common.base.Strings;
-import com.murshid.ingestor.Scripts;
-import com.murshid.ingestor.utils.WordUtils;
+import com.murshid.ingestor.enums.Scripts;
+import com.murshid.ingestor.utils.IngestorWordUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -44,7 +44,7 @@ public class OnlyUrdu {
                 int numUrdus = 0;
                 String urdu = "";
                 for (String token : tokens) {
-                    if (!Strings.isNullOrEmpty(token) && WordUtils.scriptType(token) == Scripts.NASTALIQ) {
+                    if (!Strings.isNullOrEmpty(token) && IngestorWordUtils.scriptType(token) == Scripts.NASTALIQ) {
                         numUrdus++;
                         urdu = token;
                     }

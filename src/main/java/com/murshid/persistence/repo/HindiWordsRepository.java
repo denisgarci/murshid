@@ -1,7 +1,7 @@
-package com.murshid.mysql.repo;
+package com.murshid.persistence.repo;
 
 import com.murshid.models.enums.DictionarySource;
-import com.murshid.mysql.domain.HindiWord;
+import com.murshid.persistence.domain.HindiWord;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.CrudRepository;
 

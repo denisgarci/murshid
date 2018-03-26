@@ -1,8 +1,8 @@
 package com.murshid.ingestor.pratts;
 
 import com.google.common.base.Strings;
-import com.murshid.ingestor.Scripts;
-import com.murshid.ingestor.utils.WordUtils;
+import com.murshid.ingestor.enums.Scripts;
+import com.murshid.ingestor.utils.IngestorWordUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -47,14 +47,14 @@ public class First2Hindi2LastUrdus {
                     continue;
                 }
 
-                if (WordUtils.scriptType(tokens[0]) != Scripts.NASTALIQ && WordUtils.scriptType(tokens[1]) != Scripts.NASTALIQ
-                    || WordUtils.scriptType(tokens[2]) != Scripts.DEVANAGARI || WordUtils.scriptType(tokens[3]) != Scripts.DEVANAGARI){
+                if (IngestorWordUtils.scriptType(tokens[0]) != Scripts.NASTALIQ && IngestorWordUtils.scriptType(tokens[1]) != Scripts.NASTALIQ
+                    || IngestorWordUtils.scriptType(tokens[2]) != Scripts.DEVANAGARI || IngestorWordUtils.scriptType(tokens[3]) != Scripts.DEVANAGARI){
                     continue;
                 }
 
                 boolean restLatin = true;
                 for (int p=4; p<tokens.length; p++){
-                    if (Strings.isNullOrEmpty(tokens[p]) || WordUtils.scriptType(tokens[p]) != Scripts.LATIN){
+                    if (Strings.isNullOrEmpty(tokens[p]) || IngestorWordUtils.scriptType(tokens[p]) != Scripts.LATIN){
                         restLatin = false;
                         break;
                     }

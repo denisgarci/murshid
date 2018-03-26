@@ -2,8 +2,8 @@ package com.murshid.models;
 
 import com.murshid.models.enums.Accidence;
 import com.murshid.models.enums.PartOfSpeech;
-import com.murshid.mysql.domain.DictionaryKey;
-import com.murshid.mysql.repo.AccidenceConverter;
+import com.murshid.persistence.AccidenceColumnConverter;
+import com.murshid.persistence.domain.DictionaryKey;
 
 import javax.persistence.*;
 import java.util.List;
@@ -18,7 +18,7 @@ public class WikitionaryEntry {
     private String urduSpelling;
 
     @Column
-    @Convert (converter = AccidenceConverter.class)
+    @Convert (converter = AccidenceColumnConverter.class)
     private List<Accidence> accidence;
 
     private String meaning;

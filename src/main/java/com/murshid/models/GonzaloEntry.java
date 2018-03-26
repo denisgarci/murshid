@@ -1,6 +1,7 @@
 package com.murshid.models;
 
-import com.murshid.persistence.AccidenceConverter;
+import com.murshid.models.enums.Accidence;
+import com.murshid.persistence.AccidenceColumnConverter;
 
 import javax.persistence.*;
 import java.util.List;
@@ -15,7 +16,7 @@ public class GonzaloEntry {
     private String urduWord;
 
     @Column
-    @Convert (converter = AccidenceConverter.class)
+    @Convert (converter = AccidenceColumnConverter.class)
     private List<Accidence> accidence;
 
     private String meaning;

@@ -1,6 +1,6 @@
 package com.murshid.ingestor.pratts;
 
-import com.murshid.ingestor.utils.WordUtils;
+import com.murshid.ingestor.utils.IngestorWordUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -56,13 +56,13 @@ public class SeparateUrduDerivations {
                 int id = rs.getInt("id");
                 String head = rs.getString("head");
 
-                if (!WordUtils.lastWordIsUrdu(head)) continue;
+                if (!IngestorWordUtils.lastWordIsUrdu(head)) continue;
 
-                String lastUrdu = WordUtils.getLastWord(head);
+                String lastUrdu = IngestorWordUtils.getLastWord(head);
 
                 for(String intento: intentos){
                     String intentoConUrdu = intento.concat(" ").concat(lastUrdu);
-                    if (WordUtils.endsWithUrduSafe(head, intentoConUrdu)){
+                    if (IngestorWordUtils.endsWithUrduSafe(head, intentoConUrdu)){
                         String headSansIntento = head.substring(0, head.length() - intentoConUrdu.length());
                         LOGGER.info("original={}", head);
                         LOGGER.info("sin intento={}", headSansIntento);

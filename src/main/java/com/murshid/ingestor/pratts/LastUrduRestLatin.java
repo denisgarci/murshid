@@ -1,8 +1,8 @@
 package com.murshid.ingestor.pratts;
 
 import com.google.common.base.Strings;
-import com.murshid.ingestor.Scripts;
-import com.murshid.ingestor.utils.WordUtils;
+import com.murshid.ingestor.enums.Scripts;
+import com.murshid.ingestor.utils.IngestorWordUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -47,13 +47,13 @@ public class LastUrduRestLatin {
 //                    continue;
 //                }
 
-                if (Strings.isNullOrEmpty(tokens[0]) ||  WordUtils.scriptType(tokens[0]) != Scripts.NASTALIQ){
+                if (Strings.isNullOrEmpty(tokens[0]) ||  IngestorWordUtils.scriptType(tokens[0]) != Scripts.NASTALIQ){
                     continue;
                 }
 
                 boolean restLatin = true;
                 for (int p=1; p<tokens.length; p++){
-                    if (Strings.isNullOrEmpty(tokens[p]) || WordUtils.scriptType(tokens[p]) != Scripts.LATIN){
+                    if (Strings.isNullOrEmpty(tokens[p]) || IngestorWordUtils.scriptType(tokens[p]) != Scripts.LATIN){
                         restLatin = false;
                         break;
                     }

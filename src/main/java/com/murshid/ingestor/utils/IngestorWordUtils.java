@@ -1,7 +1,7 @@
 package com.murshid.ingestor.utils;
 
 import com.google.common.base.Strings;
-import com.murshid.ingestor.Scripts;
+import com.murshid.ingestor.enums.Scripts;
 
 import java.util.Arrays;
 

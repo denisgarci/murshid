@@ -2,7 +2,7 @@ package com.murshid.utils;
 
 import java.util.Arrays;
 
-public class IngestorWordUtils {
+public class WordUtils {
 
     private static char ANUSVAARA = '\u0902';
     private static char CHANDRABINDU = '\u0901';

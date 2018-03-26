@@ -17,7 +17,7 @@ import com.murshid.mysql.domain.HindiWord;
 import com.murshid.mysql.repo.AttemptsRepository;
 import com.murshid.mysql.repo.HindiWordsRepository;
 import com.murshid.mysql.repo.WikitionaryRepository;
-import com.murshid.utils.IngestorWordUtils;
+import com.murshid.utils.WordUtils;
 import org.jsoup.nodes.Document;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -77,7 +77,7 @@ public class WikitionaryLetterIngestor implements Runnable{
 
             List<WikiEntry> entriesToWrite = attemptWithWord(currentWord, document);
             if (entriesToWrite.isEmpty()){
-                String withCandra = IngestorWordUtils.replaceAnusvaara(currentWord);
+                String withCandra = WordUtils.replaceAnusvaara(currentWord);
                 if (withCandra.equals(currentWord)){
 
                     entriesToWrite = attemptWithWord(withCandra, document);

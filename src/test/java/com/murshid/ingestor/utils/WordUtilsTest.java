@@ -10,7 +10,7 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotEquals;
 import static org.junit.Assert.assertTrue;
 
-public class IngestorWordUtilsTest {
+public class WordUtilsTest {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(IngestorWordUtilsTest.class);
     private static final Logger ERR_LOGGER = LoggerFactory.getLogger(IngestorWordUtilsTest.class);

@@ -1,7 +1,7 @@
 package com.murshid.ingestor.wikitionary;
 
 
-import com.murshid.models.Accidence;
+import com.murshid.ingestor.wikitionary.models.WikiAccidence;
 import com.murshid.ingestor.wikitionary.models.WikiEntry;
 import com.murshid.ingestor.wikitionary.models.WikiPartOfSpeech;
 import com.murshid.ingestor.wikitionary.models.WikiPosParagraph;
@@ -52,7 +52,7 @@ public class WikitionaryTest {
         assertFalse(paragraph.meanings.isEmpty());
         assertEquals(paragraph.meanings.get(0), "God");
         assertFalse(paragraph.accidence.isEmpty());
-        assertTrue(paragraph.accidence.contains(Accidence.MASCULINE));
+        assertTrue(paragraph.accidence.contains(WikiAccidence.MASCULINE));
     }
 
 
@@ -160,9 +160,9 @@ public class WikitionaryTest {
 
         assertTrue(wikiEntry.isPresent());
         assertEquals(wikiEntry.get().posParagraphs.size(), 1);
-        List<Accidence>  accidences = wikiEntry.get().posParagraphs.get(0).accidence;
-        assertTrue(accidences.contains(Accidence.MASCULINE));
-        assertTrue(accidences.contains(Accidence.PLURAL_NUMBER));
+        List<WikiAccidence>  accidences = wikiEntry.get().posParagraphs.get(0).accidence;
+        assertTrue(accidences.contains(WikiAccidence.MASCULINE));
+        assertTrue(accidences.contains(WikiAccidence.PLURAL_NUMBER));
 
     }
 
@@ -564,7 +564,7 @@ public class WikitionaryTest {
 
         assertNotNull(paragraph);
         assertFalse(paragraph.accidence.isEmpty());
-        assertTrue(paragraph.accidence.contains(Accidence.FEMININE) );
+        assertTrue(paragraph.accidence.contains(WikiAccidence.FEMININE) );
         assertFalse(paragraph.meanings.isEmpty());
         assertTrue(paragraph.meanings.get(0).contains("an exclamation of distress; a sigh"));
 

@@ -1,7 +1,8 @@
 package com.murshid.persistence;
 
 import com.google.common.collect.Lists;
-import com.murshid.models.Accidence;
+import com.murshid.models.enums.Accidence;
+import com.murshid.mysql.repo.AccidenceConverter;
 import org.junit.Test;
 
 import java.util.List;
@@ -15,12 +16,12 @@ public class AccidenceConverterTest {
     public void convertToDatabaseColumn() throws Exception {
         AccidenceConverter accidenceConverter = new AccidenceConverter();
 
-        List<Accidence> testList= Lists.newArrayList(Accidence.MASCULINE, Accidence.PLURAL_NUMBER);
+        List<Accidence> testList= Lists.newArrayList(Accidence.MASCULINE, Accidence.PLURAL);
         Object dbColumn = accidenceConverter.convertToDatabaseColumn(testList);
 
         assertNotNull(dbColumn);
         assertTrue(dbColumn instanceof String);
-        assertEquals(dbColumn, "[MASCULINE] [PLURAL_NUMBER]");
+        assertEquals(dbColumn, "[MASCULINE] [PLURAL]");
 
     }
 
@@ -28,10 +29,10 @@ public class AccidenceConverterTest {
     public void convertToEntityAttribute() throws Exception {
         AccidenceConverter accidenceConverter = new AccidenceConverter();
 
-        String testString = "[MASCULINE] [PLURAL_NUMBER]";
+        String testString = "[MASCULINE] [PLURAL]";
         Object appValue = accidenceConverter.convertToEntityAttribute(testString);
 
-        List<Accidence> testList= Lists.newArrayList(Accidence.MASCULINE, Accidence.PLURAL_NUMBER);
+        List<Accidence> testList= Lists.newArrayList(Accidence.MASCULINE, Accidence.PLURAL);
 
         assertNotNull(appValue);
         assertTrue(appValue instanceof List);

@@ -1,7 +1,7 @@
 package com.murshid.ingestor.pratts;
 
 import com.google.common.collect.ImmutableMap;
-import com.murshid.ingestor.ClientBuilderUtil;
+import com.murshid.ingestor.utils.ClientBuilderUtil;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;

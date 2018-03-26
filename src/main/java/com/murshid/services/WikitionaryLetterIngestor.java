@@ -1,7 +1,7 @@
 package com.murshid.services;
 
 import com.google.common.collect.Lists;
-import com.murshid.ingestor.FunctionUtil;
+import com.murshid.ingestor.utils.FunctionUtil;
 import com.murshid.ingestor.wikitionary.WikiUtils;
 import com.murshid.ingestor.wikitionary.WikitionaryCaller;
 import com.murshid.ingestor.wikitionary.models.WikiEntry;
@@ -57,10 +57,10 @@ public class WikitionaryLetterIngestor implements Runnable{
         List<HindiWord> targetHindiWords;
 
          if (retryFailed){
-             targetHindiWords = hindiWordsRepository.selectByInitialExceptSuccessful(letter, DictionarySource.WIKITIONARY);
+             targetHindiWords = hindiWordsRepository.selectByInitialExceptSuccessful(letter, DictionarySource.WIKITIONARY.name());
 
          } else {
-             targetHindiWords = hindiWordsRepository.selectByInitialExceptAllTried(letter, DictionarySource.WIKITIONARY);
+             targetHindiWords = hindiWordsRepository.selectByInitialExceptAllTried(letter, DictionarySource.WIKITIONARY.name());
          }
 
         WikitionaryCaller caller = new WikitionaryCaller();

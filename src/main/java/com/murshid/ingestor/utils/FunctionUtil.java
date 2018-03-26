@@ -1,4 +1,4 @@
-package com.murshid.ingestor;
+package com.murshid.ingestor.utils;
 
 import com.google.common.annotations.VisibleForTesting;
 import org.slf4j.Logger;

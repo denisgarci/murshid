@@ -1,7 +1,7 @@
 package com.murshid.ingestor.wikitionary;
 
 import com.google.common.collect.Lists;
-import com.murshid.ingestor.FunctionUtil;
+import com.murshid.ingestor.utils.FunctionUtil;
 import com.murshid.ingestor.wikitionary.models.WikiEntry;
 import com.murshid.ingestor.wikitionary.models.WikiPosParagraph;
 import org.slf4j.Logger;

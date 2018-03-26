@@ -1,4 +1,4 @@
-package com.murshid.ingestor;
+package com.murshid.ingestor.utils;
 
 import javax.ws.rs.client.Client;
 import javax.ws.rs.client.ClientBuilder;

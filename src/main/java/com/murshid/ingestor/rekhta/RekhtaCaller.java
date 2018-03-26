@@ -1,6 +1,6 @@
 package com.murshid.ingestor.rekhta;
 
-import com.murshid.ingestor.ClientBuilderUtil;
+import com.murshid.ingestor.utils.ClientBuilderUtil;
 import org.apache.http.client.utils.URIBuilder;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;

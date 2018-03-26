@@ -16,9 +16,8 @@ apply plugin: 'idea'
 apply plugin: 'org.springframework.boot'
 apply plugin: 'io.spring.dependency-management'
 
-bootJar {
-    baseName = 'murshid'
-    version =  '0.0.1'
+springBoot {
+    mainClass = 'com.murshid.IngestorApplication'
 }
 
 group = 'com.murshid'

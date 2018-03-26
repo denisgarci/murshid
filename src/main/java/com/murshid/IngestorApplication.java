@@ -1,6 +1,7 @@
 package com.murshid;
 
-import com.murshid.models.HindiWord;
+
+import com.murshid.mysql.domain.HindiWord;
 import com.murshid.services.HindiWordsService;
 import com.murshid.services.SongProcesspor;
 import org.springframework.boot.SpringApplication;
@@ -18,7 +19,7 @@ public class IngestorApplication {
 		context = SpringApplication.run(IngestorApplication.class, args);
 
 		//insertWord();
-        newWordsInSong();
+        //newWordsInSong();
 
 //
 //

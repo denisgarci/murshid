@@ -1,7 +1,7 @@
 package com.murshid.ingestor.wikitionary;
 
 import com.google.common.collect.Lists;
-import com.murshid.models.Accidence;
+import com.murshid.ingestor.wikitionary.models.WikiAccidence;
 import com.murshid.ingestor.wikitionary.models.WikiEntry;
 import com.murshid.ingestor.wikitionary.models.WikiPartOfSpeech;
 import com.murshid.ingestor.wikitionary.models.WikiPosParagraph;
@@ -56,7 +56,7 @@ public class WikiUtils {
                 if (abbrs!= null){
                     abbrs.forEach(abbr -> {
                         String accidenceLabel = abbr.attr("title");
-                        result.accidence.add(Accidence.fromLabel(accidenceLabel));
+                        result.accidence.add(WikiAccidence.fromLabel(accidenceLabel));
                     });
                 }
             });
@@ -243,7 +243,6 @@ public class WikiUtils {
             wikiEntry.IPAPronunciation = WikiUtils.ipaPronunciation(hindiH2.get());
 
             if (wikiEntry.posParagraphs.isEmpty()) {
-                LOGGER.info("Hindi entry found but no known part of speech found for entry " + entry + ". Attempting etymologies extraction");
                 return Optional.empty();
             }
         }catch (RuntimeException ex){

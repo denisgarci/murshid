@@ -1,7 +1,5 @@
 package com.murshid.ingestor.wikitionary.models;
 
-import com.murshid.models.Accidence;
-
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -13,7 +11,7 @@ public class WikiPosParagraph {
 
     public WikiPartOfSpeech partOfSpeech;
 
-    public List<Accidence> accidence = new ArrayList<>();
+    public List<WikiAccidence> accidence = new ArrayList<>();
 
     public Optional<String> urduSpelling;
 

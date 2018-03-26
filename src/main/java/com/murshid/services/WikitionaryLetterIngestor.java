@@ -131,9 +131,6 @@ public class WikitionaryLetterIngestor implements Runnable{
             }
         }
         LOGGER.info("finished processing letter {}", letter);
-
-
-
     }
 
     private List<WikiEntry> attemptWithWord(String word, Document document){

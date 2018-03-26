@@ -1,6 +1,8 @@
 package com.murshid;
 
 
+import com.murshid.dynamo.domain.Song;
+import com.murshid.dynamo.repo.SongRepository;
 import com.murshid.persistence.domain.HindiWord;
 import com.murshid.services.HindiWordsService;
 import com.murshid.services.SongProcesspor;
@@ -11,6 +13,7 @@ import org.springframework.context.ConfigurableApplicationContext;
 import java.util.Set;
 
 @SpringBootApplication
+
 public class IngestorApplication {
 
     private static ConfigurableApplicationContext context;
@@ -19,7 +22,7 @@ public class IngestorApplication {
 		context = SpringApplication.run(IngestorApplication.class, args);
 
 		//insertWord();
-        //newWordsInSong();
+        songRepo();
 
 //
 //
@@ -39,6 +42,12 @@ public class IngestorApplication {
 
 
 	}
+
+    private static void songRepo(){
+        SongRepository processor = context.getBean(SongRepository.class);
+        Song newWords = processor.findOne("Alvida");
+        System.out.println(newWords);
+    }
 
 	private static void insertWord(){
         HindiWordsService hindiWordsService = context.getBean(HindiWordsService.class);

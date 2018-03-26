@@ -1,6 +1,7 @@
 package com.murshid.models;
 
-import com.murshid.DictionarySource;
+
+import com.murshid.models.enums.DictionarySource;
 
 import javax.persistence.Column;
 import javax.persistence.Embeddable;

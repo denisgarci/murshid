@@ -42,7 +42,7 @@ public class RekhtaDBWriterByLetter implements Callable{
 
 
             PreparedStatement ps = con.prepareStatement(
-                    "INSERT INTO rekhta (latin, urdu, hindi, meaning) VALUES (?, ?, ?, ?)");
+                    "INSERT INTO rekhta (latin, urdu, hindi_word, word_index, meaning) VALUES (?, ?, ?, ?, ?)");
 
 
             Statement select = con.createStatement();
@@ -59,11 +59,13 @@ public class RekhtaDBWriterByLetter implements Callable{
                 Optional<List<RekhtaEntry>> result =  caller.fromStringEntry(word);
                 if (result.isPresent()){
                     List<RekhtaEntry> entries = result.get();
+
                     for (RekhtaEntry entry: entries){
                         index ++;
                         ps.setString(1, entry.latin);
                         ps.setString(2, entry.urdu);
-                        ps.setString(3, entry.hindi);
+                        ps.setString(3, entry.hindiWord);
+                        ps.setInt(4, entry.wordIndex);
                         ps.setString(4, entry.meaning);
                         ps.execute();
                     }

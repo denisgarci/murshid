@@ -72,7 +72,7 @@ public class First2Hindi2LastUrdus {
                 ps.setInt(4, id);
                 ps.execute();
                 LOGGER.info("head={}", head);
-                LOGGER.info("hindi={}, urdu={}, latin={}", hindi, urdu, latin);
+                LOGGER.info("hindiWord={}, urdu={}, latin={}", hindi, urdu, latin);
 
                 i++;
 

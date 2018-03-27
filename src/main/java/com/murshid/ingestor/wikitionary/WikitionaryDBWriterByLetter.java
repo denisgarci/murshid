@@ -50,7 +50,7 @@ public class WikitionaryDBWriterByLetter implements Callable {
 
 
             PreparedStatement attemptsPs = con.prepareStatement(
-                    "INSERT INTO attempts (entry, language, source, attempted_at, successful) values (?, 'hindi', 'wikitionary', current_timestamp, ?)");
+                    "INSERT INTO attempts (entry, language, source, attempted_at, successful) values (?, hindiWord, 'wikitionary', current_timestamp, ?)");
 
 
             PreparedStatement ps = con.prepareStatement(

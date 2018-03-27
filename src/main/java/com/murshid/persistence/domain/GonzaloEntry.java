@@ -1,5 +1,6 @@
 package com.murshid.persistence.domain;
 
+import com.murshid.models.CanonicalKey;
 import com.murshid.models.DictionaryKey;
 import com.murshid.models.enums.Accidence;
 import com.murshid.models.enums.PartOfSpeech;

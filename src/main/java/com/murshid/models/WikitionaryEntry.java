@@ -3,7 +3,6 @@ package com.murshid.models;
 import com.murshid.models.enums.Accidence;
 import com.murshid.models.enums.PartOfSpeech;
 import com.murshid.persistence.AccidenceColumnConverter;
-import com.murshid.persistence.domain.DictionaryKey;
 
 import javax.persistence.*;
 import java.util.List;

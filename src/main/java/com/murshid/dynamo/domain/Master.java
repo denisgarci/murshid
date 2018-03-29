@@ -2,6 +2,7 @@ package com.murshid.dynamo.domain;
 
 import com.murshid.models.CanonicalKey;
 import com.murshid.models.enums.Accidence;
+import com.murshid.models.enums.PartOfSpeech;
 
 import java.util.List;
 
@@ -12,6 +13,8 @@ public class Master {
     private int wordIndex;
 
     private String urduSpelling;
+
+    private PartOfSpeech partOfSpeech;
 
     private List<Accidence> accidence;
 
@@ -62,5 +65,12 @@ public class Master {
         return this;
     }
 
+    public PartOfSpeech getPartOfSpeech() {
+        return partOfSpeech;
+    }
 
+    public Master setPartOfSpeech(PartOfSpeech partOfSpeech) {
+        this.partOfSpeech = partOfSpeech;
+        return this;
+    }
 }

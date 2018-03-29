@@ -1,23 +1,12 @@
 package com.murshid.services;
 
 import com.google.common.collect.Lists;
-import com.murshid.ingestor.utils.FunctionUtil;
 import com.murshid.ingestor.wikitionary.WikiUtils;
 import com.murshid.ingestor.wikitionary.WikitionaryCaller;
 import com.murshid.ingestor.wikitionary.models.WikiEntry;
-import com.murshid.ingestor.wikitionary.models.WikiPosParagraph;
-import com.murshid.models.DictionaryKey;
-import com.murshid.models.WikitionaryEntry;
 import com.murshid.models.enums.DictionarySource;
-import com.murshid.models.enums.Language;
-import com.murshid.models.enums.PartOfSpeech;
-import com.murshid.persistence.domain.Attempt;
-import com.murshid.persistence.domain.AttemptKey;
 import com.murshid.persistence.domain.HindiWord;
-import com.murshid.persistence.repo.AttemptsRepository;
 import com.murshid.persistence.repo.HindiWordsRepository;
-import com.murshid.persistence.repo.WikitionaryRepository;
-import com.murshid.utils.WordUtils;
 import org.jsoup.nodes.Document;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -25,9 +14,6 @@ import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
 import javax.inject.Inject;
-import java.net.SocketTimeoutException;
-import java.sql.Timestamp;
-import java.time.Duration;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -67,69 +53,9 @@ public class WikitionaryLetterIngestor implements Runnable{
         String currentWord = null;
 
         for (HindiWord hindiWord: targetHindiWords){
-            currentWord = hindiWord.getWord();
-
-            String retryMsg = "Crawling failed for word " + currentWord + " retrying [{}x]";
-            String failureMsg = "Could not properly crawl word " + currentWord;
-            org.jsoup.nodes.Document document = FunctionUtil.retryFn(() -> WikitionaryCaller.documentForWord(caller, hindiWord.getWord()),
-                                                                     e -> e instanceof SocketTimeoutException || e instanceof javax.ws.rs.ProcessingException ,
-                                                                     Duration.ofSeconds(1).toMillis(), retryMsg, failureMsg);
-
-            List<WikiEntry> entriesToWrite = attemptWithWord(currentWord, document);
-            if (entriesToWrite.isEmpty()){
-                String withCandra = WordUtils.replaceAnusvaara(currentWord);
-                if (withCandra.equals(currentWord)){
-
-                    entriesToWrite = attemptWithWord(withCandra, document);
-                    currentWord = withCandra;
-                }
-            }
-
-            if (!entriesToWrite.isEmpty()) {
-                int index = 0;
-                for (WikiEntry wikiEntry : entriesToWrite) {
-                    for (WikiPosParagraph par : wikiEntry.posParagraphs) {
-                        for (int parIndex = 0; parIndex < par.meanings.size(); parIndex++) {
-                            DictionaryKey dictionaryKey = new DictionaryKey()
-                                    .setWordIndex(index)
-                                    .setWord(currentWord);
-
-                            WikitionaryEntry wikitionaryEntry = new WikitionaryEntry()
-                                    .setDictionaryKey(dictionaryKey)
-                                    .setIpaPronunciation(wikiEntry.IPAPronunciation.orElse(null))
-                                    .setPartOfSpeech(PartOfSpeech.valueOf(par.partOfSpeech.name()))
-                                    .setAccidence(com.murshid.utils.AccidenceConverter.wikiToGeneralAccidentList(par.accidence))
-                                    .setUrduSpelling(par.urduSpelling.orElse(null))
-                                    .setMeaning(par.meanings.get(parIndex))
-                                    .setEtymology(wikiEntry.etymology.orElse(null));
-
-                            wikitionaryEntry = wikitionaryRepository.save(wikitionaryEntry);
-
-                            index++;
-
-                            AttemptKey attemptKey = new AttemptKey().setAttemptedAt(new Timestamp(System.currentTimeMillis()))
-                                    .setEntry(currentWord);
-
-                            Attempt attempt = new Attempt().setLanguage(Language.HINDI).setDictionarySource(DictionarySource.WIKITIONARY)
-                                .setAttemptKey(attemptKey).setSuccessful(true);
-
-                            attemptsRepository.save(attempt);
-
-                            LOGGER.info("new word ingested hidiWord={} meaning {}", hindiWord.getWord(), wikitionaryEntry.getMeaning());
-
-                        }
-                    }
-                }
-            } else {
-                AttemptKey attemptKey = new AttemptKey().setAttemptedAt(new Timestamp(System.currentTimeMillis()))
-                        .setEntry(currentWord);
-
-                Attempt attempt = new Attempt().setLanguage(Language.HINDI).setDictionarySource(DictionarySource.WIKITIONARY)
-                        .setAttemptKey(attemptKey).setSuccessful(false);
-
-                attemptsRepository.save(attempt);
-            }
+            wikitionaryWordProcessor.processWord(caller, hindiWord.getWord());
         }
+
         LOGGER.info("finished processing letter {}", letter);
     }
 
@@ -148,10 +74,8 @@ public class WikitionaryLetterIngestor implements Runnable{
     private HindiWordsRepository hindiWordsRepository;
 
     @Inject
-    private WikitionaryRepository wikitionaryRepository;
+    private WikitionaryWordProcessor wikitionaryWordProcessor;
 
-    @Inject
-    private AttemptsRepository attemptsRepository;
 
 
 }

@@ -1,12 +1,14 @@
 package com.murshid.models;
 
 
+import com.google.common.collect.ImmutableMap;
 import com.murshid.models.enums.DictionarySource;
 
 import javax.persistence.Column;
 import javax.persistence.Embeddable;
 import javax.persistence.Enumerated;
 import java.io.Serializable;
+import java.util.Map;
 
 @Embeddable
 public class CanonicalKey implements Serializable{
@@ -36,4 +38,21 @@ public class CanonicalKey implements Serializable{
         return this;
     }
 
+    public String getWord() {
+        return word;
+    }
+
+    public int getWordIndex() {
+        return wordIndex;
+    }
+
+    public DictionarySource getDictionarySource() {
+        return dictionarySource;
+    }
+
+    public Map<String, Object>  toMap(){
+        return ImmutableMap.of("canonical_word", word,
+                               "canonical_index", wordIndex,
+                               "dictonary_source", dictionarySource.name());
+    }
 }

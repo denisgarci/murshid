@@ -43,7 +43,7 @@ public class SongItemConverter {
 
         item = item.with("hindi_title", song.getTitleHindi());
 
-        item = item.with("media", song.getMedia());
+        item = item.withList("media", song.getMedia());
 
         return item;
     }

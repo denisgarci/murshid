@@ -6,7 +6,7 @@ public enum PartOfSpeech {
     CONJUNCTION("Conjunction"), PRONOUN("Pronoun"), INTERJECTION("Interjection"), LETTER("Letter"), NUMERAL("Numeral"),
     PROPER_NOUN("Proper noun"), PERFECT_PARTICIPLE("Perfect participle"), SUFFIX("Suffix"), PREFIX("Prefix"),
     ACRONYM("Acronym"), DETERMINER("Determiner"), PROVERB("Proverb"), VERB_FORM("Verb form"), PARTICLE("Particle"),
-    DIACRITIC("Diacritical mark"), PREPOSITION("Preposition");
+    DIACRITIC("Diacritical mark"), PREPOSITION("Preposition"), ADVERBIAL_PHRASE("Adverbial phrase");
 
     private String label;
 

@@ -1,9 +1,6 @@
 package com.murshid.dynamo.repo;
 
-import com.amazonaws.services.dynamodbv2.document.Item;
-import com.amazonaws.services.dynamodbv2.document.KeyAttribute;
-import com.amazonaws.services.dynamodbv2.document.PrimaryKey;
-import com.amazonaws.services.dynamodbv2.document.Table;
+import com.amazonaws.services.dynamodbv2.document.*;
 import com.murshid.models.converters.DynamoAccessor;
 import com.murshid.models.converters.MasterConverter;
 import com.murshid.dynamo.domain.Master;

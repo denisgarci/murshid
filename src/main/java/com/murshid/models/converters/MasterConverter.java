@@ -90,13 +90,18 @@ public class MasterConverter {
                 .map(av -> CanonicalKey.fromAvMap(av.getM()) )
                 .collect(Collectors.toList());
 
-        List<Accidence> accidence = sAvs.get("accidence")
-                .getL().stream()
-                .map(av -> Accidence.valueOf(av.getS()))
-                .collect(Collectors.toList());
+        AttributeValue accidenceAv = sAvs.get("accidence");
+        if (accidenceAv!= null) {
+            List<Accidence> accidence =
+            accidenceAv
+                    .getL().stream()
+                    .map(av -> Accidence.valueOf(av.getS()))
+                    .collect(Collectors.toList());
+            master.setAccidence(accidence);
+        }
 
         master.setCanonicalKeys(canonicalKeys);
-        master.setAccidence(accidence);
+
 
         return master;
     }
@@ -115,8 +120,11 @@ public class MasterConverter {
         item = item.withList("canonical_keys", master.getCanonicalKeys().stream()
                 .map(CanonicalKey::toMap).collect(Collectors.toList()));
 
-        item = item.withList("accidence", master.getAccidence().stream()
-                             .map(Accidence::name).collect(Collectors.toList()));
+        List<Accidence> accidence = master.getAccidence();
+        if (accidence != null) {
+            item = item.withList("accidence", accidence.stream()
+                    .map(Accidence::name).collect(Collectors.toList()));
+        }
 
         return item;
     }

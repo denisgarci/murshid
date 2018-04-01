@@ -1,8 +1,11 @@
 package com.murshid.dynamo.repo;
 
-import com.amazonaws.services.dynamodbv2.document.*;
-import com.murshid.dynamo.DynamoAccessor;
-import com.murshid.dynamo.MasterItemConverter;
+import com.amazonaws.services.dynamodbv2.document.Item;
+import com.amazonaws.services.dynamodbv2.document.KeyAttribute;
+import com.amazonaws.services.dynamodbv2.document.PrimaryKey;
+import com.amazonaws.services.dynamodbv2.document.Table;
+import com.murshid.models.converters.DynamoAccessor;
+import com.murshid.models.converters.MasterConverter;
 import com.murshid.dynamo.domain.Master;
 
 import javax.inject.Named;
@@ -19,13 +22,13 @@ public class MasterRepository {
         if (item == null){
             return null;
         }else{
-            return MasterItemConverter.convert(item);
+            return MasterConverter.convert(item);
         }
     }
 
     public void save(Master master){
         Table table = DynamoAccessor.dynamoDB.getTable("master");
-        Item item = MasterItemConverter.convert(master);
+        Item item = MasterConverter.convert(master);
         table.putItem(item);
     }
 

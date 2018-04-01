@@ -7,11 +7,14 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
 import javax.inject.Inject;
 
 @Controller
+@RequestMapping("wikitionary")
 public class WikitionaryController {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(WikitionaryController.class);
@@ -22,8 +25,8 @@ public class WikitionaryController {
         return "processing ...";
     }
 
-    @GetMapping("/processWord")
-    public String processWord(@RequestParam(name="hindiWord", required=true, defaultValue="false") String hindiWord) {
+    @GetMapping("/processWord/{hindiWord}")
+    public String processWord(@PathVariable(name="hindiWord", required=true) String hindiWord) {
         WikitionaryCaller wikitionaryCaller = new WikitionaryCaller();
         wikitionaryWordProcessor.processWord(wikitionaryCaller, hindiWord);
         LOGGER.info("received word " + hindiWord);

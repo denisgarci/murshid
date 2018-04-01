@@ -3,7 +3,7 @@ package com.murshid.services;
 import com.amazonaws.services.dynamodbv2.document.Item;
 import com.amazonaws.services.dynamodbv2.document.Table;
 import com.google.common.collect.Sets;
-import com.murshid.dynamo.DynamoAccessor;
+import com.murshid.models.converters.DynamoAccessor;
 import com.murshid.persistence.repo.HindiWordsRepository;
 import com.murshid.utils.SongUtils;
 

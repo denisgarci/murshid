@@ -3,8 +3,8 @@ package com.murshid.dynamo.repo;
 import com.amazonaws.services.dynamodbv2.document.Item;
 import com.amazonaws.services.dynamodbv2.document.KeyAttribute;
 import com.amazonaws.services.dynamodbv2.document.Table;
-import com.murshid.dynamo.DynamoAccessor;
-import com.murshid.dynamo.SongItemConverter;
+import com.murshid.models.converters.DynamoAccessor;
+import com.murshid.models.converters.SongConverter;
 import com.murshid.dynamo.domain.Song;
 
 import javax.inject.Named;
@@ -19,7 +19,7 @@ public class SongRepository {
         if (item == null){
             return null;
         }else{
-            return SongItemConverter.convert(item);
+            return SongConverter.convert(item);
         }
     }
 

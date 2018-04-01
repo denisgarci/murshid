@@ -1,11 +1,11 @@
-package com.murshid.dynamo;
+package com.murshid.models.converters;
 
 import com.amazonaws.services.dynamodbv2.document.Item;
 import com.murshid.dynamo.domain.Song;
 
 import java.util.List;
 
-public class SongItemConverter {
+public class SongConverter {
 
     public static Song convert(Item item){
         Song song = new Song();
@@ -31,6 +31,7 @@ public class SongItemConverter {
 
         return song;
     }
+
 
     public static Item convert(Song song){
         Item item = new Item();

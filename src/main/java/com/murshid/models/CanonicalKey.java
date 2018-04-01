@@ -1,8 +1,10 @@
 package com.murshid.models;
 
 
+import com.amazonaws.services.dynamodbv2.model.AttributeValue;
 import com.google.common.collect.ImmutableMap;
 import com.murshid.models.enums.DictionarySource;
+import org.apache.commons.lang3.builder.EqualsBuilder;
 
 import javax.persistence.Column;
 import javax.persistence.Embeddable;
@@ -53,6 +55,25 @@ public class CanonicalKey implements Serializable{
     public Map<String, Object>  toMap(){
         return ImmutableMap.of("canonical_word", word,
                                "canonical_index", wordIndex,
-                               "dictonary_source", dictionarySource.name());
+                               "dictionary_source", dictionarySource.name());
+    }
+
+    public static Map<String, AttributeValue>  toAvMap(CanonicalKey canonicalKey ){
+        return ImmutableMap.of("canonical_word", new AttributeValue().withS(canonicalKey.word),
+                               "canonical_index", new AttributeValue().withN(Integer.toString(canonicalKey.wordIndex)),
+                               "dictionary_source", new AttributeValue().withS(canonicalKey.dictionarySource.name()));
+    }
+
+    public static CanonicalKey  fromAvMap(Map<String, AttributeValue> avMap){
+        CanonicalKey canonicalKey = new CanonicalKey();
+        canonicalKey.setWord(avMap.get("canonical_word").getS());
+        canonicalKey.setWordIndex(Integer.valueOf(avMap.get("canonical_index").getN()));
+        canonicalKey.setDictionarySource(DictionarySource.valueOf(avMap.get("dictionary_source").getS()));
+        return canonicalKey;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        return EqualsBuilder.reflectionEquals(this, obj);
     }
 }

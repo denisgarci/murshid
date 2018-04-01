@@ -22,7 +22,7 @@ public class IngestorApplication {
 		context = SpringApplication.run(IngestorApplication.class, args);
 
 		//insertWord();
-        songRepo();
+        //songRepo();
 
 //
 //

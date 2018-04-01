@@ -1,4 +1,4 @@
-package com.murshid.dynamo;
+package com.murshid.models.converters;
 
 import com.amazonaws.auth.AWSCredentials;
 import com.amazonaws.auth.BasicAWSCredentials;
@@ -10,11 +10,13 @@ public class DynamoAccessor {
 
     public static DynamoDB dynamoDB;
 
+    public static AmazonDynamoDB client;
+
     static {
         AWSCredentials awsCredentials = new BasicAWSCredentials("key1", "key2");
-        AmazonDynamoDB amazonDynamoDB = new AmazonDynamoDBClient(awsCredentials);
-        amazonDynamoDB.setEndpoint("http://localhost:8000/");
-        dynamoDB = new DynamoDB(amazonDynamoDB);
+        client = new AmazonDynamoDBClient(awsCredentials);
+        client.setEndpoint("http://localhost:8000/");
+        dynamoDB = new DynamoDB(client);
     }
 
 

@@ -8,7 +8,7 @@ public enum Accidence {
     FACTUAL("factual"), CONTRAFACTUAL("contrafactual"),
     _1ST("first person"), _2ND("second person"), _3RD("thrid person"),
     ACTIVE("active"), PASSIVE("passive"),
-    NON_ASPECTUAL("non aspectual"), HABITUAL("habitual"), CONTINUOUS("continuous"), PERFECTIVE("perfective"),
+    NON_ASPECTUAL("non aspectual"), HABITUAL("habitual"), CONTINUOUS("continuous"), PERFECTIVE("perfective"), ABSOLUTIVE("absolutive"),
     PRESENT("present"), FUTURE("future"), PAST("past"),
     DIRECT("direct"), OBLIQUE("oblique"), VOCATIVE("vocative");
 
@@ -27,6 +27,5 @@ public enum Accidence {
         }
         throw new IllegalArgumentException("label " + label + " not supported");
     }
-
 
 }

@@ -1,6 +1,6 @@
 package com.murshid.ingestor.rekhta;
 
-public class RekhtaEntry {
+public class RekhtaWebEntry {
     public String latin;
     public String urdu;
     public String hindiWord;

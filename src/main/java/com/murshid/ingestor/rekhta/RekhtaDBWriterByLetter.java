@@ -56,11 +56,11 @@ public class RekhtaDBWriterByLetter implements Callable{
             int index = 0;
             while(rs.next()){
                 String word = rs.getString("word");
-                Optional<List<RekhtaEntry>> result =  caller.fromStringEntry(word);
+                Optional<List<RekhtaWebEntry>> result =  caller.fromStringEntry(word);
                 if (result.isPresent()){
-                    List<RekhtaEntry> entries = result.get();
+                    List<RekhtaWebEntry> entries = result.get();
 
-                    for (RekhtaEntry entry: entries){
+                    for (RekhtaWebEntry entry: entries){
                         index ++;
                         ps.setString(1, entry.latin);
                         ps.setString(2, entry.urdu);

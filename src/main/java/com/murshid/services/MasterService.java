@@ -37,6 +37,10 @@ public class MasterService {
                 .collect(Collectors.toList());
     }
 
+    public boolean exists(String hindiWord, int index){
+        return masterRepository.findOne(hindiWord, index).isPresent();
+    }
+
     public boolean save(Master master){
         try{
             masterRepository.save(master);

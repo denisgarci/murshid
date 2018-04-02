@@ -46,13 +46,13 @@ public class RekhtaCaller {
         Document document = Jsoup.parse(entity);
         Optional<Element> rekhtaElementOpt = extracRekhtaMeaning(document);
         if (rekhtaElementOpt.isPresent()){
-            List<RekhtaEntry> entries = extractEntry(rekhtaElementOpt.get());
+            List<RekhtaWebEntry> entries = extractEntry(rekhtaElementOpt.get());
             LOGGER.info("entries = ", entries);
 
         }
     }
 
-    public Optional<List<RekhtaEntry>> fromStringEntry(String entry) throws Exception{
+    public Optional<List<RekhtaWebEntry>> fromStringEntry(String entry) throws Exception{
         RekhtaCaller caller = new RekhtaCaller();
 
         URL url = caller.createUrlWithParams(entry);
@@ -70,21 +70,21 @@ public class RekhtaCaller {
         Document document = Jsoup.parse(entity);
         Optional<Element> rekhtaElementOpt = extracRekhtaMeaning(document);
         if (rekhtaElementOpt.isPresent()){
-            List<RekhtaEntry> entries = extractEntry(rekhtaElementOpt.get());
+            List<RekhtaWebEntry> entries = extractEntry(rekhtaElementOpt.get());
             return Optional.of(entries);
         }
         return Optional.empty();
     }
 
 
-    private static List<RekhtaEntry> extractEntry(Element rekhtaElement){
+    private static List<RekhtaWebEntry> extractEntry(Element rekhtaElement){
         Element ul = rekhtaElement.selectFirst("ul");
         Elements listEntries = ul.select("li");
-        List<RekhtaEntry> entries = new ArrayList<>();
+        List<RekhtaWebEntry> entries = new ArrayList<>();
 
         for (int i=0; i< entries.size(); i++){
             Element le = listEntries.get(i);
-            RekhtaEntry re = new RekhtaEntry();
+            RekhtaWebEntry re = new RekhtaWebEntry();
             Element left = le.selectFirst("div.dict_card_left");
             Element latin = left.selectFirst("h4");
             Element hindi =  left.selectFirst("h5");

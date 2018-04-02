@@ -6,20 +6,21 @@ import com.murshid.models.converters.MasterConverter;
 import com.murshid.dynamo.domain.Master;
 
 import javax.inject.Named;
+import java.util.Optional;
 
 @Named
 public class MasterRepository {
 
-    public Master findOne(String hindiWord, int wordIndex){
+    public Optional<Master> findOne(String hindiWord, int wordIndex){
         Table table = DynamoAccessor.dynamoDB.getTable("master");
         KeyAttribute keyAttribute = new KeyAttribute("title_latin", hindiWord);
         PrimaryKey primaryKey = new PrimaryKey().addComponent("hindi_word", hindiWord)
                 .addComponent("word_index", wordIndex);
         Item item = table.getItem(primaryKey);
         if (item == null){
-            return null;
+            return Optional.empty();
         }else{
-            return MasterConverter.convert(item);
+            return Optional.of(MasterConverter.convert(item));
         }
     }
 

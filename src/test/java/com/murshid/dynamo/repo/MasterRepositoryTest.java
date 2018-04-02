@@ -13,6 +13,8 @@ import org.springframework.test.context.junit4.SpringRunner;
 
 import javax.inject.Inject;
 
+import java.util.Optional;
+
 import static org.junit.Assert.*;
 
 @RunWith(SpringRunner.class)
@@ -21,10 +23,10 @@ public class MasterRepositoryTest {
 
     @Test
     public void findOne() throws Exception {
-        Master master = masterRepository.findOne("दिल", 0);
+        Optional<Master> master = masterRepository.findOne("दिल", 0);
 
-        assertNotNull(master);
-        assertEquals(master.getUrduSpelling(), "دل");
+        assertTrue(master.isPresent());
+        assertEquals(master.get().getUrduSpelling(), "دل");
 
     }
 

@@ -47,7 +47,7 @@ public class ShabdkoshCaller {
         LOGGER.info("SKEntry for {} is: {}", word,  skEntry);
     }
 
-//    public Optional<List<RekhtaEntry>> fromStringEntry(String entry) throws Exception{
+//    public Optional<List<RekhtaWebEntry>> fromStringEntry(String entry) throws Exception{
 //        ShabdkoshCaller caller = new ShabdkoshCaller();
 //
 //        URL url = caller.createUrlForWord(entry);
@@ -65,19 +65,19 @@ public class ShabdkoshCaller {
 //        Document document = Jsoup.parse(entity);
 //        Optional<Element> rekhtaElementOpt = extracSKMeaning(document);
 //        if (rekhtaElementOpt.isPresent()){
-//            List<RekhtaEntry> entries = extractEntry(rekhtaElementOpt.get());
+//            List<RekhtaWebEntry> entries = extractEntry(rekhtaElementOpt.get());
 //            return Optional.of(entries);
 //        }
 //        return Optional.empty();
 //    }
 
 
-//    private static List<RekhtaEntry> extractEntry(Element rekhtaElement){
+//    private static List<RekhtaWebEntry> extractEntry(Element rekhtaElement){
 //        Element ul = rekhtaElement.selectFirst("ul");
 //        Elements listEntries = ul.select("li");
-//        List<RekhtaEntry> entries = new ArrayList<>();
+//        List<RekhtaWebEntry> entries = new ArrayList<>();
 //        listEntries.forEach(le -> {
-//            RekhtaEntry re = new RekhtaEntry();
+//            RekhtaWebEntry re = new RekhtaWebEntry();
 //            Element left = le.selectFirst("div.dict_card_left");
 //            Element latin = left.selectFirst("h4");
 //            Element hindiWord =  left.selectFirst("h5");

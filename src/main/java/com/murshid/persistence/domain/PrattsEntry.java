@@ -8,9 +8,8 @@ import javax.persistence.*;
 @Entity(name = "pratts")
 public class PrattsEntry {
 
-    @Id @GeneratedValue
-    @Column(name = "id", nullable = false)
-    private int id;
+    @EmbeddedId
+    private DictionaryKey dictionaryKey;
 
     private int section;
 
@@ -18,7 +17,6 @@ public class PrattsEntry {
 
     @Column(name = "keystring", nullable = false)
     private String keystring;
-
 
     @Column(name = "head", nullable = false)
     private String head;
@@ -32,21 +30,9 @@ public class PrattsEntry {
     @Column(name = "urdu", nullable = true)
     private String urduWord;
 
-    @Embedded
-    private DictionaryKey dictionaryKey;
-
     @Enumerated(EnumType.STRING)
     @Column(name ="part_of_speech", nullable = true)
     private PartOfSpeech partOfSpeech;
-
-    public int getId() {
-        return id;
-    }
-
-    public PrattsEntry setId(int id) {
-        this.id = id;
-        return this;
-    }
 
     public int getSection() {
         return section;

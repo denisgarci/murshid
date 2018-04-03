@@ -5,6 +5,8 @@ import com.amazonaws.services.dynamodbv2.model.ScanRequest;
 import com.amazonaws.services.dynamodbv2.model.ScanResult;
 import com.murshid.dynamo.domain.Master;
 import com.murshid.dynamo.repo.MasterRepository;
+import com.murshid.models.CanonicalKey;
+import com.murshid.models.DictionaryKey;
 import com.murshid.models.converters.DynamoAccessor;
 import com.murshid.models.converters.MasterConverter;
 import org.slf4j.Logger;
@@ -51,8 +53,68 @@ public class MasterService {
         return true;
     }
 
+    /**
+     * checks if all canonical keys contained in Master (if any)
+     * really exist in the respective entities
+     * @param master    the Master recprd
+     * @return          true if all canonical keys exist, false otherwise
+     */
+    public boolean validateCanonicalKeys(Master master){
+
+        boolean anyDoesntExist = false;
+        if (master.getCanonicalKeys() == null){
+            return true;
+        }
+        for (int i=0; i< master.getCanonicalKeys().size(); i++){
+            CanonicalKey ck = master.getCanonicalKeys().get(i);
+            DictionaryKey dk = new DictionaryKey().setWord(ck.word).setWordIndex(ck.wordIndex);
+            switch (ck.dictionarySource){
+                case PRATTS:
+                    if (!prattsService.exists(dk)){
+                        anyDoesntExist = true;
+                        break;
+                    }
+                    break;
+                case GONZALO:
+                    if (!gonzaloService.exists(dk)){
+                        anyDoesntExist = true;
+                        break;
+                    }
+                    break;
+                case REKHTA:
+                    if (!rekhtaService.exists(dk)){
+                        anyDoesntExist = true;
+                        break;
+                    }
+                    break;
+                case WIKITIONARY:
+                    if (!wikitionaryService.exists(dk)){
+                        anyDoesntExist = true;
+                        break;
+                    }
+                    break;
+            }
+
+        };
+        return !anyDoesntExist;
+    }
+
     @Inject
     private MasterRepository masterRepository;
+
+    @Inject
+    private WikitionaryService wikitionaryService;
+
+    @Inject
+    private PrattsService prattsService;
+
+    @Inject
+    private GonzaloService gonzaloService;
+
+    @Inject
+    private RekhtaService rekhtaService;
+
+
 
 
 }

@@ -1,5 +1,6 @@
 package com.murshid.persistence.domain;
 
+import com.murshid.models.DictionaryKey;
 import com.murshid.models.enums.PartOfSpeech;
 
 import javax.persistence.*;
@@ -31,11 +32,8 @@ public class PrattsEntry {
     @Column(name = "urdu", nullable = true)
     private String urduWord;
 
-    @Column(name = "hindi_word", nullable = true)
-    private String hindiWord;
-
-    @Column(name = "word_index", nullable = true)
-    private String wordIndex;
+    @Embedded
+    private DictionaryKey dictionaryKey;
 
     @Enumerated(EnumType.STRING)
     @Column(name ="part_of_speech", nullable = true)
@@ -104,24 +102,6 @@ public class PrattsEntry {
         return this;
     }
 
-    public String getHindiWord() {
-        return hindiWord;
-    }
-
-    public PrattsEntry setHindiWord(String hindiWord) {
-        this.hindiWord = hindiWord;
-        return this;
-    }
-
-    public String getWordIndex() {
-        return wordIndex;
-    }
-
-    public PrattsEntry setWordIndex(String wordIndex) {
-        this.wordIndex = wordIndex;
-        return this;
-    }
-
     public String getKeystring() {
         return keystring;
     }
@@ -131,13 +111,21 @@ public class PrattsEntry {
         return this;
     }
 
-
     public String getHead() {
         return head;
     }
 
     public PrattsEntry setHead(String head) {
         this.head = head;
+        return this;
+    }
+
+    public DictionaryKey getDictionaryKey() {
+        return dictionaryKey;
+    }
+
+    public PrattsEntry setDictionaryKey(DictionaryKey dictionaryKey) {
+        this.dictionaryKey = dictionaryKey;
         return this;
     }
 

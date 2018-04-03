@@ -1,6 +1,5 @@
 package com.murshid.ingestor.pratts;
 
-import com.google.common.base.Strings;
 import com.murshid.ingestor.enums.Scripts;
 import com.murshid.ingestor.utils.IngestorWordUtils;
 import org.slf4j.Logger;
@@ -8,14 +7,15 @@ import org.slf4j.LoggerFactory;
 
 import java.sql.*;
 
-public class LatinUrduKeys {
+import static com.murshid.ingestor.pratts.AnalysisBodyForHindiUrdu.replaceFirstCapitals;
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(LatinUrduKeys.class);
+public class FirstLatinToLatin {
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(FirstLatinToLatin.class);
 
     public static void main(String[] args) {
 
         Connection con = null;
-        Statement st = null;
         ResultSet rs = null;
 
         String url = "jdbc:mysql://localhost:3306/pratts";
@@ -29,35 +29,31 @@ public class LatinUrduKeys {
 
 
             PreparedStatement ps = con.prepareStatement(
-                    "UPDATE entries SET latin = ?, urdu = ?  where id = ?");
+                    "UPDATE pratts SET latin=? where id = ?");
 
             Statement select = con.createStatement();
-            rs = select.executeQuery("select * from entries where hindi  is null or urdu is null or latin is null");
+            rs = select.executeQuery("SELECT body, id from pratts where latin  is null ");
 
             int i = 0;
             while (rs.next()) {
                 int id = rs.getInt("id");
-                String head = rs.getString("head");
+                String body = rs.getString("body");
 
-                String tokens[] = head.split(" ");
-                if (tokens.length != 2) continue;
-
-                if (Strings.isNullOrEmpty(tokens[0]) || Strings.isNullOrEmpty(tokens[1])){
-                    continue;
+                String body2 = replaceFirstCapitals(body);
+                if (!body.equals(body2)){
+                    body = body2;
                 }
 
-                if (IngestorWordUtils.scriptType(tokens[0]) != Scripts.NASTALIQ
-                        || IngestorWordUtils.scriptType(tokens[1]) != Scripts.LATIN){
-                    continue;
-                }
+                body2 = body2.substring(2);
 
-                String urdu = tokens[0];
-                String latin  = tokens[1];
+                String tokens[] = body2.split(" ");
+
+                String latin = firstLatin(tokens);
 
                 ps.setString(1, latin);
-                ps.setString(2, urdu);
-                ps.setInt(3, id);
+                ps.setInt(2, id);
                 ps.execute();
+
                 i++;
 
                 if (i % 100 == 0) {
@@ -83,6 +79,13 @@ public class LatinUrduKeys {
         }
     }
 
-
+    private static String firstLatin(String[] words ){
+        for (String string: words){
+            if (IngestorWordUtils.scriptType(string) == Scripts.LATIN){
+                return string;
+            }
+        }
+        return null;
+    }
 
 }

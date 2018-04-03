@@ -1,7 +1,12 @@
 package com.murshid.persistence.repo;
 
+import com.murshid.models.DictionaryKey;
 import com.murshid.persistence.domain.GonzaloEntry;
 import org.springframework.data.repository.CrudRepository;
 
-public interface GonzaloRepository extends CrudRepository<GonzaloEntry, String> {
+import java.util.List;
+
+public interface GonzaloRepository extends CrudRepository<GonzaloEntry, DictionaryKey> {
+
+    List<GonzaloEntry> findByDictionaryKey(DictionaryKey dictionaryKey);
 }

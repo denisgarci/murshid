@@ -26,8 +26,26 @@ public class MasterController {
         return result;
     }
 
-    @PostMapping
-    public ResponseEntity<String> persistPratts(@RequestBody Master masterEntry) {
+    @PostMapping("/insertNew")
+    public ResponseEntity<String> insertNew(@RequestBody Master masterEntry) {
+        if (isValid(masterEntry)) {
+            if (masterService.exists(masterEntry.getHindiWord(), masterEntry.getWordIndex())){
+                LOGGER.info("hindiWord {} index {} already exists in master", masterEntry.getHindiWord(), masterEntry.getWordIndex());
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
+            }
+            boolean success = masterService.save(masterEntry);
+            if (success) {
+                return ResponseEntity.status(HttpStatus.CREATED).build();
+            }else {
+                return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+            }
+        } else {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
+        }
+    }
+
+    @PostMapping("/upsert")
+    public ResponseEntity<String> upsert(@RequestBody Master masterEntry) {
         if (isValid(masterEntry)) {
             boolean success = masterService.save(masterEntry);
             if (success) {
@@ -58,6 +76,11 @@ public class MasterController {
 
         if (master.getPartOfSpeech() == null) {
             LOGGER.info("part of speech cannot be null");
+            return false;
+        }
+
+        if (!masterService.validateCanonicalKeys(master)){
+            LOGGER.info("some of the canonical keys are not present");
             return false;
         }
 

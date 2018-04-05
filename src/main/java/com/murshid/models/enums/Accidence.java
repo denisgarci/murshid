@@ -3,12 +3,13 @@ package com.murshid.models.enums;
 public enum Accidence {
     MASCULINE("masculine"), FEMININE("feminine"), NEUTER("neuter"),
     PLURAL("plural"), SINGULAR("singular"),
+    LONG_FORM("long form"),
     FORMAL("formal"), FAMILIAR("familiar"), INTIMATE("intimate"),
     INDICATIVE("indicative"), SUBJUNCTIVE("subjunctive"), CONDITIONAL("conditional"), IMPERATIVE("imperative"), PRESUMPTIVE("presumptive"),
     FACTUAL("factual"), CONTRAFACTUAL("contrafactual"),
     _1ST("first person"), _2ND("second person"), _3RD("thrid person"),
     ACTIVE("active"), PASSIVE("passive"),
-    NON_ASPECTUAL("non aspectual"), HABITUAL("habitual"), CONTINUOUS("continuous"), PERFECTIVE("perfective"), ABSOLUTIVE("absolutive"),
+    NON_ASPECTUAL("non aspectual"), HABITUAL("habitual"), CONTINUOUS("continuous"), PERFECTIVE("perfective"), IMPERFECTIVE("imperfective"), ABSOLUTIVE("absolutive"), VERBAL_NOUN("verbal noun"),
     PRESENT("present"), FUTURE("future"), PAST("past"),
     DIRECT("direct"), OBLIQUE("oblique"), VOCATIVE("vocative");
 

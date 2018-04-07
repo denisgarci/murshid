@@ -4,12 +4,15 @@ import com.murshid.models.CanonicalKey;
 import com.murshid.models.enums.Accidence;
 import com.murshid.models.enums.PartOfSpeech;
 
+import javax.persistence.Column;
 import java.util.List;
 
 public class Master {
 
+    @Column(name = "hindi_word")
     private String hindiWord;
 
+    @Column(name = "word_index")
     private int wordIndex;
 
     private String urduSpelling;

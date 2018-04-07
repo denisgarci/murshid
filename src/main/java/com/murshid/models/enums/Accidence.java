@@ -10,7 +10,7 @@ public enum Accidence {
     _1ST("first person"), _2ND("second person"), _3RD("thrid person"),
     ACTIVE("active"), PASSIVE("passive"),
     NON_ASPECTUAL("non aspectual"), HABITUAL("habitual"), CONTINUOUS("continuous"), PERFECTIVE("perfective"), IMPERFECTIVE("imperfective"), ABSOLUTIVE("absolutive"), VERBAL_NOUN("verbal noun"),
-    PRESENT("present"), FUTURE("future"), PAST("past"),
+    PRESENT("present"), FUTURE("future"), PAST("past"), PLUSQUAMPERFECT("plusquamperfect"),
     DIRECT("direct"), OBLIQUE("oblique"), VOCATIVE("vocative");
 
 

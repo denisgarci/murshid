@@ -19,11 +19,11 @@ public class NounCanonizerTest {
         Set<CanonicalResult> results = NounCanonizer.process(sonInflected);
 
         Set <CanonicalResult> expected = Sets.newHashSet(
-                new CanonicalResult().setPossiblePOS(Sets.newHashSet(PartOfSpeech.NOUN, PartOfSpeech.ADJECTIVE))
+                new CanonicalResult().setPossiblePOS(PartOfSpeech.NOUN)
                         .setCanonicalForm(sonCanonical).setAccidence(Sets.newHashSet(Accidence.SINGULAR, Accidence.OBLIQUE)),
-                new CanonicalResult().setPossiblePOS(Sets.newHashSet(PartOfSpeech.NOUN, PartOfSpeech.ADJECTIVE))
+                new CanonicalResult().setPossiblePOS(PartOfSpeech.NOUN)
                         .setCanonicalForm(sonCanonical).setAccidence(Sets.newHashSet(Accidence.SINGULAR, Accidence.VOCATIVE)),
-                new CanonicalResult().setPossiblePOS(Sets.newHashSet(PartOfSpeech.NOUN, PartOfSpeech.ADJECTIVE))
+                new CanonicalResult().setPossiblePOS(PartOfSpeech.NOUN)
                         .setCanonicalForm(sonCanonical).setAccidence(Sets.newHashSet(Accidence.PLURAL, Accidence.DIRECT))
         );
         assertTrue(results.containsAll(expected));
@@ -31,7 +31,7 @@ public class NounCanonizerTest {
         String sonPluralOblique = "बेटों";
         results = NounCanonizer.process(sonPluralOblique);
         expected = Sets.newHashSet(
-                new CanonicalResult().setPossiblePOS(Sets.newHashSet(PartOfSpeech.NOUN))
+                new CanonicalResult().setPossiblePOS(PartOfSpeech.NOUN)
                         .setCanonicalForm(sonCanonical).setAccidence(Sets.newHashSet(Accidence.PLURAL, Accidence.OBLIQUE))
         );
         assertTrue(results.containsAll(expected));
@@ -39,7 +39,7 @@ public class NounCanonizerTest {
         String sonPluralVocative = "बेटो";
         results = NounCanonizer.process(sonPluralVocative);
         expected = Sets.newHashSet(
-                new CanonicalResult().setPossiblePOS(Sets.newHashSet(PartOfSpeech.NOUN))
+                new CanonicalResult().setPossiblePOS(PartOfSpeech.NOUN)
                         .setCanonicalForm(sonCanonical).setAccidence(Sets.newHashSet(Accidence.PLURAL, Accidence.VOCATIVE))
         );
         assertTrue(results.containsAll(expected));
@@ -54,7 +54,7 @@ public class NounCanonizerTest {
         String daughterObliquePlural = "बेटियों";
         Set<CanonicalResult> results = NounCanonizer.process(daughterObliquePlural);
         Set <CanonicalResult> expected = Sets.newHashSet(
-                new CanonicalResult().setPossiblePOS(Sets.newHashSet(PartOfSpeech.NOUN))
+                new CanonicalResult().setPossiblePOS(PartOfSpeech.NOUN)
                         .setCanonicalForm(daughterCanonical).setAccidence(Sets.newHashSet(Accidence.PLURAL, Accidence.OBLIQUE))
         );
         assertTrue(results.containsAll(expected));
@@ -62,7 +62,7 @@ public class NounCanonizerTest {
         String daughterDirectPlural = "बेटियाँ";
         results = NounCanonizer.process(daughterDirectPlural);
         expected = Sets.newHashSet(
-                new CanonicalResult().setPossiblePOS(Sets.newHashSet(PartOfSpeech.NOUN))
+                new CanonicalResult().setPossiblePOS(PartOfSpeech.NOUN)
                         .setCanonicalForm(daughterCanonical).setAccidence(Sets.newHashSet(Accidence.PLURAL, Accidence.DIRECT))
         );
         assertTrue(results.containsAll(expected));
@@ -78,7 +78,7 @@ public class NounCanonizerTest {
         String thievesPluralOblique = "बाकुओं";
         Set<CanonicalResult> results = NounCanonizer.process(thievesPluralOblique);
         Set <CanonicalResult> expected = Sets.newHashSet(
-                new CanonicalResult().setPossiblePOS(Sets.newHashSet(PartOfSpeech.NOUN))
+                new CanonicalResult().setPossiblePOS(PartOfSpeech.NOUN)
                         .setCanonicalForm(thiefCanonical).setAccidence(Sets.newHashSet(Accidence.PLURAL, Accidence.OBLIQUE))
         );
         assertTrue(results.containsAll(expected));
@@ -92,7 +92,7 @@ public class NounCanonizerTest {
         String sisterPluralDirect = "बहनें";
         Set<CanonicalResult> results = NounCanonizer.process(sisterPluralDirect);
         Set <CanonicalResult> expected = Sets.newHashSet(
-                new CanonicalResult().setPossiblePOS(Sets.newHashSet(PartOfSpeech.NOUN))
+                new CanonicalResult().setPossiblePOS(PartOfSpeech.NOUN)
                         .setCanonicalForm(sisterCanonical).setAccidence(Sets.newHashSet(Accidence.PLURAL, Accidence.DIRECT))
         );
         assertTrue(results.containsAll(expected));
@@ -100,7 +100,7 @@ public class NounCanonizerTest {
         String sisterPluralOblique = "बहनों";
         results = NounCanonizer.process(sisterPluralOblique);
         expected = Sets.newHashSet(
-                new CanonicalResult().setPossiblePOS(Sets.newHashSet(PartOfSpeech.NOUN))
+                new CanonicalResult().setPossiblePOS(PartOfSpeech.NOUN)
                         .setCanonicalForm(sisterCanonical).setAccidence(Sets.newHashSet(Accidence.PLURAL, Accidence.OBLIQUE))
         );
         assertTrue(results.containsAll(expected));
@@ -108,7 +108,7 @@ public class NounCanonizerTest {
         String sisterPluralVocative = "बहनो";
         results = NounCanonizer.process(sisterPluralVocative);
         expected = Sets.newHashSet(
-                new CanonicalResult().setPossiblePOS(Sets.newHashSet(PartOfSpeech.NOUN))
+                new CanonicalResult().setPossiblePOS(PartOfSpeech.NOUN)
                         .setCanonicalForm(sisterCanonical).setAccidence(Sets.newHashSet(Accidence.PLURAL, Accidence.VOCATIVE))
         );
         assertTrue(results.containsAll(expected));

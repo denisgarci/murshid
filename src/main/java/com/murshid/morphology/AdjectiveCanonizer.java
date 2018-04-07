@@ -18,20 +18,19 @@ public class AdjectiveCanonizer {
      */
     public static Set<CanonicalResult> process(String inflectedForm){
         Set<CanonicalResult> results = new HashSet<>();
-        Set<PartOfSpeech> nounSet  = Sets.newHashSet(PartOfSpeech.NOUN);
 
         //masculine in -A
         if (inflectedForm.endsWith("े")){
             String canonicalForm = inflectedForm.substring(0, inflectedForm.length()-1).concat("ा");
-            results.add(new CanonicalResult().setPossiblePOS(nounSet)
+            results.add(new CanonicalResult().setPossiblePOS(PartOfSpeech.ADJECTIVE)
                                 .setCanonicalForm(canonicalForm).setAccidence(Sets.newHashSet(Accidence.SINGULAR, Accidence.OBLIQUE)));
-            results.add(new CanonicalResult().setPossiblePOS(nounSet)
+            results.add(new CanonicalResult().setPossiblePOS(PartOfSpeech.ADJECTIVE)
                                 .setCanonicalForm(canonicalForm).setAccidence(Sets.newHashSet(Accidence.SINGULAR, Accidence.VOCATIVE)));
-            results.add(new CanonicalResult().setPossiblePOS(nounSet)
+            results.add(new CanonicalResult().setPossiblePOS(PartOfSpeech.ADJECTIVE)
                                 .setCanonicalForm(canonicalForm).setAccidence(Sets.newHashSet(Accidence.PLURAL, Accidence.DIRECT)));
-            results.add(new CanonicalResult().setPossiblePOS(nounSet)
+            results.add(new CanonicalResult().setPossiblePOS(PartOfSpeech.ADJECTIVE)
                                 .setCanonicalForm(canonicalForm).setAccidence(Sets.newHashSet(Accidence.PLURAL, Accidence.OBLIQUE)));
-            results.add(new CanonicalResult().setPossiblePOS(nounSet)
+            results.add(new CanonicalResult().setPossiblePOS(PartOfSpeech.ADJECTIVE)
                                 .setCanonicalForm(canonicalForm).setAccidence(Sets.newHashSet(Accidence.PLURAL, Accidence.VOCATIVE)));
         }
 

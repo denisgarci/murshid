@@ -1,5 +1,6 @@
 package com.murshid.controllers;
 
+import com.google.common.collect.Sets;
 import com.murshid.dynamo.domain.Master;
 import com.murshid.services.MasterService;
 import org.slf4j.Logger;
@@ -21,7 +22,7 @@ public class MasterController {
 
     @GetMapping("/findWord")
     public @ResponseBody
-    List findInKeyAndBody(@RequestParam(name = "word") String word) {
+    List findInKeyAndBody(@RequestParam(name = "hindiWord") String word) {
         List result = masterService.getWords(word);
         return result;
     }
@@ -81,6 +82,11 @@ public class MasterController {
 
         if (!masterService.validateCanonicalKeys(master)){
             LOGGER.info("some of the canonical keys are not present");
+            return false;
+        }
+
+        if (!masterService.validateAccidence(master.getPartOfSpeech(), Sets.newHashSet(master.getAccidence()))){
+            LOGGER.info("inadequate accidence for the POS");
             return false;
         }
 

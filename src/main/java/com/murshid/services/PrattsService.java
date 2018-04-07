@@ -22,6 +22,10 @@ public class PrattsService {
         }
     }
 
+    public List<PrattsEntry> findByHindiWord(String hindiWord){
+        return prattsRepository.findByDictionaryKeyWord(hindiWord);
+    }
+
     public PrattsEntry save(PrattsEntry prattsEntry){
         prattsEntry.setBody(prattsEntry.getBody().replace("\n", ""));
         return prattsRepository.save(prattsEntry);

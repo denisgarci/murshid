@@ -36,9 +36,9 @@ public class MasterRepositoryTest {
                 .setHindiWord("कहानी")
                 .setPartOfSpeech(PartOfSpeech.NOUN)
                 .setCanonicalKeys(Lists.newArrayList(
-                        new CanonicalKey().setWord("कहानी").setWordIndex(0).setDictionarySource(DictionarySource.WIKITIONARY),
-                        new CanonicalKey().setWord("कहानी").setWordIndex(0).setDictionarySource(DictionarySource.REKHTA),
-                        new CanonicalKey().setWord("कहानी").setWordIndex(0).setDictionarySource(DictionarySource.PRATTS)
+                        new CanonicalKey().setHindiWord("कहानी").setWordIndex(0).setDictionarySource(DictionarySource.WIKITIONARY),
+                        new CanonicalKey().setHindiWord("कहानी").setWordIndex(0).setDictionarySource(DictionarySource.REKHTA),
+                        new CanonicalKey().setHindiWord("कहानी").setWordIndex(0).setDictionarySource(DictionarySource.PRATTS)
                 ))
                 .setUrduSpelling("کہانی")
                 .setWordIndex(0);

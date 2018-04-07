@@ -1,7 +1,7 @@
 package com.murshid.persistence.repo;
 
 import com.murshid.models.DictionaryKey;
-import com.murshid.models.WikitionaryEntry;
+import com.murshid.persistence.domain.WikitionaryEntry;
 import org.springframework.data.repository.CrudRepository;
 
 import java.util.List;

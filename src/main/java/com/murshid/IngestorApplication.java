@@ -28,9 +28,9 @@ public class IngestorApplication {
 //
 //        GonzaloRepository gonzaloRepository = context.getBean(GonzaloRepository.class);
 //
-//        DictionaryKey dictionaryKey = new DictionaryKey().setWord("बैरीयां").setWordIndex(0);
+//        DictionaryKey dictionaryKey = new DictionaryKey().setHindiWord("बैरीयां").setWordIndex(0);
 //
-//        CanonicalKey canonicalKey = new CanonicalKey().setWord("बैरी").setDictionarySource(DictionarySource.PRATTS);
+//        CanonicalKey canonicalKey = new CanonicalKey().setHindiWord("बैरी").setDictionarySource(DictionarySource.PRATTS);
 //
 //		List<Accidence> accidence = Lists.newArrayList(Accidence.MASCULINE, Accidence.PLURAL_NUMBER);
 //

@@ -12,6 +12,8 @@ public interface PrattsRepository extends CrudRepository<PrattsEntry, Integer> {
 
     List<PrattsEntry> findByDictionaryKeyWordOrUrduWord(String hindiWord, String urduWord);
 
+    List<PrattsEntry> findByDictionaryKeyWord(String hindiWord);
+
     List<PrattsEntry> findByDictionaryKey(DictionaryKey dictionaryKey);
 
 }

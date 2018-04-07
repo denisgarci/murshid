@@ -30,7 +30,7 @@ public class ExtractInitial {
             int i = 0;
             while (rs.next()) {
 
-                String word = rs.getString("word");
+                String word = rs.getString("hindiWord");
                 char initial = word.charAt(0);
                 if (initial == '_'){
                     initial = word.charAt(1);

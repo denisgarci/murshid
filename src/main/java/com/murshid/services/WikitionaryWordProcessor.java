@@ -7,12 +7,12 @@ import com.murshid.ingestor.wikitionary.WikitionaryCaller;
 import com.murshid.ingestor.wikitionary.models.WikiEntry;
 import com.murshid.ingestor.wikitionary.models.WikiPosParagraph;
 import com.murshid.models.DictionaryKey;
-import com.murshid.models.WikitionaryEntry;
 import com.murshid.models.enums.DictionarySource;
 import com.murshid.models.enums.Language;
 import com.murshid.models.enums.PartOfSpeech;
 import com.murshid.persistence.domain.Attempt;
 import com.murshid.persistence.domain.AttemptKey;
+import com.murshid.persistence.domain.WikitionaryEntry;
 import com.murshid.persistence.repo.AttemptsRepository;
 import com.murshid.persistence.repo.WikitionaryRepository;
 import com.murshid.utils.WordUtils;
@@ -38,8 +38,8 @@ public class WikitionaryWordProcessor {
 
     public void processWord(@Nonnull WikitionaryCaller caller,  @NotNull final String hindiWord){
 
-        String retryMsg = "Crawling failed for word " + hindiWord + " retrying [{}x]";
-        String failureMsg = "Could not properly crawl word " + hindiWord;
+        String retryMsg = "Crawling failed for hindiWord " + hindiWord + " retrying [{}x]";
+        String failureMsg = "Could not properly crawl hindiWord " + hindiWord;
         org.jsoup.nodes.Document document = FunctionUtil.retryFn(() -> WikitionaryCaller.documentForWord(caller, hindiWord),
                                                                  e -> e instanceof SocketTimeoutException || e instanceof javax.ws.rs.ProcessingException ,
                                                                  Duration.ofSeconds(1).toMillis(), retryMsg, failureMsg);
@@ -87,7 +87,7 @@ public class WikitionaryWordProcessor {
 
                         attemptsRepository.save(attempt);
 
-                        LOGGER.info("new word ingested hidiWord={} meaning {}", alternativeHindiWord, wikitionaryEntry.getMeaning());
+                        LOGGER.info("new hindiWord ingested hidiWord={} meaning {}", alternativeHindiWord, wikitionaryEntry.getMeaning());
 
                     }
                 }

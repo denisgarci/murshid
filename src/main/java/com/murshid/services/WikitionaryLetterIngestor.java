@@ -27,7 +27,7 @@ public class WikitionaryLetterIngestor implements Runnable{
     private boolean retryFailed;
 
     /**
-     * Reads words from the hindi_words list, and tries to ingest that word from the Wikidictionary website
+     * Reads words from the hindi_words list, and tries to ingest that hindiWord from the Wikidictionary website
      * @param letter            the initial of the hindi_words we select
      * @param retryFailed       true if we should leave out only words that were successfully ingested in the past, false
      *                          if we should leave out all words that were tried before, independently of success.

@@ -27,7 +27,7 @@ public class ShabdkoshCaller {
         //new PrattsCaller().invokeAll();
         ShabdkoshCaller caller = new ShabdkoshCaller();
 
-        //String word = "हैकल";
+        //String hindiWord = "हैकल";
         String word = "हैट";
 
         URL url = caller.createUrlWithParams(word);

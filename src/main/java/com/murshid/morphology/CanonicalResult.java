@@ -11,7 +11,7 @@ public class CanonicalResult {
 
     String canonicalForm;
 
-    Set<PartOfSpeech> possiblePOS = new HashSet<>();
+    PartOfSpeech possiblePOS;
 
     Set<Accidence> accidence = new HashSet<>();
 
@@ -51,11 +51,11 @@ public class CanonicalResult {
         return this;
     }
 
-    public Set<PartOfSpeech> getPossiblePOS() {
+    public PartOfSpeech getPossiblePOS() {
         return possiblePOS;
     }
 
-    public CanonicalResult setPossiblePOS(Set<PartOfSpeech> possiblePOS) {
+    public CanonicalResult setPossiblePOS(PartOfSpeech possiblePOS) {
         this.possiblePOS = possiblePOS;
         return this;
     }

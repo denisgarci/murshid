@@ -1,7 +1,7 @@
 package com.murshid.services;
 
 import com.murshid.models.DictionaryKey;
-import com.murshid.models.WikitionaryEntry;
+import com.murshid.persistence.domain.WikitionaryEntry;
 import com.murshid.persistence.repo.HindiWordsRepository;
 import com.murshid.persistence.repo.WikitionaryRepository;
 import org.springframework.beans.BeansException;

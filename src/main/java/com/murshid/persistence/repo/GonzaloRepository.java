@@ -9,4 +9,6 @@ import java.util.List;
 public interface GonzaloRepository extends CrudRepository<GonzaloEntry, DictionaryKey> {
 
     List<GonzaloEntry> findByDictionaryKey(DictionaryKey dictionaryKey);
+
+    List<GonzaloEntry> findByDictionaryKeyWord(String hindiWord);
 }

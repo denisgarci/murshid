@@ -24,6 +24,10 @@ public class GonzaloService {
         return exists(new DictionaryKey().setWord(hindiWord).setWordIndex(wordIndex));
     }
 
+    public List<GonzaloEntry> findByHindiWord(String hindiWord){
+        return gonzaloRepository.findByDictionaryKeyWord(hindiWord);
+    }
+
     public Optional<GonzaloEntry> findOne(DictionaryKey key){
         List<GonzaloEntry> result = gonzaloRepository.findByDictionaryKey(key);
         if (result.size() > 0){

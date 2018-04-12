@@ -45,7 +45,7 @@ public class RekhtaController {
             LOGGER.info("dictionary key cannot be null");
             return false;
         } else {
-            if (prattsEntry.getDictionaryKey().word == null) {
+            if (prattsEntry.getDictionaryKey().hindiWord == null) {
                 LOGGER.info("dictionary entry key cannot be null");
                 return false;
             }

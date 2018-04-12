@@ -70,11 +70,11 @@ public class WikitionaryDBWriterByLetter implements Callable {
 
             int transactionIndex = 0;
             while (rs.next()) {
-                String word = rs.getString("hindiWord");
+                String word = rs.getString("canonicalWord");
                 currentWord = word;
 
-                String retryMsg = "Crawling failed for hindiWord " + word + " retrying [{}x]";
-                String failureMsg = "Could not properly crawl hindiWord " + word;
+                String retryMsg = "Crawling failed for canonicalWord " + word + " retrying [{}x]";
+                String failureMsg = "Could not properly crawl canonicalWord " + word;
                 org.jsoup.nodes.Document document = FunctionUtil.retryFn(() -> WikitionaryCaller.documentForWord(caller, word),
                                             e -> e instanceof SocketTimeoutException || e instanceof javax.ws.rs.ProcessingException ,
                                             Duration.ofSeconds(1).toMillis(), retryMsg, failureMsg);

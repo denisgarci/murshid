@@ -44,7 +44,6 @@ dependencies {
     // Use MySQL Connector-J
     compile 'mysql:mysql-connector-java'
 
-
     //use the following 2 versions specifically for thr HTTP client
     compile group: 'javax.ws.rs', name: 'javax.ws.rs-api', version: '2.1-m01'
     compile group: 'org.glassfish.jersey.core', name: 'jersey-client', version: '2.24.1'

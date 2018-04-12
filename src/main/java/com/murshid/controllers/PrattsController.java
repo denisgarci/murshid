@@ -22,7 +22,7 @@ public class PrattsController {
 
     @GetMapping("/findAnywhere")
     public @ResponseBody
-    List<PrattsEntry> findInKeyAndBody(@RequestParam(name = "hindiWord") String word) {
+    List<PrattsEntry> findInKeyAndBody(@RequestParam(name = "word") String word) {
         List list = Lists.newArrayList(prattsService.findAnywhere(word));
         return list;
     }
@@ -47,8 +47,8 @@ public class PrattsController {
             LOGGER.info("dictionary key cannot be null");
             return false;
         } else {
-            if (prattsEntry.getDictionaryKey().word == null) {
-                LOGGER.info("hindi hindiWord cannot be null");
+            if (prattsEntry.getDictionaryKey().hindiWord == null) {
+                LOGGER.info("hindi canonicalWord cannot be null");
                 return false;
             }
         }

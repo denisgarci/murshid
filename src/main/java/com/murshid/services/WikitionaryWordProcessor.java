@@ -38,8 +38,8 @@ public class WikitionaryWordProcessor {
 
     public void processWord(@Nonnull WikitionaryCaller caller,  @NotNull final String hindiWord){
 
-        String retryMsg = "Crawling failed for hindiWord " + hindiWord + " retrying [{}x]";
-        String failureMsg = "Could not properly crawl hindiWord " + hindiWord;
+        String retryMsg = "Crawling failed for canonicalWord " + hindiWord + " retrying [{}x]";
+        String failureMsg = "Could not properly crawl canonicalWord " + hindiWord;
         org.jsoup.nodes.Document document = FunctionUtil.retryFn(() -> WikitionaryCaller.documentForWord(caller, hindiWord),
                                                                  e -> e instanceof SocketTimeoutException || e instanceof javax.ws.rs.ProcessingException ,
                                                                  Duration.ofSeconds(1).toMillis(), retryMsg, failureMsg);
@@ -63,7 +63,7 @@ public class WikitionaryWordProcessor {
                     for (int parIndex = 0; parIndex < par.meanings.size(); parIndex++) {
                         DictionaryKey dictionaryKey = new DictionaryKey()
                                 .setWordIndex(index)
-                                .setWord(alternativeHindiWord);
+                                .setHindiWord(alternativeHindiWord);
 
                         WikitionaryEntry wikitionaryEntry = new WikitionaryEntry()
                                 .setDictionaryKey(dictionaryKey)
@@ -87,7 +87,7 @@ public class WikitionaryWordProcessor {
 
                         attemptsRepository.save(attempt);
 
-                        LOGGER.info("new hindiWord ingested hidiWord={} meaning {}", alternativeHindiWord, wikitionaryEntry.getMeaning());
+                        LOGGER.info("new canonicalWord ingested hidiWord={} meaning {}", alternativeHindiWord, wikitionaryEntry.getMeaning());
 
                     }
                 }

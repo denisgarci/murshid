@@ -5,6 +5,8 @@ import org.junit.Test;
 import java.util.Set;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+
 
 public class SongUtilsTest {
 
@@ -13,6 +15,27 @@ public class SongUtilsTest {
         String test = "Hello world [something] here I am";
         test = SongUtils.removeTextBetweenBrackets(test);
         assertEquals(test, "Hello world  here I am");
+    }
+
+
+    @Test
+    public void complexBracketExtraction(){
+
+        String song = "अलविदा\n" +
+        "                [refrain - not in Hindi\n" +
+        "बैरीयां मेरे रब्बा \n" +
+        "क्यूँ हुआ मेरे रब्बा\n" +
+        "यूँ ना धावी यूँ ना धावी \n" +
+        "दो दिलों दी ये कहानी] \n" +
+
+         "मिट भी जाऊँ, ना मिटे ये कैसी प्यास है \n";
+
+        song = song.replaceAll("\\n", " ");
+        song = song.replaceAll("\\r", " ");
+
+        String extracted = SongUtils.removeTextBetweenBrackets(song);
+        assertFalse(extracted.contains("]"));
+        assertFalse(extracted.contains("["));
     }
 
     @Test

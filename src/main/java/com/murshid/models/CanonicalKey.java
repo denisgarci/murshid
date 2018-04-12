@@ -2,11 +2,14 @@ package com.murshid.models;
 
 
 import com.amazonaws.services.dynamodbv2.model.AttributeValue;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.common.collect.ImmutableMap;
 import com.murshid.models.enums.DictionarySource;
 import org.apache.commons.lang3.builder.EqualsBuilder;
 
+import javax.persistence.Column;
 import javax.persistence.Embeddable;
+import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
 import java.io.Serializable;
 import java.util.Map;
@@ -14,20 +17,26 @@ import java.util.Map;
 @Embeddable
 public class CanonicalKey implements Serializable{
 
-    public String hindiWord;
+    @JsonProperty("canonical_word")
+    @Column(name ="canonical_word")
+    public String canonicalWord;
 
-    public int wordIndex;
+    @JsonProperty("canonical_index")
+    @Column(name ="canonical_index")
+    public int canonicalIndex;
 
-    @Enumerated
+    @JsonProperty("dictionary_source")
+    @Column(name ="dictionary_source")
+    @Enumerated(EnumType.STRING)
     public DictionarySource dictionarySource;
 
-    public CanonicalKey setHindiWord(String hindiWord) {
-        this.hindiWord = hindiWord;
+    public CanonicalKey setCanonicalWord(String canonicalWord) {
+        this.canonicalWord = canonicalWord;
         return this;
     }
 
-    public CanonicalKey setWordIndex(int wordIndex) {
-        this.wordIndex = wordIndex;
+    public CanonicalKey setCanonicalIndex(int canonicalIndex) {
+        this.canonicalIndex = canonicalIndex;
         return this;
     }
 
@@ -36,12 +45,12 @@ public class CanonicalKey implements Serializable{
         return this;
     }
 
-    public String getHindiWord() {
-        return hindiWord;
+    public String getCanonicalWord() {
+        return canonicalWord;
     }
 
-    public int getWordIndex() {
-        return wordIndex;
+    public int getCanonicalIndex() {
+        return canonicalIndex;
     }
 
     public DictionarySource getDictionarySource() {
@@ -49,22 +58,22 @@ public class CanonicalKey implements Serializable{
     }
 
     public Map<String, Object>  toMap(){
-        return ImmutableMap.of("hindiWord", hindiWord,
-                               "wordIndex", wordIndex,
-                               "dictionarySource", dictionarySource.name());
+        return ImmutableMap.of("canonical_word", canonicalWord,
+                               "canonical_index", canonicalIndex,
+                               "dictionary_source", dictionarySource.name());
     }
 
     public static Map<String, AttributeValue>  toAvMap(CanonicalKey canonicalKey ){
-        return ImmutableMap.of("hindiWord", new AttributeValue().withS(canonicalKey.hindiWord),
-                               "wordIndex", new AttributeValue().withN(Integer.toString(canonicalKey.wordIndex)),
-                               "dictionarySource", new AttributeValue().withS(canonicalKey.dictionarySource.name()));
+        return ImmutableMap.of("canonical_word", new AttributeValue().withS(canonicalKey.canonicalWord),
+                               "canonical_index", new AttributeValue().withN(Integer.toString(canonicalKey.canonicalIndex)),
+                               "dictionary_source", new AttributeValue().withS(canonicalKey.dictionarySource.name()));
     }
 
     public static CanonicalKey  fromAvMap(Map<String, AttributeValue> avMap){
         CanonicalKey canonicalKey = new CanonicalKey();
-        canonicalKey.setHindiWord(avMap.get("hindiWord").getS());
-        canonicalKey.setWordIndex(Integer.valueOf(avMap.get("wordIndex").getN()));
-        canonicalKey.setDictionarySource(DictionarySource.valueOf(avMap.get("dictionarySource").getS()));
+        canonicalKey.setCanonicalWord(avMap.get("canonical_word").getS());
+        canonicalKey.setCanonicalIndex(Integer.valueOf(avMap.get("canonical_index").getN()));
+        canonicalKey.setDictionarySource(DictionarySource.valueOf(avMap.get("dictionary_source").getS()));
         return canonicalKey;
     }
 

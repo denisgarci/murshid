@@ -13,7 +13,7 @@ import java.util.Optional;
 public class PrattsService {
 
     public List<PrattsEntry> findAnywhere(String word){
-        List<PrattsEntry> inHindiOrUrdu = prattsRepository.findByDictionaryKeyWordOrUrduWord(word, word);
+        List<PrattsEntry> inHindiOrUrdu = prattsRepository.findByDictionaryKeyHindiWordOrUrduWord(word, word);
         if (inHindiOrUrdu.isEmpty()){
             String searchString = "%" + word + "%";
             return prattsRepository.findByBodyLikeOrKeystringLike(searchString, searchString);
@@ -23,7 +23,7 @@ public class PrattsService {
     }
 
     public List<PrattsEntry> findByHindiWord(String hindiWord){
-        return prattsRepository.findByDictionaryKeyWord(hindiWord);
+        return prattsRepository.findByDictionaryKeyHindiWord(hindiWord);
     }
 
     public PrattsEntry save(PrattsEntry prattsEntry){
@@ -36,13 +36,13 @@ public class PrattsService {
     }
 
     public boolean exists(String hindiWord, int wordIndex){
-        return exists(new DictionaryKey().setWord(hindiWord).setWordIndex(wordIndex));
+        return exists(new DictionaryKey().setHindiWord(hindiWord).setWordIndex(wordIndex));
     }
 
     public Optional<PrattsEntry> findOne(DictionaryKey key){
         List<PrattsEntry> result = prattsRepository.findByDictionaryKey(key);
         if (result.size() > 1){
-            throw new RuntimeException("unexpected size of results (" + result.size() + ") by DictionaryKey in Pratts hindiWOrd=" + key.word + " wordIndex=" +  key.wordIndex);
+            throw new RuntimeException("unexpected size of results (" + result.size() + ") by DictionaryKey in Pratts hindiWOrd=" + key.hindiWord + " canonicalIndex=" + key.wordIndex);
         }else if (result.isEmpty()){
             return Optional.empty();
         }else{

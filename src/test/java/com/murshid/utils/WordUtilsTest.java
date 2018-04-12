@@ -2,7 +2,10 @@ package com.murshid.utils;
 
 import org.junit.Test;
 
-import static org.junit.Assert.assertEquals;
+import java.util.Set;
+
+import static org.junit.Assert.*;
+
 
 public class WordUtilsTest {
 
@@ -27,6 +30,25 @@ public class WordUtilsTest {
         assertEquals(milungaChandra, WordUtils.replaceAnusvaara(milungaAnus));
 
     }
+
+    @Test
+    public void explodeHehs() throws Exception {
+
+        //iniciales
+        String hogaWithHehGoal = "ہوگا";
+        String hogaWithHehDoachsmee = "ھوگا";
+        Set<String> exploded = WordUtils.explodeHehs(hogaWithHehGoal);
+
+        assertTrue(exploded.contains(hogaWithHehDoachsmee));
+
+        String huinWithGoal = "ہونیں";
+        String huinWithGeDoChashmee = "هونیں";
+        exploded = WordUtils.explodeHehs(huinWithGeDoChashmee);
+        assertTrue(exploded.contains(huinWithGoal));
+
+
+    }
+
 
 
 

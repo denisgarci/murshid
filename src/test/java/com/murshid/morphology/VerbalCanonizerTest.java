@@ -35,7 +35,7 @@ public class VerbalCanonizerTest {
 
         Set <CanonicalResult> expected = Sets.newHashSet(
                 new CanonicalResult().setPossiblePOS(PartOfSpeech.VERB)
-                        .setCanonicalForm(speakcanonical).setAccidence(Sets.newHashSet(Accidence.IMPERATIVE, Accidence.FORMAL))
+                        .setCanonicalForm(speakcanonical).setAccidence(Sets.newHashSet(Accidence.IMPERATIVE, Accidence._3RD, Accidence.PLURAL))
         );
         assertTrue(results.containsAll(expected));
 
@@ -43,7 +43,7 @@ public class VerbalCanonizerTest {
         results = VerbalCanonizer.process(imperativeFormal2);
         expected = Sets.newHashSet(
                 new CanonicalResult().setPossiblePOS(PartOfSpeech.VERB)
-                        .setCanonicalForm(speakcanonical).setAccidence(Sets.newHashSet(Accidence.IMPERATIVE, Accidence.FORMAL))
+                        .setCanonicalForm(speakcanonical).setAccidence(Sets.newHashSet(Accidence.IMPERATIVE, Accidence._3RD, Accidence.PLURAL))
         );
         assertTrue(results.containsAll(expected));
 
@@ -52,7 +52,7 @@ public class VerbalCanonizerTest {
         results = VerbalCanonizer.process(imperativeInformal);
         expected = Sets.newHashSet(
                 new CanonicalResult().setPossiblePOS(PartOfSpeech.VERB)
-                        .setCanonicalForm(speakcanonical).setAccidence(Sets.newHashSet(Accidence.IMPERATIVE, Accidence.FAMILIAR))
+                        .setCanonicalForm(speakcanonical).setAccidence(Sets.newHashSet(Accidence.IMPERATIVE, Accidence._2ND, Accidence.PLURAL))
         );
         assertTrue(results.containsAll(expected));
 
@@ -61,7 +61,7 @@ public class VerbalCanonizerTest {
         results = VerbalCanonizer.process(imperativeIntimate);
         expected = Sets.newHashSet(
                 new CanonicalResult().setPossiblePOS(PartOfSpeech.VERB)
-                        .setCanonicalForm(speakcanonical).setAccidence(Sets.newHashSet(Accidence.IMPERATIVE, Accidence.INTIMATE))
+                        .setCanonicalForm(speakcanonical).setAccidence(Sets.newHashSet(Accidence.IMPERATIVE, Accidence._2ND, Accidence.SINGULAR))
         );
         assertTrue(results.containsAll(expected));
 

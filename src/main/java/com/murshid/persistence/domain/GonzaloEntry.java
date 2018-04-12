@@ -24,7 +24,7 @@ public class GonzaloEntry {
 
     private String meaning;
 
-    @Enumerated
+    @Enumerated(EnumType.STRING)
     @Column(name ="part_of_speech", nullable = true)
     private PartOfSpeech partOfSpeech;
 

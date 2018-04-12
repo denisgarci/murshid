@@ -47,7 +47,7 @@ public class WriteHindiWordsFromFile {
                     i++;
 
                     if (i % 20 == 0) {
-                        LOGGER.info("Writing hindiWord={}", word);
+                        LOGGER.info("Writing canonicalWord={}", word);
                         con.commit();
                     }
 

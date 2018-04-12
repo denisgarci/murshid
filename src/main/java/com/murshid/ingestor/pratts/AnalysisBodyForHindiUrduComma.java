@@ -85,7 +85,7 @@ public class AnalysisBodyForHindiUrduComma {
                 ps.setString(2, supposedHindi);
                 ps.setInt(3, id);
                 ps.execute();
-                LOGGER.info("hindiWord={}, urdu={}",  supposedHindi, supposedUrdu);
+                LOGGER.info("canonicalWord={}, urdu={}",  supposedHindi, supposedUrdu);
 
                 i++;
 

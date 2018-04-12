@@ -29,7 +29,8 @@ import java.util.stream.Collectors;
 public class MasterService {
     private static final Logger LOGGER = LoggerFactory.getLogger(MasterService.class);
 
-    private  static Set<PartOfSpeech> verbDerivates = Sets.newHashSet(PartOfSpeech.VERB, PartOfSpeech.ABSOLUTIVE, PartOfSpeech.VERBAL_NOUN, PartOfSpeech.PARTICIPLE);
+    private  static Set<PartOfSpeech> verbDerivates = Sets.newHashSet(PartOfSpeech.VERB, PartOfSpeech.ABSOLUTIVE, PartOfSpeech.VERBAL_NOUN,
+      PartOfSpeech.PARTICIPLE, PartOfSpeech.INFINITIVE);
 
     /**
      * true if the POS indicated in Master can refer to the POS indicated in the respective disctionarr tables.
@@ -39,6 +40,10 @@ public class MasterService {
      * @return              true if the link is valid, false if not
      */
     public boolean isDerivatePOS(PartOfSpeech root, PartOfSpeech derivate){
+        if (root == null){
+            LOGGER.info("the POS does not exist in the dictionary table");
+            return false;
+        }
         switch (root){
             case VERB:
                 return verbDerivates.contains(derivate);
@@ -47,13 +52,23 @@ public class MasterService {
         }
     }
 
+    public List<Master> getAllWords(){
+
+        ScanRequest scanRequest = new ScanRequest().withTableName("master");
+
+        ScanResult scanResult = DynamoAccessor.client.scan(scanRequest);
+        return scanResult.getItems()
+                .stream().map(MasterConverter::fromAvMap)
+                .collect(Collectors.toList());
+    }
+
     public List<Master> getWords(@Nonnull String word) {
 
         Map<String, AttributeValue> expressionAttributeValues =  new HashMap<String, AttributeValue>();
-        expressionAttributeValues.put(":hindiWord", new AttributeValue().withS(word));
+        expressionAttributeValues.put(":canonicalWord", new AttributeValue().withS(word));
 
         ScanRequest scanRequest = new ScanRequest()
-        .withTableName("master").withFilterExpression( "hindi_word = :hindiWord")
+        .withTableName("master").withFilterExpression( "hindi_word = :canonicalWord")
                 .withExpressionAttributeValues(expressionAttributeValues);
 
         ScanResult scanResult = DynamoAccessor.client.scan(scanRequest);
@@ -77,7 +92,10 @@ public class MasterService {
     }
 
 
-    public boolean validateAccidence(PartOfSpeech partOfSpeech, Set<Accidence> accidence){
+    public boolean validateAccidence(PartOfSpeech partOfSpeech, List<Accidence> accidence){
+        if (accidence == null){
+            accidence = Collections.EMPTY_LIST;
+        }
         boolean hasGender = accidence.contains(Accidence.MASCULINE) || accidence.contains(Accidence.FEMININE);
         boolean hasNumber = accidence.contains(Accidence.SINGULAR) || accidence.contains(Accidence.PLURAL);
         boolean hasCase = accidence.contains(Accidence.DIRECT) || accidence.contains(Accidence.OBLIQUE) || accidence.contains(Accidence.VOCATIVE);
@@ -85,7 +103,6 @@ public class MasterService {
         boolean hasPerson = accidence.contains(Accidence._1ST) || accidence.contains(Accidence._2ND) || accidence.contains(Accidence._3RD);
         //"subjunctive" is a tense for the moment
         boolean hasTense = accidence.contains(Accidence.PRESENT) || accidence.contains(Accidence.FUTURE) || accidence.contains(Accidence.PAST) || accidence.contains(Accidence.PLUSQUAMPERFECT) || accidence.contains(Accidence.SUBJUNCTIVE);
-        boolean hasFamiliarityDegree = accidence.contains(Accidence.FORMAL) || accidence.contains(Accidence.FAMILIAR) || accidence.contains(Accidence.INTIMATE);
 
         if (partOfSpeech == PartOfSpeech.NOUN || partOfSpeech == PartOfSpeech.ADJECTIVE){
             if (hasGender && hasNumber && hasCase && accidence.size() == 3) {
@@ -97,10 +114,19 @@ public class MasterService {
         }
 
         if (partOfSpeech == PartOfSpeech.PARTICIPLE){
-            if (hasGender && hasNumber && hasAspect && accidence.size() == 3){
+            if (hasGender && hasNumber && hasAspect && hasCase && accidence.size()  == 4){
                 return true;
             }else{
-                LOGGER.error("accidence validation failure: accidence validation error:part of speech PARTICIPLE has to have exactly gender, number and aspect");
+                LOGGER.error("accidence validation failure: accidence validation error:part of speech PARTICIPLE has to have exactly gender, number, aspect, and case");
+                return false;
+            }
+        }
+
+        if (partOfSpeech == PartOfSpeech.ABSOLUTIVE){
+            if (accidence.isEmpty()){
+                return true;
+            }else{
+                LOGGER.info("accidence validation failure: absolutive cannot have accidences");
                 return false;
             }
         }
@@ -110,11 +136,25 @@ public class MasterService {
                 LOGGER.info("accidence validation failure: part of speech VERB has to have at least person, number and tense");
                 return false;
             }
-            if (accidence.contains(Accidence._2ND) && !hasFamiliarityDegree){
-                LOGGER.info("accidence validation failure: second person verbs have to contain familiarity degree");
+            return true;
+        }
+
+        if (partOfSpeech == PartOfSpeech.INFINITIVE){
+            if ( hasGender &&  hasNumber && hasCase && accidence.size() == 3) {
+                return true;
+            }else{
+                LOGGER.info("accidence validation failure: part of speech INFINITIVE has to have number, gender and case");
                 return false;
             }
-            return true;
+        }
+
+        if (partOfSpeech == PartOfSpeech.VERBAL_NOUN){
+            if ( hasGender &&  hasNumber && hasCase && accidence.size() == 3) {
+                return true;
+            }else{
+                LOGGER.info("accidence validation failure: part of speech VERBAL_NPUN has to have number, gender and case");
+                return false;
+            }
         }
 
         return true;
@@ -134,46 +174,49 @@ public class MasterService {
         }
         for (int i=0; i< master.getCanonicalKeys().size(); i++){
             CanonicalKey ck = master.getCanonicalKeys().get(i);
-            DictionaryKey dk = new DictionaryKey().setWord(ck.hindiWord).setWordIndex(ck.wordIndex);
+            DictionaryKey dk = new DictionaryKey().setHindiWord(ck.canonicalWord).setWordIndex(ck.canonicalIndex);
 
             switch (ck.dictionarySource){
                 case PRATTS:
                     Optional<PrattsEntry> prattsEntry = prattsService.findOne(dk);
                     if (!prattsEntry.isPresent()){
-                        LOGGER.info("the PRATTS canonical entry hindiWord={} wordIndex={} indicated in Master does not exist", master.getHindiWord(), master.getWordIndex());
+                        LOGGER.info("the PRATTS canonical entry canonicalWord={} canonicalIndex={} indicated in Master does not exist", master.getHindiWord(), master.getWordIndex());
                         return false;
                     }else if (!isDerivatePOS(prattsEntry.get().getPartOfSpeech(), master.getPartOfSpeech())){
                         LOGGER.info("the POS indicated in Master ({}) is not a derivate of the entry in PRATTS ({})", master.getPartOfSpeech(), prattsEntry.get().getPartOfSpeech());
                         return false;
                     }
-
+                    break;
                 case GONZALO:
                     Optional<GonzaloEntry> gonzaloEntry = gonzaloService.findOne(dk);
                     if (!gonzaloEntry.isPresent()){
-                        LOGGER.info("the GONZALO canonical entry hindiWord={} wordIndex={} indicated in Master does not exist", master.getHindiWord(), master.getWordIndex());
+                        LOGGER.info("the GONZALO canonical entry canonicalWord={} canonicalIndex={} indicated in Master does not exist", master.getHindiWord(), master.getWordIndex());
                         return false;
                     }else if (!isDerivatePOS(gonzaloEntry.get().getPartOfSpeech(), master.getPartOfSpeech())){
                         LOGGER.info("the POS indicated in Master ({}) is not a derivate of the entry in GONZALO ({})", master.getPartOfSpeech(), gonzaloEntry.get().getPartOfSpeech());
                         return false;
                     }
+                    break;
                 case REKHTA:
                     Optional<RekhtaEntry> rekhtaEntry = rekhtaService.findOne(dk);
                     if (!rekhtaEntry.isPresent()){
-                        LOGGER.info("the REKHTA canonical entry hindiWord={} wordIndex={} indicated in Master does not exist", master.getHindiWord(), master.getWordIndex());
+                        LOGGER.info("the REKHTA canonical entry canonicalWord={} canonicalIndex={} indicated in Master does not exist", master.getHindiWord(), master.getWordIndex());
                         return false;
                     }else if (!isDerivatePOS(rekhtaEntry.get().getPartOfSpeech(), master.getPartOfSpeech())){
                         LOGGER.info("the POS indicated in Master ({}) is not a derivate of the entry in REKHTA ({})", master.getPartOfSpeech(), rekhtaEntry.get().getPartOfSpeech());
                         return false;
                     }
+                    break;
                 case WIKITIONARY:
                     Optional<WikitionaryEntry> wikitionaryEntry = wikitionaryService.findOne(dk);
                     if (!wikitionaryEntry.isPresent()){
-                        LOGGER.info("the WIKITIONARY canonical entry hindiWord={} wordIndex={} indicated in Master does not exist", master.getHindiWord(), master.getWordIndex());
+                        LOGGER.info("the WIKITIONARY canonical entry canonicalWord={} canonicalIndex={} indicated in Master does not exist", master.getHindiWord(), master.getWordIndex());
                         return false;
                     }else if (!isDerivatePOS(wikitionaryEntry.get().getPartOfSpeech(), master.getPartOfSpeech())){
                         LOGGER.info("the POS indicated in Master ({}) is not a derivate of the entry in WIKITIONARY ({})", master.getPartOfSpeech(), wikitionaryEntry.get().getPartOfSpeech());
                         return false;
                     }
+                    break;
             }
 
         };

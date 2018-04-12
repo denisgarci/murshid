@@ -29,24 +29,24 @@ public class VerbalCanonizer {
         if (inflectedForm.endsWith("ो")){
             String canonicalForm = inflectedForm.substring(0, inflectedForm.length()-1).concat("ना");
             results.add(new CanonicalResult().setPossiblePOS(PartOfSpeech.VERB)
-                                .setCanonicalForm(canonicalForm).setAccidence(Sets.newHashSet(Accidence.IMPERATIVE, Accidence.FAMILIAR)));
+                                .setCanonicalForm(canonicalForm).setAccidence(Sets.newHashSet(Accidence.IMPERATIVE, Accidence.PLURAL, Accidence._2ND)));
         }
         if (inflectedForm.endsWith("िए")){
             String canonicalForm = inflectedForm.substring(0, inflectedForm.length()-2).concat("ना");
             results.add(new CanonicalResult().setPossiblePOS(PartOfSpeech.VERB)
-                                .setCanonicalForm(canonicalForm).setAccidence(Sets.newHashSet(Accidence.IMPERATIVE, Accidence.FORMAL)));
+                                .setCanonicalForm(canonicalForm).setAccidence(Sets.newHashSet(Accidence.IMPERATIVE, Accidence.PLURAL, Accidence._3RD)));
         }
         if (inflectedForm.endsWith("िये")){
             String canonicalForm = inflectedForm.substring(0, inflectedForm.length()-3).concat("ना");
             results.add(new CanonicalResult().setPossiblePOS(PartOfSpeech.VERB)
-                                .setCanonicalForm(canonicalForm).setAccidence(Sets.newHashSet(Accidence.IMPERATIVE, Accidence.FORMAL)));
+                                .setCanonicalForm(canonicalForm).setAccidence(Sets.newHashSet(Accidence.IMPERATIVE, Accidence.PLURAL, Accidence._3RD)));
         }
 
         {
             String canonicalForm = inflectedForm.concat("ना");
             results.add(new CanonicalResult().setPossiblePOS(PartOfSpeech.VERB)
                                 .setCanonicalForm(canonicalForm)
-                                .setAccidence(Sets.newHashSet(Accidence.IMPERATIVE, Accidence.INTIMATE)));
+                                .setAccidence(Sets.newHashSet(Accidence.IMPERATIVE, Accidence.SINGULAR, Accidence._2ND)));
         }
 
         //absolutive
@@ -61,9 +61,15 @@ public class VerbalCanonizer {
                                     .setCanonicalForm(canonicalForm));
         }
 
-        //verbal noun
-        if (inflectedForm.endsWith("नेवला") || inflectedForm.endsWith("के")){
+        //verbal nouns
+        if (inflectedForm.endsWith("नेवला")){
             String canonicalForm = inflectedForm.substring(0, inflectedForm.length()-5).concat("ना");
+            results.add(new CanonicalResult().setPossiblePOS(PartOfSpeech.VERBAL_NOUN)
+                                .setCanonicalForm(canonicalForm));
+        }
+
+        if ( inflectedForm.endsWith("के")){
+            String canonicalForm = inflectedForm.substring(0, inflectedForm.length()-2).concat("ना");
             results.add(new CanonicalResult().setPossiblePOS(PartOfSpeech.VERBAL_NOUN)
                                 .setCanonicalForm(canonicalForm));
         }

@@ -21,16 +21,16 @@ public class GonzaloService {
     }
 
     public boolean exists(String hindiWord, int wordIndex){
-        return exists(new DictionaryKey().setWord(hindiWord).setWordIndex(wordIndex));
+        return exists(new DictionaryKey().setHindiWord(hindiWord).setWordIndex(wordIndex));
     }
 
     public List<GonzaloEntry> findByHindiWord(String hindiWord){
-        return gonzaloRepository.findByDictionaryKeyWord(hindiWord);
+        return gonzaloRepository.findByDictionaryKeyHindiWord(hindiWord);
     }
 
     public Optional<GonzaloEntry> findOne(DictionaryKey key){
         List<GonzaloEntry> result = gonzaloRepository.findByDictionaryKey(key);
-        if (result.size() > 0){
+        if (result.size() > 1){
             throw new RuntimeException("unexpected size of results by DictionaryKey in Gonzalo");
         }else if (result.isEmpty()){
             return Optional.empty();

@@ -8,7 +8,7 @@ import java.util.List;
 
 public interface RekhtaRepository extends CrudRepository<RekhtaEntry, DictionaryKey> {
 
-    List<RekhtaEntry> findByDictionaryKeyWord(String hindiWord);
+    List<RekhtaEntry> findByDictionaryKeyHindiWord(String hindiWord);
 
 
 }

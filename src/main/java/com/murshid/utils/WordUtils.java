@@ -1,6 +1,9 @@
 package com.murshid.utils;
 
+import com.google.common.collect.Sets;
+
 import java.util.Arrays;
+import java.util.Set;
 
 public class WordUtils {
 
@@ -35,6 +38,26 @@ public class WordUtils {
         }else{
             return original;
         }
+    }
+
+    private static char HEH_DOCHASHMEE = '\u06be';
+    private static char HEH_GOAL = '\u06C1';
+    private static char HEH = '\u0647';
+
+    public static Set<String> explodeHehs(String original) {
+        StringBuilder sb = new StringBuilder(original);
+        for (int i =0 ; i< sb.length(); i++){
+            char letter = sb.charAt(i);
+            if (letter == HEH_DOCHASHMEE || letter == HEH_GOAL || letter == HEH){
+                sb.setCharAt(i, '_');
+            }
+        }
+
+        String allHeh = sb.toString().replaceAll("_" , new String(new char[]{HEH}));
+        String allHehGoal = sb.toString().replaceAll("_" , new String(new char[]{HEH_GOAL}));
+        String allHehDoChashmee = sb.toString().replaceAll("_" , new String(new char[]{HEH_DOCHASHMEE}));
+
+        return Sets.newHashSet(allHeh, allHehDoChashmee, allHehGoal);
     }
 
 }

@@ -35,6 +35,10 @@ public class WikitionaryService implements ApplicationContextAware {
         pool.shutdown();
     }
 
+    public WikitionaryEntry save(WikitionaryEntry rekhtaEntry){
+        return wikitionaryRepository.save(rekhtaEntry);
+    }
+
     class LoggerThreadFactory implements ThreadFactory {
         private int counter;
         public Thread newThread(Runnable r) {
@@ -47,7 +51,7 @@ public class WikitionaryService implements ApplicationContextAware {
     }
 
     public boolean exists(String hindiWord, int index){
-        DictionaryKey dictionaryKey = new DictionaryKey().setWord(hindiWord).setWordIndex(index);
+        DictionaryKey dictionaryKey = new DictionaryKey().setHindiWord(hindiWord).setWordIndex(index);
         return exists(dictionaryKey);
     }
 
@@ -56,12 +60,12 @@ public class WikitionaryService implements ApplicationContextAware {
     }
 
     public Optional<WikitionaryEntry> findOne(String hindiWord, int wordIndex){
-        DictionaryKey key = new DictionaryKey().setWord(hindiWord).setWordIndex(wordIndex);
+        DictionaryKey key = new DictionaryKey().setHindiWord(hindiWord).setWordIndex(wordIndex);
         return findOne(key);
     }
 
     public List<WikitionaryEntry> findByHindiWord(String hindiWord){
-        return wikitionaryRepository.findByDictionaryKeyWord(hindiWord);
+        return wikitionaryRepository.findByDictionaryKeyHindiWord(hindiWord);
     }
 
     @Override

@@ -8,5 +8,5 @@ import java.util.List;
 
 public interface WikitionaryRepository extends CrudRepository<WikitionaryEntry, DictionaryKey> {
 
-    List<WikitionaryEntry> findByDictionaryKeyWord(String hindiWord);
+    List<WikitionaryEntry> findByDictionaryKeyHindiWord(String hindiWord);
 }

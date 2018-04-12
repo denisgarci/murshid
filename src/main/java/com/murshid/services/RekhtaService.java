@@ -26,12 +26,12 @@ public class RekhtaService {
     }
 
     public boolean exists(String hindiWord, int index){
-        DictionaryKey dictionaryKey = new DictionaryKey().setWord(hindiWord).setWordIndex(index);
+        DictionaryKey dictionaryKey = new DictionaryKey().setHindiWord(hindiWord).setWordIndex(index);
         return exists(dictionaryKey);
     }
 
     public List<RekhtaEntry> findByHindiWord(String hindiWord){
-        return rekhtaRepository.findByDictionaryKeyWord(hindiWord);
+        return rekhtaRepository.findByDictionaryKeyHindiWord(hindiWord);
     }
 
     @Inject

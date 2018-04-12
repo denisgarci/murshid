@@ -10,9 +10,9 @@ public interface PrattsRepository extends CrudRepository<PrattsEntry, Integer> {
 
     List<PrattsEntry> findByBodyLikeOrKeystringLike(String username, String aa);
 
-    List<PrattsEntry> findByDictionaryKeyWordOrUrduWord(String hindiWord, String urduWord);
+    List<PrattsEntry> findByDictionaryKeyHindiWordOrUrduWord(String hindiWord, String urduWord);
 
-    List<PrattsEntry> findByDictionaryKeyWord(String hindiWord);
+    List<PrattsEntry> findByDictionaryKeyHindiWord(String hindiWord);
 
     List<PrattsEntry> findByDictionaryKey(DictionaryKey dictionaryKey);
 

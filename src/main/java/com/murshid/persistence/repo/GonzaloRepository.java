@@ -10,5 +10,5 @@ public interface GonzaloRepository extends CrudRepository<GonzaloEntry, Dictiona
 
     List<GonzaloEntry> findByDictionaryKey(DictionaryKey dictionaryKey);
 
-    List<GonzaloEntry> findByDictionaryKeyWord(String hindiWord);
+    List<GonzaloEntry> findByDictionaryKeyHindiWord(String hindiWord);
 }

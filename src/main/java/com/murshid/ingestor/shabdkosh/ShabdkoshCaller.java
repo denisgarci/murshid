@@ -27,7 +27,7 @@ public class ShabdkoshCaller {
         //new PrattsCaller().invokeAll();
         ShabdkoshCaller caller = new ShabdkoshCaller();
 
-        //String hindiWord = "हैकल";
+        //String canonicalWord = "हैकल";
         String word = "हैट";
 
         URL url = caller.createUrlWithParams(word);
@@ -80,10 +80,10 @@ public class ShabdkoshCaller {
 //            RekhtaWebEntry re = new RekhtaWebEntry();
 //            Element left = le.selectFirst("div.dict_card_left");
 //            Element latin = left.selectFirst("h4");
-//            Element hindiWord =  left.selectFirst("h5");
+//            Element canonicalWord =  left.selectFirst("h5");
 //            Element urdu =  left.selectFirst("p.meaningUrduText");
 //            re.latin = latin.wholeText();
-//            re.hindiWord = hindiWord.wholeText();
+//            re.canonicalWord = canonicalWord.wholeText();
 //            re.urdu = urdu.wholeText();
 //            Element right = le.selectFirst("div.dict_card_right");
 //            re.meaning = right.selectFirst("h4").wholeText();

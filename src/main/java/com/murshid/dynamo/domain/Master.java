@@ -1,5 +1,6 @@
 package com.murshid.dynamo.domain;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.murshid.models.CanonicalKey;
 import com.murshid.models.enums.Accidence;
 import com.murshid.models.enums.PartOfSpeech;
@@ -9,18 +10,26 @@ import java.util.List;
 
 public class Master {
 
+    @JsonProperty("hindi_word")
     @Column(name = "hindi_word")
     private String hindiWord;
 
+    @JsonProperty("word_index")
     @Column(name = "word_index")
     private int wordIndex;
 
+    @JsonProperty("urdu_spelling")
+    @Column(name = "urdu_spelling")
     private String urduSpelling;
 
+    @JsonProperty("part_of_speech")
+    @Column(name = "part_of_speech")
     private PartOfSpeech partOfSpeech;
 
     private List<Accidence> accidence;
 
+    @JsonProperty("canonical_keys")
+    @Column(name = "canonical_keys")
     private List<CanonicalKey> canonicalKeys;
 
     public String getHindiWord() {

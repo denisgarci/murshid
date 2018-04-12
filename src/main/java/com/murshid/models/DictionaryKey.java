@@ -8,13 +8,13 @@ import java.io.Serializable;
 public class DictionaryKey implements Serializable{
 
     @Column(name = "hindi_word", nullable = false)
-    public String word;
+    public String hindiWord;
 
     @Column(name = "word_index", nullable = false)
     public int wordIndex;
 
-    public DictionaryKey setWord(String word) {
-        this.word = word;
+    public DictionaryKey setHindiWord(String hindiWord) {
+        this.hindiWord = hindiWord;
         return this;
     }
 

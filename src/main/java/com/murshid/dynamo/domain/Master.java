@@ -4,9 +4,13 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.murshid.models.CanonicalKey;
 import com.murshid.models.enums.Accidence;
 import com.murshid.models.enums.PartOfSpeech;
+import org.apache.commons.lang3.builder.EqualsBuilder;
+import org.apache.commons.lang3.builder.HashCodeBuilder;
 
 import javax.persistence.Column;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 public class Master {
 
@@ -18,15 +22,11 @@ public class Master {
     @Column(name = "word_index")
     private int wordIndex;
 
-    @JsonProperty("urdu_spelling")
-    @Column(name = "urdu_spelling")
-    private String urduSpelling;
-
     @JsonProperty("part_of_speech")
     @Column(name = "part_of_speech")
     private PartOfSpeech partOfSpeech;
 
-    private List<Accidence> accidence;
+    private Set<Accidence> accidence;
 
     @JsonProperty("canonical_keys")
     @Column(name = "canonical_keys")
@@ -50,20 +50,11 @@ public class Master {
         return this;
     }
 
-    public String getUrduSpelling() {
-        return urduSpelling;
-    }
-
-    public Master setUrduSpelling(String urduSpelling) {
-        this.urduSpelling = urduSpelling;
-        return this;
-    }
-
-    public List<Accidence> getAccidence() {
+    public Set<Accidence> getAccidence() {
         return accidence;
     }
 
-    public Master setAccidence(List<Accidence> accidence) {
+    public Master setAccidence(Set<Accidence> accidence) {
         this.accidence = accidence;
         return this;
     }
@@ -84,5 +75,42 @@ public class Master {
     public Master setPartOfSpeech(PartOfSpeech partOfSpeech) {
         this.partOfSpeech = partOfSpeech;
         return this;
+    }
+
+    @Override
+    public Object clone() {
+          Master master = new Master();
+          master.setAccidence(new HashSet<>(this.accidence));
+          master.setCanonicalKeys(this.canonicalKeys);
+          master.setPartOfSpeech(this.getPartOfSpeech());
+          master.setWordIndex(this.getWordIndex()+ 1);
+          return master;
+
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) { return true; }
+
+        if (!(o instanceof Master)) { return false; }
+
+        Master master = (Master) o;
+
+        return new EqualsBuilder()
+                .append(getHindiWord(), master.getHindiWord())
+                .append(getPartOfSpeech(), master.getPartOfSpeech())
+                .append(getAccidence(), master.getAccidence())
+                .append(getCanonicalKeys(), master.getCanonicalKeys())
+                .isEquals();
+    }
+
+    @Override
+    public int hashCode() {
+        return new HashCodeBuilder(17, 37)
+                .append(getHindiWord())
+                .append(getPartOfSpeech())
+                .append(getAccidence())
+                .append(getCanonicalKeys())
+                .toHashCode();
     }
 }

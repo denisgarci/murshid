@@ -6,7 +6,7 @@ import com.murshid.ingestor.wikitionary.WikitionaryCaller;
 import com.murshid.ingestor.wikitionary.models.WikiEntry;
 import com.murshid.models.enums.DictionarySource;
 import com.murshid.persistence.domain.HindiWord;
-import com.murshid.persistence.repo.HindiWordsRepository;
+import com.murshid.persistence.repo.SpellCheckRepository;
 import org.jsoup.nodes.Document;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -43,10 +43,10 @@ public class WikitionaryLetterIngestor implements Runnable{
         List<HindiWord> targetHindiWords;
 
          if (retryFailed){
-             targetHindiWords = hindiWordsRepository.selectByInitialExceptSuccessful(letter, DictionarySource.WIKITIONARY.name());
+             targetHindiWords = spellCheckRepository.selectByInitialExceptSuccessful(letter, DictionarySource.WIKITIONARY.name());
 
          } else {
-             targetHindiWords = hindiWordsRepository.selectByInitialExceptAllTried(letter, DictionarySource.WIKITIONARY.name());
+             targetHindiWords = spellCheckRepository.selectByInitialExceptAllTried(letter, DictionarySource.WIKITIONARY.name());
          }
 
         WikitionaryCaller caller = new WikitionaryCaller();
@@ -71,7 +71,7 @@ public class WikitionaryLetterIngestor implements Runnable{
     }
 
     @Inject
-    private HindiWordsRepository hindiWordsRepository;
+    private SpellCheckRepository spellCheckRepository;
 
     @Inject
     private WikitionaryWordProcessor wikitionaryWordProcessor;

@@ -2,6 +2,7 @@ package com.murshid.dynamo;
 
 import com.amazonaws.services.dynamodbv2.model.AttributeValue;
 import com.google.common.collect.Lists;
+import com.google.common.collect.Sets;
 import com.murshid.dynamo.domain.Master;
 import com.murshid.models.CanonicalKey;
 import com.murshid.models.converters.MasterConverter;
@@ -13,6 +14,7 @@ import org.junit.Test;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 import static org.hibernate.validator.internal.util.Contracts.assertNotNull;
@@ -23,7 +25,7 @@ public class MasterConverterTest {
     @Test
     public void convertToAvMap() throws Exception {
 
-        List<Accidence> accidenceList = Lists.newArrayList(Accidence.FEMININE, Accidence.SINGULAR);
+        Set<Accidence> accidenceList = Sets.newHashSet(Accidence.FEMININE, Accidence.SINGULAR);
         List<CanonicalKey> canonicalKeysList = Lists.newArrayList(
                 new CanonicalKey().setCanonicalIndex(0).setDictionarySource(DictionarySource.GONZALO).setCanonicalWord("भी"),
                 new CanonicalKey().setCanonicalIndex(0).setDictionarySource(DictionarySource.PRATTS).setCanonicalWord("भी"));
@@ -32,7 +34,6 @@ public class MasterConverterTest {
         Master master = new Master()
                 .setWordIndex(0)
                 .setHindiWord("भी")
-                .setUrduSpelling("بھی")
                 .setPartOfSpeech(PartOfSpeech.ADVERB)
                 .setAccidence(accidenceList)
                 .setCanonicalKeys(canonicalKeysList);
@@ -40,7 +41,6 @@ public class MasterConverterTest {
         Map<String, AttributeValue> avMap = MasterConverter.convertToAvMap(master);
 
         assertEquals(avMap.get("hindi_word").getS(), "भी");
-        assertEquals(avMap.get("urdu_spelling").getS(), "بھی");
 
         List<Accidence> accAvs = avMap.get("accidence").getL().stream().map(av ->  Accidence.valueOf(av.getS())).collect(
                 Collectors.toList());
@@ -55,7 +55,6 @@ public class MasterConverterTest {
     public void convertFromAvMap() throws Exception {
         Map<String, AttributeValue> avMap = new HashMap<>();
         avMap.put("hindi_word", new AttributeValue("भी"));
-        avMap.put("urdu_spelling", new AttributeValue("بھی"));
         avMap.put("part_of_speech", new AttributeValue(PartOfSpeech.ADVERB.name()));
         AttributeValue wordIndex = new AttributeValue();
         wordIndex.setN("3");
@@ -90,7 +89,6 @@ public class MasterConverterTest {
 
         assertNotNull(master);
         assertEquals(master.getHindiWord(), "भी");
-        assertEquals(master.getUrduSpelling(), "بھی");
         assertEquals(master.getAccidence(), Lists.newArrayList(Accidence.FEMININE, Accidence.SINGULAR));
         assertEquals(master.getWordIndex(), 3);
 

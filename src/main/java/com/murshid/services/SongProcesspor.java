@@ -5,7 +5,7 @@ import com.amazonaws.services.dynamodbv2.document.Table;
 import com.google.common.collect.Sets;
 import com.murshid.dynamo.domain.Master;
 import com.murshid.models.converters.DynamoAccessor;
-import com.murshid.persistence.repo.HindiWordsRepository;
+import com.murshid.persistence.repo.SpellCheckRepository;
 import com.murshid.utils.SongUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -40,7 +40,7 @@ public class SongProcesspor {
         Optional<String> song = getSong(songTitleLatin);
         if (song.isPresent()){
             Set<String> tokens = SongUtils.hindiTokens(song.get());
-            return tokens.stream().filter(s-> hindiWordsRepository.findOne(s) == null).collect(Collectors.toSet());
+            return tokens.stream().filter(s-> spellCheckRepository.findOne(s) == null).collect(Collectors.toSet());
         }
         return Sets.newTreeSet();
     }
@@ -68,7 +68,7 @@ public class SongProcesspor {
 
 
     @Inject
-    private HindiWordsRepository hindiWordsRepository;
+    private SpellCheckRepository spellCheckRepository;
 
     @Inject
     private MasterService masterService;

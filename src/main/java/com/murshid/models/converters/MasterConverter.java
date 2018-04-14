@@ -12,6 +12,7 @@ import org.slf4j.LoggerFactory;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 public class MasterConverter {
@@ -28,10 +29,6 @@ public class MasterConverter {
             master.setWordIndex(item.getInt("word_index"));
         }
 
-        if (item.isPresent("urdu_spelling")){
-            master.setUrduSpelling(item.getString("urdu_spelling"));
-        }
-
         if (item.isPresent("part_of_speech")){
             master.setPartOfSpeech(PartOfSpeech.valueOf(item.getString("part_of_speech")));
         }
@@ -42,7 +39,7 @@ public class MasterConverter {
 
 
         if (item.isPresent("accidence")){
-            master.setAccidence((List<Accidence>)item.get("accidence"));
+            master.setAccidence((Set<Accidence>)item.get("accidence"));
         }
 
         return master;
@@ -75,7 +72,6 @@ public class MasterConverter {
         Map<String, AttributeValue> result = new HashMap<>();
         result.put("hindi_word", new AttributeValue(master.getHindiWord()));
         result.put("word_index", new AttributeValue(Integer.toString(master.getWordIndex())));
-        result.put("urdu_spelling", new AttributeValue(master.getUrduSpelling()));
         result.put("part_of_speech", new AttributeValue(master.getPartOfSpeech().name()));
         result.put("canonical_keys", cksList);
         result.put("accidence", accsList  );
@@ -86,7 +82,6 @@ public class MasterConverter {
         Master master = new Master();
         master.setHindiWord(sAvs.get("hindi_word").getS())
                 .setPartOfSpeech(PartOfSpeech.valueOf(sAvs.get("part_of_speech").getS()))
-                .setUrduSpelling(sAvs.get("urdu_spelling").getS())
                 .setWordIndex(Integer.valueOf(sAvs.get("word_index").getN()));
 
         List<CanonicalKey> canonicalKeys = sAvs.get("canonical_keys")
@@ -95,13 +90,13 @@ public class MasterConverter {
                 .collect(Collectors.toList());
 
         AttributeValue accidenceAv = sAvs.get("accidence");
-        LOGGER.info("processing "+ master.getHindiWord());
+
         if (accidenceAv!= null) {
-            List<Accidence> accidence =
+            Set<Accidence> accidence =
             accidenceAv
                     .getL().stream()
                     .map(av -> Accidence.valueOf(av.getS()))
-                    .collect(Collectors.toList());
+                    .collect(Collectors.toSet());
             master.setAccidence(accidence);
         }
 
@@ -118,14 +113,12 @@ public class MasterConverter {
 
         item = item.with("word_index", master.getWordIndex());
 
-        item = item.with("urdu_spelling", master.getUrduSpelling());
-
         item = item.with("part_of_speech", master.getPartOfSpeech().name());
 
         item = item.withList("canonical_keys", master.getCanonicalKeys().stream()
                 .map(CanonicalKey::toMap).collect(Collectors.toList()));
 
-        List<Accidence> accidence = master.getAccidence();
+        Set<Accidence> accidence = master.getAccidence();
         if (accidence != null) {
             item = item.withList("accidence", accidence.stream()
                     .map(Accidence::name).collect(Collectors.toList()));

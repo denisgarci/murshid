@@ -76,25 +76,6 @@ public class WikitionaryTest {
     }
 
     @Test
-    public void etymologiesExtractionQasuur() throws Exception {
-
-        String word = "क़सूर";
-
-        WikitionaryCaller caller = new WikitionaryCaller();
-        Document document = WikitionaryCaller.documentForWord(caller, word);
-
-        List<WikiEntry> wikiEntries = WikiUtils.populateEtymologyEntries(word, document);
-
-        assertFalse(wikiEntries.isEmpty());
-        assertEquals(wikiEntries.size(), 2);
-        assertTrue(wikiEntries.get(0).etymology.isPresent());
-        assertEquals(wikiEntries.get(0).etymology.get(), "Borrowed from Arabic قُصُور‎ (quṣūr).");
-
-        assertTrue(wikiEntries.get(1).etymology.isPresent());
-        assertEquals(wikiEntries.get(1).etymology.get(), "Ultimately named for Kusha (Ramayana).");
-    }
-
-    @Test
     public void multilanguageEntryExtraction() throws Exception {
 
         String word = "उ";

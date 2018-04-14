@@ -1,10 +1,11 @@
 package com.murshid;
 
 
+import com.murshid.dynamo.domain.Master;
 import com.murshid.dynamo.domain.Song;
 import com.murshid.dynamo.repo.SongRepository;
-import com.murshid.persistence.domain.HindiWord;
-import com.murshid.services.HindiWordsService;
+import com.murshid.models.CanonicalKey;
+import com.murshid.services.MasterService;
 import com.murshid.services.SongProcesspor;
 import com.murshid.services.WikitionaryLetterIngestor;
 import org.slf4j.Logger;
@@ -13,7 +14,9 @@ import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.ConfigurableApplicationContext;
 
+import java.util.List;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 @SpringBootApplication
 
@@ -26,7 +29,7 @@ public class IngestorApplication {
 	public static void main(String[] args) {
 		context = SpringApplication.run(IngestorApplication.class, args);
 
-		//insertWord();
+        sameCanonical();
         //songRepo();
 
 //
@@ -48,6 +51,18 @@ public class IngestorApplication {
 
 	}
 
+    private static void sameCanonical(){
+        MasterService processor = context.getBean(MasterService.class);
+        List<Master> entries = processor.getAllWords();
+
+        for (Master master : entries){
+            Set<String> canonicalWords = master.getCanonicalKeys().stream().map(CanonicalKey::getCanonicalWord).collect(Collectors.toSet());
+            if (canonicalWords.size() > 1){
+                LOGGER.info("the master hindiWord={} wordIndex={} has more than one canonical key", master.getHindiWord(), master.getWordIndex());
+            }
+        }
+        LOGGER.info("finished");
+    }
 
 
     private static void songRepo(){
@@ -56,12 +71,6 @@ public class IngestorApplication {
         System.out.println(newWords);
     }
 
-	private static void insertWord(){
-        HindiWordsService hindiWordsService = context.getBean(HindiWordsService.class);
-        HindiWord hindiWord = hindiWordsService.upsert("बैरीयां");
-        System.out.println(hindiWord);
-
-    }
 
     private static void newWordsInSong(){
         SongProcesspor processor = context.getBean(SongProcesspor.class);

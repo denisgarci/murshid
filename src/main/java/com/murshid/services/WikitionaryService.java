@@ -2,7 +2,7 @@ package com.murshid.services;
 
 import com.murshid.models.DictionaryKey;
 import com.murshid.persistence.domain.WikitionaryEntry;
-import com.murshid.persistence.repo.HindiWordsRepository;
+import com.murshid.persistence.repo.SpellCheckRepository;
 import com.murshid.persistence.repo.WikitionaryRepository;
 import org.springframework.beans.BeansException;
 import org.springframework.context.ApplicationContext;
@@ -22,7 +22,7 @@ public class WikitionaryService implements ApplicationContextAware {
     private ApplicationContext applicationContext;
 
     public void processAllLetters(boolean retryFailed){
-        List<Character> initials = hindiWordsRepository.selectDistinctInitials();
+        List<Character> initials = spellCheckRepository.selectDistinctInitials();
         ExecutorService pool = Executors.newFixedThreadPool(initials.size(), new LoggerThreadFactory());
 
         for (Character initial : initials){
@@ -77,5 +77,5 @@ public class WikitionaryService implements ApplicationContextAware {
     private WikitionaryRepository wikitionaryRepository;
 
     @Inject
-    private HindiWordsRepository hindiWordsRepository;
+    private SpellCheckRepository spellCheckRepository;
 }

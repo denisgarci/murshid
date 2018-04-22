@@ -1,11 +1,14 @@
 package com.murshid.services;
 
+import com.amazonaws.services.dynamodbv2.document.Item;
 import com.amazonaws.services.dynamodbv2.model.AttributeValue;
 import com.amazonaws.services.dynamodbv2.model.ScanRequest;
 import com.amazonaws.services.dynamodbv2.model.ScanResult;
 import com.google.common.collect.Sets;
 import com.murshid.dynamo.domain.Master;
+import com.murshid.dynamo.domain.Song;
 import com.murshid.dynamo.repo.MasterRepository;
+import com.murshid.dynamo.repo.SongRepository;
 import com.murshid.models.CanonicalKey;
 import com.murshid.models.DictionaryKey;
 import com.murshid.models.converters.DynamoAccessor;
@@ -16,6 +19,7 @@ import com.murshid.persistence.domain.GonzaloEntry;
 import com.murshid.persistence.domain.PrattsEntry;
 import com.murshid.persistence.domain.RekhtaEntry;
 import com.murshid.persistence.domain.WikitionaryEntry;
+import com.murshid.utils.SongUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -32,6 +36,8 @@ public class MasterService {
     private  static Set<PartOfSpeech> verbDerivates = Sets.newHashSet(PartOfSpeech.VERB, PartOfSpeech.ABSOLUTIVE, PartOfSpeech.VERBAL_NOUN,
       PartOfSpeech.PARTICIPLE, PartOfSpeech.INFINITIVE);
 
+    private  static Set<PartOfSpeech> pronounDerivates = Sets.newHashSet(PartOfSpeech.PRONOUN, PartOfSpeech.POSSESSIVE_PRONOUN, PartOfSpeech.PERSONAL_PRONOUN,  PartOfSpeech.DEMONSTRATIVE_PRONOUN);
+
     /**
      * true if the POS indicated in Master can refer to the POS indicated in the respective disctionarr tables.
      * For example, a participle can refer to a dictionary verb.
@@ -47,6 +53,8 @@ public class MasterService {
         switch (root){
             case VERB:
                 return verbDerivates.contains(derivate);
+            case PRONOUN:
+                return pronounDerivates.contains(derivate);
             default:
                 return derivate == root;
         }
@@ -71,7 +79,15 @@ public class MasterService {
         List<Master> result = new ArrayList<>();
         result.add(origin);
         String hindiWord = origin.getHindiWord();
-        if ((origin.getPartOfSpeech() == PartOfSpeech.PARTICIPLE || origin.getPartOfSpeech() == PartOfSpeech.INFINITIVE) && hindiWord.endsWith("ा")){
+
+        if (origin.getPartOfSpeech() == PartOfSpeech.NOUN && origin.getAccidence().contains(Accidence.MASCULINE) && origin.getAccidence().contains(Accidence.SINGULAR) &&  hindiWord.endsWith("ा")){
+
+            result.addAll(explodeMasculinesInAA(origin));
+
+        } else if (
+                (origin.getPartOfSpeech() == PartOfSpeech.PARTICIPLE || origin.getPartOfSpeech() == PartOfSpeech.INFINITIVE )
+
+                && hindiWord.endsWith("ा")){
 
             Master masculineObliqueSingular = (Master) origin.clone();
             masculineObliqueSingular.setWordIndex(1);
@@ -167,23 +183,529 @@ public class MasterService {
             feminineVocativePLural.getAccidence().remove(Accidence.DIRECT);
             feminineVocativePLural.getAccidence().add(Accidence.VOCATIVE);
             result.add(feminineVocativePLural);
+        }else if (
+                (origin.getPartOfSpeech() == PartOfSpeech.ADJECTIVE || origin.getPartOfSpeech() == PartOfSpeech.POSSESSIVE_PRONOUN || origin.getPartOfSpeech() == PartOfSpeech.ADVERB)
+
+                && hindiWord.endsWith("ा")){
+
+            Master masculineObliqueSingular = (Master) origin.clone();
+            masculineObliqueSingular.setWordIndex(1);
+            masculineObliqueSingular.setHindiWord(hindiWord.substring(0, hindiWord.length()-1).concat("े"));
+            masculineObliqueSingular.getAccidence().remove(Accidence.DIRECT);
+            masculineObliqueSingular.getAccidence().add(Accidence.OBLIQUE);
+            result.add(masculineObliqueSingular);
+
+            Master masculineVocativeSingular = (Master) origin.clone();
+            masculineVocativeSingular.setWordIndex(2);
+            masculineVocativeSingular.setHindiWord(hindiWord.substring(0, hindiWord.length()-1).concat("े"));
+            masculineVocativeSingular.getAccidence().remove(Accidence.DIRECT);
+            masculineVocativeSingular.getAccidence().add(Accidence.VOCATIVE);
+            result.add(masculineVocativeSingular);
+
+            Master masculineDirectPlural = (Master) origin.clone();
+            masculineDirectPlural.setWordIndex(3);
+            masculineDirectPlural.setHindiWord(hindiWord.substring(0, hindiWord.length()-1).concat("े"));
+            masculineDirectPlural.getAccidence().remove(Accidence.SINGULAR);
+            masculineDirectPlural.getAccidence().add(Accidence.PLURAL);
+            result.add(masculineDirectPlural);
+
+            Master masculineObliquePlural = (Master) origin.clone();
+            masculineObliquePlural.setWordIndex(4);
+            masculineObliquePlural.setHindiWord(hindiWord.substring(0, hindiWord.length()-1).concat("े"));
+            masculineObliquePlural.getAccidence().remove(Accidence.SINGULAR);
+            masculineObliquePlural.getAccidence().add(Accidence.PLURAL);
+            masculineObliquePlural.getAccidence().remove(Accidence.DIRECT);
+            masculineObliquePlural.getAccidence().add(Accidence.OBLIQUE);
+            result.add(masculineObliquePlural);
+
+            Master masculineVocativePlural = (Master) origin.clone();
+            masculineVocativePlural.setWordIndex(5);
+            masculineVocativePlural.setHindiWord(hindiWord.substring(0, hindiWord.length()-1).concat("े"));
+            masculineVocativePlural.getAccidence().remove(Accidence.SINGULAR);
+            masculineVocativePlural.getAccidence().add(Accidence.PLURAL);
+            masculineVocativePlural.getAccidence().remove(Accidence.DIRECT);
+            masculineVocativePlural.getAccidence().add(Accidence.VOCATIVE);
+            result.add(masculineVocativePlural);
+
+            Master feminineDirectSingular = (Master) origin.clone();
+            feminineDirectSingular.setWordIndex(6);
+            feminineDirectSingular.setHindiWord(hindiWord.substring(0, hindiWord.length()-1).concat("ी"));
+            feminineDirectSingular.getAccidence().remove(Accidence.MASCULINE);
+            feminineDirectSingular.getAccidence().add(Accidence.FEMININE);
+            result.add(feminineDirectSingular);
+
+            Master feminineObliqueSingular = (Master) origin.clone();
+            feminineObliqueSingular.setWordIndex(7);
+            feminineObliqueSingular.setHindiWord(hindiWord.substring(0, hindiWord.length()-1).concat("ी"));
+            feminineObliqueSingular.getAccidence().remove(Accidence.MASCULINE);
+            feminineObliqueSingular.getAccidence().add(Accidence.FEMININE);
+            feminineObliqueSingular.getAccidence().remove(Accidence.DIRECT);
+            feminineObliqueSingular.getAccidence().add(Accidence.OBLIQUE);
+            result.add(feminineObliqueSingular);
+
+            Master feminineVocativeSingular = (Master) origin.clone();
+            feminineVocativeSingular.setWordIndex(8);
+            feminineVocativeSingular.setHindiWord(hindiWord.substring(0, hindiWord.length()-1).concat("ी"));
+            feminineVocativeSingular.getAccidence().remove(Accidence.MASCULINE);
+            feminineVocativeSingular.getAccidence().add(Accidence.FEMININE);
+            feminineVocativeSingular.getAccidence().remove(Accidence.DIRECT);
+            feminineVocativeSingular.getAccidence().add(Accidence.VOCATIVE);
+            result.add(feminineVocativeSingular);
+
+            Master feminineDirectPLural = (Master) origin.clone();
+            feminineDirectPLural.setWordIndex(9);
+            feminineDirectPLural.setHindiWord(hindiWord.substring(0, hindiWord.length()-1).concat("ी"));
+            feminineDirectPLural.getAccidence().remove(Accidence.MASCULINE);
+            feminineDirectPLural.getAccidence().add(Accidence.FEMININE);
+            feminineDirectPLural.getAccidence().remove(Accidence.SINGULAR);
+            feminineDirectPLural.getAccidence().add(Accidence.PLURAL);
+            result.add(feminineDirectPLural);
+
+            Master feminineObliquePLural = (Master) origin.clone();
+            feminineObliquePLural.setWordIndex(10);
+            feminineObliquePLural.setHindiWord(hindiWord.substring(0, hindiWord.length()-1).concat("ी"));
+            feminineObliquePLural.getAccidence().remove(Accidence.MASCULINE);
+            feminineObliquePLural.getAccidence().add(Accidence.FEMININE);
+            feminineObliquePLural.getAccidence().remove(Accidence.SINGULAR);
+            feminineObliquePLural.getAccidence().add(Accidence.PLURAL);
+            feminineObliquePLural.getAccidence().remove(Accidence.DIRECT);
+            feminineObliquePLural.getAccidence().add(Accidence.OBLIQUE);
+            result.add(feminineObliquePLural);
+
+            Master feminineVocativePLural = (Master) origin.clone();
+            feminineVocativePLural.setWordIndex(11);
+            feminineVocativePLural.setHindiWord(hindiWord.substring(0, hindiWord.length()-1).concat("ी"));
+            feminineVocativePLural.getAccidence().remove(Accidence.MASCULINE);
+            feminineVocativePLural.getAccidence().add(Accidence.FEMININE);
+            feminineVocativePLural.getAccidence().remove(Accidence.SINGULAR);
+            feminineVocativePLural.getAccidence().add(Accidence.PLURAL);
+            feminineVocativePLural.getAccidence().remove(Accidence.DIRECT);
+            feminineVocativePLural.getAccidence().add(Accidence.VOCATIVE);
+            result.add(feminineVocativePLural);
+        } else if (origin.getPartOfSpeech() == PartOfSpeech.NOUN  && origin.getAccidence().contains(Accidence.MASCULINE) && !hindiWord.endsWith("ा") && !hindiWord.endsWith("ू") && !hindiWord.endsWith("ी") ){
+
+                    result.addAll(explodeMasculinesNotInAAorUUorII(origin));
+
+        } else if (origin.getPartOfSpeech() == PartOfSpeech.NOUN  && origin.getAccidence().contains(Accidence.MASCULINE) && hindiWord.endsWith("ू") ){
+
+            result.addAll(explodeMasculinesInUU(origin));
+
+        } else if (origin.getPartOfSpeech() == PartOfSpeech.NOUN  && origin.getAccidence().contains(Accidence.MASCULINE) && hindiWord.endsWith("ी") ){
+
+            result.addAll(explodeMasculinesInII(origin));
+
+        } else if (origin.getPartOfSpeech() == PartOfSpeech.NOUN  && origin.getAccidence().contains(Accidence.FEMININE) && hindiWord.endsWith("ई") ){
+
+            result.addAll(explodeFemininesInIIIsolated(origin));
+
+        } else if (origin.getPartOfSpeech() == PartOfSpeech.NOUN  && origin.getAccidence().contains(Accidence.FEMININE) && (!hindiWord.endsWith("ी") ) ){
+
+            result.addAll(explodeFemininesNotInII(origin));
+
+        } else if (origin.getPartOfSpeech() == PartOfSpeech.NOUN  && origin.getAccidence().contains(Accidence.FEMININE) && (hindiWord.endsWith("ी")) ){
+
+            result.addAll(explodeFemininesInII(origin));
+
         }
+
         return result;
     }
 
-    public List<Master> getWords(@Nonnull String word) {
+    private List<Master> explodeMasculinesNotInAAorUUorII(Master origin){
+
+        List<Master> result = new ArrayList<>();
+        String hindiWord = origin.getHindiWord();
+
+        Master masculineObliqueSingular = (Master) origin.clone();
+        masculineObliqueSingular.setWordIndex(1);
+        masculineObliqueSingular.setHindiWord(hindiWord);
+        masculineObliqueSingular.getAccidence().remove(Accidence.DIRECT);
+        masculineObliqueSingular.getAccidence().add(Accidence.OBLIQUE);
+        result.add(masculineObliqueSingular);
+
+        Master masculineVocativeSingular = (Master) origin.clone();
+        masculineVocativeSingular.setWordIndex(2);
+        masculineVocativeSingular.setHindiWord(hindiWord);
+        masculineVocativeSingular.getAccidence().remove(Accidence.DIRECT);
+        masculineVocativeSingular.getAccidence().add(Accidence.VOCATIVE);
+        result.add(masculineVocativeSingular);
+
+        Master masculineDirectPlural = (Master) origin.clone();
+        masculineDirectPlural.setWordIndex(3);
+        masculineDirectPlural.setHindiWord(hindiWord);
+        masculineDirectPlural.getAccidence().remove(Accidence.SINGULAR);
+        masculineDirectPlural.getAccidence().add(Accidence.PLURAL);
+        result.add(masculineDirectPlural);
+
+        Master masculineObliquePlural = (Master) origin.clone();
+        masculineObliquePlural.setWordIndex(4);
+        masculineObliquePlural.setHindiWord(hindiWord.concat("ों"));
+        masculineObliquePlural.getAccidence().remove(Accidence.SINGULAR);
+        masculineObliquePlural.getAccidence().add(Accidence.PLURAL);
+        masculineObliquePlural.getAccidence().remove(Accidence.DIRECT);
+        masculineObliquePlural.getAccidence().add(Accidence.OBLIQUE);
+        result.add(masculineObliquePlural);
+
+        Master masculineVocativePlural = (Master) origin.clone();
+        masculineVocativePlural.setWordIndex(5);
+        masculineVocativePlural.setHindiWord(hindiWord.concat("ो"));
+        masculineVocativePlural.getAccidence().remove(Accidence.SINGULAR);
+        masculineVocativePlural.getAccidence().add(Accidence.PLURAL);
+        masculineVocativePlural.getAccidence().remove(Accidence.DIRECT);
+        masculineVocativePlural.getAccidence().add(Accidence.VOCATIVE);
+        result.add(masculineVocativePlural);
+
+        return result;
+
+    }
+
+    private List<Master> explodeMasculinesInAA(Master origin){
+        List<Master> result = new ArrayList<>();
+        String hindiWord = origin.getHindiWord();
+
+        Master masculineObliqueSingular = (Master) origin.clone();
+        masculineObliqueSingular.setWordIndex(1);
+        masculineObliqueSingular.setHindiWord(hindiWord.substring(0, hindiWord.length()-1).concat("े"));
+        masculineObliqueSingular.getAccidence().remove(Accidence.DIRECT);
+        masculineObliqueSingular.getAccidence().add(Accidence.OBLIQUE);
+        result.add(masculineObliqueSingular);
+
+        Master masculineVocativeSingular = (Master) origin.clone();
+        masculineVocativeSingular.setWordIndex(2);
+        masculineVocativeSingular.setHindiWord(hindiWord.substring(0, hindiWord.length()-1).concat("े"));
+        masculineVocativeSingular.getAccidence().remove(Accidence.DIRECT);
+        masculineVocativeSingular.getAccidence().add(Accidence.VOCATIVE);
+        result.add(masculineVocativeSingular);
+
+        Master masculineDirectPlural = (Master) origin.clone();
+        masculineDirectPlural.setWordIndex(3);
+        masculineDirectPlural.setHindiWord(hindiWord.substring(0, hindiWord.length()-1).concat("े"));
+        masculineDirectPlural.getAccidence().remove(Accidence.SINGULAR);
+        masculineDirectPlural.getAccidence().add(Accidence.PLURAL);
+        result.add(masculineDirectPlural);
+
+        Master masculineObliquePlural = (Master) origin.clone();
+        masculineObliquePlural.setWordIndex(4);
+        masculineObliquePlural.setHindiWord(hindiWord.substring(0, hindiWord.length()-1).concat("ों"));
+        masculineObliquePlural.getAccidence().remove(Accidence.SINGULAR);
+        masculineObliquePlural.getAccidence().add(Accidence.PLURAL);
+        masculineObliquePlural.getAccidence().remove(Accidence.DIRECT);
+        masculineObliquePlural.getAccidence().add(Accidence.OBLIQUE);
+        result.add(masculineObliquePlural);
+
+        Master masculineVocativePlural = (Master) origin.clone();
+        masculineVocativePlural.setWordIndex(5);
+        masculineVocativePlural.setHindiWord(hindiWord.substring(0, hindiWord.length()-1).concat("ो"));
+        masculineVocativePlural.getAccidence().remove(Accidence.SINGULAR);
+        masculineVocativePlural.getAccidence().add(Accidence.PLURAL);
+        masculineVocativePlural.getAccidence().remove(Accidence.DIRECT);
+        masculineVocativePlural.getAccidence().add(Accidence.VOCATIVE);
+        result.add(masculineVocativePlural);
+
+        return result;
+
+    }
+
+    private List<Master> explodeMasculinesInII(Master origin){
+
+        List<Master> result = new ArrayList<>();
+        String hindiWord = origin.getHindiWord();
+
+        Master masculineObliqueSingular = (Master) origin.clone();
+        masculineObliqueSingular.setWordIndex(1);
+        masculineObliqueSingular.setHindiWord(hindiWord);
+        masculineObliqueSingular.getAccidence().remove(Accidence.DIRECT);
+        masculineObliqueSingular.getAccidence().add(Accidence.OBLIQUE);
+        result.add(masculineObliqueSingular);
+
+        Master masculineVocativeSingular = (Master) origin.clone();
+        masculineVocativeSingular.setWordIndex(2);
+        masculineVocativeSingular.setHindiWord(hindiWord);
+        masculineVocativeSingular.getAccidence().remove(Accidence.DIRECT);
+        masculineVocativeSingular.getAccidence().add(Accidence.VOCATIVE);
+        result.add(masculineVocativeSingular);
+
+        Master masculineDirectPlural = (Master) origin.clone();
+        masculineDirectPlural.setWordIndex(3);
+        masculineDirectPlural.setHindiWord(hindiWord);
+        masculineDirectPlural.getAccidence().remove(Accidence.SINGULAR);
+        masculineDirectPlural.getAccidence().add(Accidence.PLURAL);
+        result.add(masculineDirectPlural);
+
+        Master masculineObliquePlural = (Master) origin.clone();
+        masculineObliquePlural.setWordIndex(4);
+        masculineObliquePlural.setHindiWord(hindiWord.substring(0, hindiWord.length()-1).concat("ियों"));
+        masculineObliquePlural.getAccidence().remove(Accidence.SINGULAR);
+        masculineObliquePlural.getAccidence().add(Accidence.PLURAL);
+        masculineObliquePlural.getAccidence().remove(Accidence.DIRECT);
+        masculineObliquePlural.getAccidence().add(Accidence.OBLIQUE);
+        result.add(masculineObliquePlural);
+
+        Master masculineVocativePlural = (Master) origin.clone();
+        masculineVocativePlural.setWordIndex(5);
+        masculineVocativePlural.setHindiWord(hindiWord.substring(0, hindiWord.length()-1).concat("ियो"));
+        masculineVocativePlural.getAccidence().remove(Accidence.SINGULAR);
+        masculineVocativePlural.getAccidence().add(Accidence.PLURAL);
+        masculineVocativePlural.getAccidence().remove(Accidence.DIRECT);
+        masculineVocativePlural.getAccidence().add(Accidence.VOCATIVE);
+        result.add(masculineVocativePlural);
+
+        return result;
+
+    }
+
+    private List<Master> explodeMasculinesInUU(Master origin){
+
+        List<Master> result = new ArrayList<>();
+        String hindiWord = origin.getHindiWord();
+
+        Master masculineObliqueSingular = (Master) origin.clone();
+        masculineObliqueSingular.setWordIndex(1);
+        masculineObliqueSingular.setHindiWord(hindiWord);
+        masculineObliqueSingular.getAccidence().remove(Accidence.DIRECT);
+        masculineObliqueSingular.getAccidence().add(Accidence.OBLIQUE);
+        result.add(masculineObliqueSingular);
+
+        Master masculineVocativeSingular = (Master) origin.clone();
+        masculineVocativeSingular.setWordIndex(2);
+        masculineVocativeSingular.setHindiWord(hindiWord);
+        masculineVocativeSingular.getAccidence().remove(Accidence.DIRECT);
+        masculineVocativeSingular.getAccidence().add(Accidence.VOCATIVE);
+        result.add(masculineVocativeSingular);
+
+        Master masculineDirectPlural = (Master) origin.clone();
+        masculineDirectPlural.setWordIndex(3);
+        masculineDirectPlural.setHindiWord(hindiWord);
+        masculineDirectPlural.getAccidence().remove(Accidence.SINGULAR);
+        masculineDirectPlural.getAccidence().add(Accidence.PLURAL);
+        result.add(masculineDirectPlural);
+
+        Master masculineObliquePlural = (Master) origin.clone();
+        masculineObliquePlural.setWordIndex(4);
+        masculineObliquePlural.setHindiWord(hindiWord.substring(0, hindiWord.length()-1).concat("ुओं"));
+        masculineObliquePlural.getAccidence().remove(Accidence.SINGULAR);
+        masculineObliquePlural.getAccidence().add(Accidence.PLURAL);
+        masculineObliquePlural.getAccidence().remove(Accidence.DIRECT);
+        masculineObliquePlural.getAccidence().add(Accidence.OBLIQUE);
+        result.add(masculineObliquePlural);
+
+        Master masculineVocativePlural = (Master) origin.clone();
+        masculineVocativePlural.setWordIndex(5);
+        masculineVocativePlural.setHindiWord(hindiWord.substring(0, hindiWord.length()-1).concat("ुओ"));
+        masculineVocativePlural.getAccidence().remove(Accidence.SINGULAR);
+        masculineVocativePlural.getAccidence().add(Accidence.PLURAL);
+        masculineVocativePlural.getAccidence().remove(Accidence.DIRECT);
+        masculineVocativePlural.getAccidence().add(Accidence.VOCATIVE);
+        result.add(masculineVocativePlural);
+
+        return result;
+
+    }
+
+    private List<Master> explodeFemininesNotInII(Master origin){
+
+        List<Master> result = new ArrayList<>();
+        String hindiWord = origin.getHindiWord();
+
+        Master feminineObliqueSingular = (Master) origin.clone();
+        feminineObliqueSingular.setWordIndex(7);
+        feminineObliqueSingular.setHindiWord(hindiWord);
+        feminineObliqueSingular.getAccidence().remove(Accidence.MASCULINE);
+        feminineObliqueSingular.getAccidence().add(Accidence.FEMININE);
+        feminineObliqueSingular.getAccidence().remove(Accidence.DIRECT);
+        feminineObliqueSingular.getAccidence().add(Accidence.OBLIQUE);
+        result.add(feminineObliqueSingular);
+
+        Master feminineVocativeSingular = (Master) origin.clone();
+        feminineVocativeSingular.setWordIndex(8);
+        feminineVocativeSingular.setHindiWord(hindiWord);
+        feminineVocativeSingular.getAccidence().remove(Accidence.MASCULINE);
+        feminineVocativeSingular.getAccidence().add(Accidence.FEMININE);
+        feminineVocativeSingular.getAccidence().remove(Accidence.DIRECT);
+        feminineVocativeSingular.getAccidence().add(Accidence.VOCATIVE);
+        result.add(feminineVocativeSingular);
+
+        Master feminineDirectPLural = (Master) origin.clone();
+        feminineDirectPLural.setWordIndex(9);
+        feminineDirectPLural.setHindiWord(hindiWord.concat("ें"));
+        feminineDirectPLural.getAccidence().remove(Accidence.MASCULINE);
+        feminineDirectPLural.getAccidence().add(Accidence.FEMININE);
+        feminineDirectPLural.getAccidence().remove(Accidence.SINGULAR);
+        feminineDirectPLural.getAccidence().add(Accidence.PLURAL);
+        result.add(feminineDirectPLural);
+
+        Master feminineObliquePLural = (Master) origin.clone();
+        feminineObliquePLural.setWordIndex(10);
+        feminineObliquePLural.setHindiWord(hindiWord.concat("ों"));
+        feminineObliquePLural.getAccidence().remove(Accidence.MASCULINE);
+        feminineObliquePLural.getAccidence().add(Accidence.FEMININE);
+        feminineObliquePLural.getAccidence().remove(Accidence.SINGULAR);
+        feminineObliquePLural.getAccidence().add(Accidence.PLURAL);
+        feminineObliquePLural.getAccidence().remove(Accidence.DIRECT);
+        feminineObliquePLural.getAccidence().add(Accidence.OBLIQUE);
+        result.add(feminineObliquePLural);
+
+        Master feminineVocativePLural = (Master) origin.clone();
+        feminineVocativePLural.setWordIndex(11);
+        feminineVocativePLural.setHindiWord(hindiWord.concat("ो"));
+        feminineVocativePLural.getAccidence().remove(Accidence.MASCULINE);
+        feminineVocativePLural.getAccidence().add(Accidence.FEMININE);
+        feminineVocativePLural.getAccidence().remove(Accidence.SINGULAR);
+        feminineVocativePLural.getAccidence().add(Accidence.PLURAL);
+        feminineVocativePLural.getAccidence().remove(Accidence.DIRECT);
+        feminineVocativePLural.getAccidence().add(Accidence.VOCATIVE);
+        result.add(feminineVocativePLural);
+
+        return result;
+
+    }
+
+    private List<Master> explodeFemininesInII(Master origin){
+
+        List<Master> result = new ArrayList<>();
+        String hindiWord = origin.getHindiWord();
+
+        Master feminineObliqueSingular = (Master) origin.clone();
+        feminineObliqueSingular.setWordIndex(7);
+        feminineObliqueSingular.setHindiWord(hindiWord);
+        feminineObliqueSingular.getAccidence().remove(Accidence.MASCULINE);
+        feminineObliqueSingular.getAccidence().add(Accidence.FEMININE);
+        feminineObliqueSingular.getAccidence().remove(Accidence.DIRECT);
+        feminineObliqueSingular.getAccidence().add(Accidence.OBLIQUE);
+        result.add(feminineObliqueSingular);
+
+        Master feminineVocativeSingular = (Master) origin.clone();
+        feminineVocativeSingular.setWordIndex(8);
+        feminineVocativeSingular.setHindiWord(hindiWord);
+        feminineVocativeSingular.getAccidence().remove(Accidence.MASCULINE);
+        feminineVocativeSingular.getAccidence().add(Accidence.FEMININE);
+        feminineVocativeSingular.getAccidence().remove(Accidence.DIRECT);
+        feminineVocativeSingular.getAccidence().add(Accidence.VOCATIVE);
+        result.add(feminineVocativeSingular);
+
+        Master feminineDirectPLural = (Master) origin.clone();
+        feminineDirectPLural.setWordIndex(9);
+        feminineDirectPLural.setHindiWord(hindiWord.substring(0, hindiWord.length()-1).concat("ियाँ"));
+        feminineDirectPLural.getAccidence().remove(Accidence.MASCULINE);
+        feminineDirectPLural.getAccidence().add(Accidence.FEMININE);
+        feminineDirectPLural.getAccidence().remove(Accidence.SINGULAR);
+        feminineDirectPLural.getAccidence().add(Accidence.PLURAL);
+        result.add(feminineDirectPLural);
+
+        Master feminineObliquePLural = (Master) origin.clone();
+        feminineObliquePLural.setWordIndex(10);
+        feminineObliquePLural.setHindiWord(hindiWord.substring(0, hindiWord.length()-1).concat("ियों"));
+        feminineObliquePLural.getAccidence().remove(Accidence.MASCULINE);
+        feminineObliquePLural.getAccidence().add(Accidence.FEMININE);
+        feminineObliquePLural.getAccidence().remove(Accidence.SINGULAR);
+        feminineObliquePLural.getAccidence().add(Accidence.PLURAL);
+        feminineObliquePLural.getAccidence().remove(Accidence.DIRECT);
+        feminineObliquePLural.getAccidence().add(Accidence.OBLIQUE);
+        result.add(feminineObliquePLural);
+
+        Master feminineVocativePLural = (Master) origin.clone();
+        feminineVocativePLural.setWordIndex(11);
+        feminineVocativePLural.setHindiWord(hindiWord.substring(0, hindiWord.length()-1).concat("ियो"));
+        feminineVocativePLural.getAccidence().remove(Accidence.MASCULINE);
+        feminineVocativePLural.getAccidence().add(Accidence.FEMININE);
+        feminineVocativePLural.getAccidence().remove(Accidence.SINGULAR);
+        feminineVocativePLural.getAccidence().add(Accidence.PLURAL);
+        feminineVocativePLural.getAccidence().remove(Accidence.DIRECT);
+        feminineVocativePLural.getAccidence().add(Accidence.VOCATIVE);
+        result.add(feminineVocativePLural);
+
+        return result;
+
+    }
+
+    private List<Master> explodeFemininesInIIIsolated(Master origin){
+
+        List<Master> result = new ArrayList<>();
+        String hindiWord = origin.getHindiWord();
+
+        Master feminineObliqueSingular = (Master) origin.clone();
+        feminineObliqueSingular.setWordIndex(7);
+        feminineObliqueSingular.setHindiWord(hindiWord);
+        feminineObliqueSingular.getAccidence().remove(Accidence.MASCULINE);
+        feminineObliqueSingular.getAccidence().add(Accidence.FEMININE);
+        feminineObliqueSingular.getAccidence().remove(Accidence.DIRECT);
+        feminineObliqueSingular.getAccidence().add(Accidence.OBLIQUE);
+        result.add(feminineObliqueSingular);
+
+        Master feminineVocativeSingular = (Master) origin.clone();
+        feminineVocativeSingular.setWordIndex(8);
+        feminineVocativeSingular.setHindiWord(hindiWord);
+        feminineVocativeSingular.getAccidence().remove(Accidence.MASCULINE);
+        feminineVocativeSingular.getAccidence().add(Accidence.FEMININE);
+        feminineVocativeSingular.getAccidence().remove(Accidence.DIRECT);
+        feminineVocativeSingular.getAccidence().add(Accidence.VOCATIVE);
+        result.add(feminineVocativeSingular);
+
+        Master feminineDirectPLural = (Master) origin.clone();
+        feminineDirectPLural.setWordIndex(9);
+        feminineDirectPLural.setHindiWord(hindiWord.substring(0, hindiWord.length()-1).concat("इयाँ"));
+        feminineDirectPLural.getAccidence().remove(Accidence.MASCULINE);
+        feminineDirectPLural.getAccidence().add(Accidence.FEMININE);
+        feminineDirectPLural.getAccidence().remove(Accidence.SINGULAR);
+        feminineDirectPLural.getAccidence().add(Accidence.PLURAL);
+        result.add(feminineDirectPLural);
+
+        Master feminineObliquePLural = (Master) origin.clone();
+        feminineObliquePLural.setWordIndex(10);
+        feminineObliquePLural.setHindiWord(hindiWord.substring(0, hindiWord.length()-1).concat("इयों"));
+        feminineObliquePLural.getAccidence().remove(Accidence.MASCULINE);
+        feminineObliquePLural.getAccidence().add(Accidence.FEMININE);
+        feminineObliquePLural.getAccidence().remove(Accidence.SINGULAR);
+        feminineObliquePLural.getAccidence().add(Accidence.PLURAL);
+        feminineObliquePLural.getAccidence().remove(Accidence.DIRECT);
+        feminineObliquePLural.getAccidence().add(Accidence.OBLIQUE);
+        result.add(feminineObliquePLural);
+
+        Master feminineVocativePLural = (Master) origin.clone();
+        feminineVocativePLural.setWordIndex(11);
+        feminineVocativePLural.setHindiWord(hindiWord.substring(0, hindiWord.length()-1).concat("इयो"));
+        feminineVocativePLural.getAccidence().remove(Accidence.MASCULINE);
+        feminineVocativePLural.getAccidence().add(Accidence.FEMININE);
+        feminineVocativePLural.getAccidence().remove(Accidence.SINGULAR);
+        feminineVocativePLural.getAccidence().add(Accidence.PLURAL);
+        feminineVocativePLural.getAccidence().remove(Accidence.DIRECT);
+        feminineVocativePLural.getAccidence().add(Accidence.VOCATIVE);
+        result.add(feminineVocativePLural);
+
+        return result;
+
+    }
+
+
+
+
+    public List<Master> getByInflectedWord(@Nonnull String inflectedWord) {
 
         Map<String, AttributeValue> expressionAttributeValues =  new HashMap<String, AttributeValue>();
-        expressionAttributeValues.put(":canonicalWord", new AttributeValue().withS(word));
+        expressionAttributeValues.put(":inflectedWord", new AttributeValue().withS(inflectedWord));
 
         ScanRequest scanRequest = new ScanRequest()
-        .withTableName("master").withFilterExpression( "hindi_word = :canonicalWord")
+        .withTableName("master").withFilterExpression( "hindi_word = :inflectedWord")
                 .withExpressionAttributeValues(expressionAttributeValues);
 
         ScanResult scanResult = DynamoAccessor.client.scan(scanRequest);
         return scanResult.getItems()
                 .stream().map(MasterConverter::fromAvMap)
                 .collect(Collectors.toList());
+    }
+
+    public List<Master> findByCanonicalWord(@Nonnull String canonicalWord) {
+
+        Iterator<Item> items = masterRepository.findByCanonicalWord(canonicalWord);
+
+        List<Master> result = new ArrayList<>();
+        items.forEachRemaining(it ->{
+            Optional<Master> master = masterRepository.findOne(it.getString("hindi_word"), it.getInt("word_index"));
+            if(master.isPresent()){
+                result.add(master.get());
+            }
+        });
+        return result;
     }
 
     public boolean exists(String hindiWord, int index){
@@ -281,8 +803,7 @@ public class MasterService {
         if (master.getCanonicalKeys() == null){
             return true;
         }
-        for (int i=0; i< master.getCanonicalKeys().size(); i++){
-            CanonicalKey ck = master.getCanonicalKeys().get(i);
+        for (CanonicalKey ck: master.getCanonicalKeys()){
             DictionaryKey dk = new DictionaryKey().setHindiWord(ck.canonicalWord).setWordIndex(ck.canonicalIndex);
 
             switch (ck.dictionarySource){
@@ -332,8 +853,38 @@ public class MasterService {
         return true;
     }
 
+    public Map<String, Object> createMasterEntries(String songTitleLatin){
+        Map<String, Object> result = new HashMap<>();
+        Song song = songRepository.findOne(songTitleLatin);
+        if (song == null){
+            return Collections.EMPTY_MAP;
+        }
+
+        Set<String> songWords = SongUtils.hindiTokens(song.getSong());
+        songWords.forEach(sw -> {
+                  List<Master> masterEntries = getByInflectedWord(sw);
+                  masterEntries.forEach(me -> {
+                   String key = me.getHindiWord().concat("_").concat(Integer.toString(me.getWordIndex()));
+                   Map<String, Object> value = new HashMap<>();
+                   value.put("part_of_speech", me.getPartOfSpeech().name());
+                   value.put("accidence", me.getAccidence());
+                   value.put("canonical_word", me.getCanonicalWord());
+                   value.put("canonical_keys", me.getCanonicalKeys().stream().map(ck ->
+                     ck.getDictionarySource().name().concat("_").concat(ck.getCanonicalWord()).concat("_").concat(Integer.toString(ck.canonicalIndex)))
+                     .collect(Collectors.toList()));
+                   result.put(key, value);
+         });
+       });
+
+       return result;
+    }
+
     @Inject
     private MasterRepository masterRepository;
+
+    @Inject
+    private SongRepository songRepository;
+
 
     @Inject
     private WikitionaryService wikitionaryService;

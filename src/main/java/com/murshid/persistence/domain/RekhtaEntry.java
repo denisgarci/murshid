@@ -2,11 +2,12 @@ package com.murshid.persistence.domain;
 
 import com.murshid.models.DictionaryKey;
 import com.murshid.models.enums.PartOfSpeech;
+import com.murshid.services.HasDictionaryKey;
 
 import javax.persistence.*;
 
 @Entity(name = "rekhta")
-public class RekhtaEntry {
+public class RekhtaEntry implements HasDictionaryKey{
 
     @EmbeddedId
     private DictionaryKey dictionaryKey;
@@ -67,5 +68,15 @@ public class RekhtaEntry {
     public RekhtaEntry setUrduWord(String urduWord) {
         this.urduWord = urduWord;
         return this;
+    }
+
+    @Override
+    public String getHindiWord() {
+        return dictionaryKey.hindiWord;
+    }
+
+    @Override
+    public int getWordIndex() {
+        return dictionaryKey.wordIndex;
     }
 }

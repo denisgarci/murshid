@@ -1,8 +1,9 @@
 package com.murshid.controllers;
 
 import com.murshid.dynamo.domain.Master;
+import com.murshid.models.CanonicalKey;
 import com.murshid.services.MasterService;
-import com.murshid.services.SongProcesspor;
+import com.murshid.services.SongsService;
 import com.murshid.services.SpellCheckService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -13,6 +14,7 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.inject.Inject;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 @Controller
@@ -25,24 +27,39 @@ public class MasterController {
     @GetMapping("/tokensNotInMaster")
     public @ResponseBody
     Set<String> tokensNotInMaster(@RequestParam(name = "songName") String songName) {
-        return songProcesspor.wordTokensNotInMaster(songName);
+        return songsService.wordTokensNotInMaster(songName);
     }
 
     @GetMapping("/tokensNotInSpellChecker")
     public @ResponseBody
     Set<String> tokensNotInSpellChecker(@RequestParam(name = "songName") String songName) {
-        return songProcesspor.newWordsInSong(songName);
+        return songsService.newWordsInSong(songName);
+    }
+
+    @GetMapping("/createMasterEntries")
+    public @ResponseBody
+    Map<String, Object> createMasterEntries(@RequestParam(name = "songName") String songName) {
+
+       return  masterService.createMasterEntries(songName);
     }
 
     @GetMapping("/findWord")
     public @ResponseBody
     List findInKeyAndBody(@RequestParam(name = "hindiWord") String word) {
-        List result = masterService.getWords(word);
+        List result = masterService.getByInflectedWord(word);
+        return result;
+    }
+
+    @GetMapping("/findByCanonicalWord")
+    public @ResponseBody
+    List findInByCanonicalWord(@RequestParam(name = "canonicalWord") String canonicalWord) {
+        List result = masterService.findByCanonicalWord(canonicalWord);
         return result;
     }
 
     @PostMapping("/insertNew")
     public ResponseEntity<String> insertNew(@RequestBody Master masterEntry) {
+        complementCanonicalKeys(masterEntry);
         if (isValid(masterEntry)) {
             if (masterService.exists(masterEntry.getHindiWord(), masterEntry.getWordIndex())){
                 LOGGER.info("canonicalWord {} index {} already exists in master", masterEntry.getHindiWord(), masterEntry.getWordIndex());
@@ -61,6 +78,7 @@ public class MasterController {
 
     @PostMapping("/insertNewWithExplode")
     public ResponseEntity<String> insertNewWithExplode(@RequestBody Master masterEntry) {
+        complementCanonicalKeys(masterEntry);
         if (!isValid(masterEntry)) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
         }
@@ -94,6 +112,7 @@ public class MasterController {
 
     @PostMapping("/upsert")
     public ResponseEntity<String> upsert(@RequestBody Master masterEntry) {
+        complementCanonicalKeys(masterEntry);
         if (isValid(masterEntry)) {
             boolean success = masterService.save(masterEntry);
             if (success) {
@@ -104,6 +123,13 @@ public class MasterController {
         } else {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
         }
+    }
+
+    private Master complementCanonicalKeys(Master master){
+        for (CanonicalKey ck: master.getCanonicalKeys()){
+            ck.setCanonicalWord(master.getCanonicalWord());
+        }
+        return master;
     }
 
     private boolean isValid(Master master) {
@@ -144,7 +170,7 @@ public class MasterController {
     private MasterService masterService;
 
     @Inject
-    private SongProcesspor songProcesspor;
+    private SongsService songsService;
 
     @Inject
     private SpellCheckService spellCheckService;

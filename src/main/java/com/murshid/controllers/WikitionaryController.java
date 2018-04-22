@@ -59,11 +59,6 @@ public class WikitionaryController {
             }
         }
 
-        if (wikitionaryEntry.getUrduSpelling() == null) {
-            LOGGER.info("urdu spelling cannot be null");
-            return false;
-        }
-
         if (wikitionaryEntry.getMeaning() == null) {
             LOGGER.info("meaning cannot be null");
             return false;

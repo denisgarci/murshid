@@ -5,12 +5,13 @@ import com.murshid.models.DictionaryKey;
 import com.murshid.models.enums.Accidence;
 import com.murshid.models.enums.PartOfSpeech;
 import com.murshid.persistence.AccidenceColumnConverter;
+import com.murshid.services.HasDictionaryKey;
 
 import javax.persistence.*;
 import java.util.List;
 
 @Entity(name = "gonzalo")
-public class GonzaloEntry {
+public class GonzaloEntry implements HasDictionaryKey{
 
     @EmbeddedId
     private DictionaryKey dictionaryKey;
@@ -84,4 +85,14 @@ public class GonzaloEntry {
         this.meaning = meaning;
         return this;
     }
+
+    public String getHindiWord(){
+        return this.dictionaryKey.hindiWord;
+    }
+
+    @Override
+    public int getWordIndex() {
+        return this.dictionaryKey.wordIndex;
+    }
+
 }

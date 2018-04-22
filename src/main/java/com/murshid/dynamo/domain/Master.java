@@ -9,7 +9,6 @@ import org.apache.commons.lang3.builder.HashCodeBuilder;
 
 import javax.persistence.Column;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
 
 public class Master {
@@ -26,11 +25,17 @@ public class Master {
     @Column(name = "part_of_speech")
     private PartOfSpeech partOfSpeech;
 
+
+    @JsonProperty("canonical_word")
+    @Column(name = "canonical_word")
+    private String  canonicalWord;
+
+
     private Set<Accidence> accidence;
 
     @JsonProperty("canonical_keys")
     @Column(name = "canonical_keys")
-    private List<CanonicalKey> canonicalKeys;
+    private Set<CanonicalKey> canonicalKeys;
 
     public String getHindiWord() {
         return hindiWord;
@@ -59,11 +64,11 @@ public class Master {
         return this;
     }
 
-    public List<CanonicalKey> getCanonicalKeys() {
+    public Set<CanonicalKey> getCanonicalKeys() {
         return canonicalKeys;
     }
 
-    public Master setCanonicalKeys(List<CanonicalKey> canonicalKeys) {
+    public Master setCanonicalKeys(Set<CanonicalKey> canonicalKeys) {
         this.canonicalKeys = canonicalKeys;
         return this;
     }
@@ -77,10 +82,21 @@ public class Master {
         return this;
     }
 
+
+    public String getCanonicalWord() {
+        return canonicalWord;
+    }
+
+    public Master setCanonicalWord(String canonicalWord) {
+        this.canonicalWord = canonicalWord;
+        return this;
+    }
+
     @Override
     public Object clone() {
           Master master = new Master();
           master.setAccidence(new HashSet<>(this.accidence));
+          master.setCanonicalWord(this.canonicalWord);
           master.setCanonicalKeys(this.canonicalKeys);
           master.setPartOfSpeech(this.getPartOfSpeech());
           master.setWordIndex(this.getWordIndex()+ 1);
@@ -101,6 +117,7 @@ public class Master {
                 .append(getPartOfSpeech(), master.getPartOfSpeech())
                 .append(getAccidence(), master.getAccidence())
                 .append(getCanonicalKeys(), master.getCanonicalKeys())
+                .append(getCanonicalWord(), master.getCanonicalWord())
                 .isEquals();
     }
 
@@ -111,6 +128,11 @@ public class Master {
                 .append(getPartOfSpeech())
                 .append(getAccidence())
                 .append(getCanonicalKeys())
+                .append(getCanonicalWord())
                 .toHashCode();
+    }
+
+    public String getKey(){
+        return getHindiWord().concat("_").concat(Integer.toString(getWordIndex()));
     }
 }

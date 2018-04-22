@@ -34,6 +34,11 @@ public class RekhtaService {
         return rekhtaRepository.findByDictionaryKeyHindiWord(hindiWord);
     }
 
+    public Optional<RekhtaEntry> findOne(String hindiWord, int index){
+        DictionaryKey dictionaryKey = new DictionaryKey().setHindiWord(hindiWord).setWordIndex(index);
+        return findOne(dictionaryKey);
+    }
+
     @Inject
     private RekhtaRepository rekhtaRepository;
 }

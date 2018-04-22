@@ -4,12 +4,15 @@ import com.murshid.models.DictionaryKey;
 import com.murshid.persistence.domain.WikitionaryEntry;
 import com.murshid.persistence.repo.SpellCheckRepository;
 import com.murshid.persistence.repo.WikitionaryRepository;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeansException;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
 
 import javax.inject.Inject;
 import javax.inject.Named;
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.ExecutorService;
@@ -18,6 +21,8 @@ import java.util.concurrent.ThreadFactory;
 
 @Named
 public class WikitionaryService implements ApplicationContextAware {
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(WikitionaryService.class);
 
     private ApplicationContext applicationContext;
 
@@ -65,7 +70,12 @@ public class WikitionaryService implements ApplicationContextAware {
     }
 
     public List<WikitionaryEntry> findByHindiWord(String hindiWord){
-        return wikitionaryRepository.findByDictionaryKeyHindiWord(hindiWord);
+        try{
+            return wikitionaryRepository.findByDictionaryKeyHindiWord(hindiWord);
+        }catch (Exception ex){
+            LOGGER.error("error when finding hindiWord={} in Wikitionary", hindiWord, ex);
+            return Collections.emptyList();
+        }
     }
 
     @Override

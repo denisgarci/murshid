@@ -1,6 +1,5 @@
 package com.murshid.services;
 
-import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 import com.murshid.dynamo.domain.Master;
 import com.murshid.models.CanonicalKey;
@@ -26,20 +25,20 @@ public class MasterServiceTest {
 
         CanonicalKey canonicalKey = new CanonicalKey().setDictionarySource(DictionarySource.PRATTS)
                 .setCanonicalIndex(0).setCanonicalWord("बोलना");
-        Master master = new Master().setCanonicalKeys(Lists.newArrayList(canonicalKey))
+        Master master = new Master().setCanonicalKeys(Sets.newHashSet(canonicalKey))
                 .setHindiWord("बोलता")
                 .setAccidence(Sets.newHashSet(Accidence.MASCULINE, Accidence.DIRECT, Accidence.SINGULAR))
                 .setPartOfSpeech(PartOfSpeech.PARTICIPLE);
 
          List<Master> result = masterService.explode(master);
 
-        Master expectedMasculineVocativeSingular = new Master().setCanonicalKeys(Lists.newArrayList(canonicalKey))
+        Master expectedMasculineVocativeSingular = new Master().setCanonicalKeys(Sets.newHashSet(canonicalKey))
                 .setHindiWord("बोलते")
                 .setAccidence(Sets.newHashSet(Accidence.MASCULINE, Accidence.VOCATIVE, Accidence.SINGULAR))
                 .setPartOfSpeech(PartOfSpeech.PARTICIPLE);
 
 
-        Master expectedFeminineDirectPlural = new Master().setCanonicalKeys(Lists.newArrayList(canonicalKey))
+        Master expectedFeminineDirectPlural = new Master().setCanonicalKeys(Sets.newHashSet(canonicalKey))
                 .setHindiWord("बोलतीं")
                 .setAccidence(Sets.newHashSet(Accidence.FEMININE, Accidence.DIRECT, Accidence.PLURAL))
                 .setPartOfSpeech(PartOfSpeech.PARTICIPLE);

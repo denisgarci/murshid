@@ -3,9 +3,9 @@ package com.murshid.dynamo.repo;
 import com.amazonaws.services.dynamodbv2.document.Item;
 import com.amazonaws.services.dynamodbv2.document.KeyAttribute;
 import com.amazonaws.services.dynamodbv2.document.Table;
+import com.murshid.dynamo.domain.Song;
 import com.murshid.models.converters.DynamoAccessor;
 import com.murshid.models.converters.SongConverter;
-import com.murshid.dynamo.domain.Song;
 
 import javax.inject.Named;
 
@@ -21,6 +21,12 @@ public class SongRepository {
         }else{
             return SongConverter.convert(item);
         }
+    }
+
+    public void save(Song song){
+        Table table = DynamoAccessor.dynamoDB.getTable("songs");
+        Item item = SongConverter.convert(song);
+        table.putItem(item);
     }
 
 }

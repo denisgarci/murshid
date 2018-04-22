@@ -12,7 +12,6 @@ import com.murshid.models.enums.PartOfSpeech;
 import org.junit.Test;
 
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -26,7 +25,7 @@ public class MasterConverterTest {
     public void convertToAvMap() throws Exception {
 
         Set<Accidence> accidenceList = Sets.newHashSet(Accidence.FEMININE, Accidence.SINGULAR);
-        List<CanonicalKey> canonicalKeysList = Lists.newArrayList(
+        Set<CanonicalKey> canonicalKeysList = Sets.newHashSet(
                 new CanonicalKey().setCanonicalIndex(0).setDictionarySource(DictionarySource.GONZALO).setCanonicalWord("भी"),
                 new CanonicalKey().setCanonicalIndex(0).setDictionarySource(DictionarySource.PRATTS).setCanonicalWord("भी"));
 
@@ -42,12 +41,12 @@ public class MasterConverterTest {
 
         assertEquals(avMap.get("hindi_word").getS(), "भी");
 
-        List<Accidence> accAvs = avMap.get("accidence").getL().stream().map(av ->  Accidence.valueOf(av.getS())).collect(
-                Collectors.toList());
+        Set<Accidence> accAvs = avMap.get("accidence").getL().stream().map(av ->  Accidence.valueOf(av.getS())).collect(
+                Collectors.toSet());
         assertEquals(accAvs, accidenceList);
 
-        List<CanonicalKey> cksAvs = avMap.get("canonical_keys").getL().stream().map(av -> CanonicalKey.fromAvMap(av.getM())).collect(
-                Collectors.toList());
+        Set<CanonicalKey> cksAvs = avMap.get("canonical_keys").getL().stream().map(av -> CanonicalKey.fromAvMap(av.getM())).collect(
+                Collectors.toSet());
         assertEquals(cksAvs, canonicalKeysList);
     }
 
@@ -59,6 +58,7 @@ public class MasterConverterTest {
         AttributeValue wordIndex = new AttributeValue();
         wordIndex.setN("3");
         avMap.put("word_index", wordIndex);
+        avMap.put("canonical_word", new AttributeValue("भी"));
 
         //create Dictionary Sources
         Map<String, AttributeValue> ckMap1 = new HashMap<>();
@@ -80,7 +80,7 @@ public class MasterConverterTest {
         AttributeValue avAcc1 = new AttributeValue(Accidence.FEMININE.name());
         AttributeValue avAcc2 = new AttributeValue(Accidence.SINGULAR.name());
         AttributeValue avAccs = new AttributeValue();
-        avAccs.setL(Lists.newArrayList(avAcc1, avAcc2));
+        avAccs.setL(Sets.newHashSet(avAcc1, avAcc2));
 
         avMap.put("canonical_keys", cksAv);
         avMap.put("accidence", avAccs);
@@ -89,10 +89,10 @@ public class MasterConverterTest {
 
         assertNotNull(master);
         assertEquals(master.getHindiWord(), "भी");
-        assertEquals(master.getAccidence(), Lists.newArrayList(Accidence.FEMININE, Accidence.SINGULAR));
+        assertEquals(master.getAccidence(), Sets.newHashSet(Accidence.FEMININE, Accidence.SINGULAR));
         assertEquals(master.getWordIndex(), 3);
 
-        List<CanonicalKey> canonicalKeysList = Lists.newArrayList(
+        Set<CanonicalKey> canonicalKeysList = Sets.newHashSet(
                 new CanonicalKey().setCanonicalIndex(0).setDictionarySource(DictionarySource.GONZALO).setCanonicalWord("भी"),
                 new CanonicalKey().setCanonicalIndex(0).setDictionarySource(DictionarySource.PRATTS).setCanonicalWord("भी"));
         assertEquals(master.getCanonicalKeys(), canonicalKeysList);

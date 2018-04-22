@@ -2,11 +2,12 @@ package com.murshid.persistence.domain;
 
 import com.murshid.models.DictionaryKey;
 import com.murshid.models.enums.PartOfSpeech;
+import com.murshid.services.HasDictionaryKey;
 
 import javax.persistence.*;
 
 @Entity(name = "pratts")
-public class PrattsEntry {
+public class PrattsEntry implements HasDictionaryKey {
 
     @EmbeddedId
     private DictionaryKey dictionaryKey;
@@ -115,4 +116,18 @@ public class PrattsEntry {
         return this;
     }
 
+    @Override
+    public String getHindiWord() {
+        return dictionaryKey.hindiWord;
+    }
+
+    @Override
+    public String getMeaning() {
+        return body;
+    }
+
+    @Override
+    public int getWordIndex() {
+        return dictionaryKey.wordIndex;
+    }
 }

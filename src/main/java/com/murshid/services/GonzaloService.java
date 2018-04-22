@@ -39,6 +39,11 @@ public class GonzaloService {
         }
     }
 
+    public Optional<GonzaloEntry> findOne(String hindiWord, int index){
+        DictionaryKey dictionaryKey = new DictionaryKey().setHindiWord(hindiWord).setWordIndex(index);
+        return findOne(dictionaryKey);
+    }
+
     @Inject
     private GonzaloRepository gonzaloRepository;
 }

@@ -2,6 +2,7 @@ package com.murshid.models.converters;
 
 import com.amazonaws.services.dynamodbv2.document.Item;
 import com.amazonaws.services.dynamodbv2.model.AttributeValue;
+import com.google.common.collect.Sets;
 import com.murshid.dynamo.domain.Master;
 import com.murshid.models.CanonicalKey;
 import com.murshid.models.enums.Accidence;
@@ -33,13 +34,18 @@ public class MasterConverter {
             master.setPartOfSpeech(PartOfSpeech.valueOf(item.getString("part_of_speech")));
         }
 
+        if (item.isPresent("canonical_word")){
+            master.setCanonicalWord(item.getString("canonical_word"));
+        }
+
+
         if (item.isPresent("canonical_keys")){
-            master.setCanonicalKeys((List<CanonicalKey>)item.get("canonical_keys"));
+            master.setCanonicalKeys(Sets.newHashSet((List)item.get("canonical_keys")));
         }
 
 
         if (item.isPresent("accidence")){
-            master.setAccidence((Set<Accidence>)item.get("accidence"));
+            master.setAccidence(((List<String>)item.get("accidence")).stream().map(Accidence::valueOf).collect(Collectors.toSet()));
         }
 
         return master;
@@ -73,8 +79,10 @@ public class MasterConverter {
         result.put("hindi_word", new AttributeValue(master.getHindiWord()));
         result.put("word_index", new AttributeValue(Integer.toString(master.getWordIndex())));
         result.put("part_of_speech", new AttributeValue(master.getPartOfSpeech().name()));
+        result.put("canonical_word", new AttributeValue(master.getCanonicalWord()));
         result.put("canonical_keys", cksList);
         result.put("accidence", accsList  );
+
         return result;
     }
 
@@ -82,12 +90,13 @@ public class MasterConverter {
         Master master = new Master();
         master.setHindiWord(sAvs.get("hindi_word").getS())
                 .setPartOfSpeech(PartOfSpeech.valueOf(sAvs.get("part_of_speech").getS()))
+                .setCanonicalWord(sAvs.get("canonical_word").getS())
                 .setWordIndex(Integer.valueOf(sAvs.get("word_index").getN()));
 
-        List<CanonicalKey> canonicalKeys = sAvs.get("canonical_keys")
+        Set<CanonicalKey> canonicalKeys = sAvs.get("canonical_keys")
                 .getL().stream()
                 .map(av -> CanonicalKey.fromAvMap(av.getM()) )
-                .collect(Collectors.toList());
+                .collect(Collectors.toSet());
 
         AttributeValue accidenceAv = sAvs.get("accidence");
 
@@ -110,6 +119,8 @@ public class MasterConverter {
         Item item = new Item();
 
         item = item.with("hindi_word", master.getHindiWord());
+
+        item = item.with("canonical_word", master.getCanonicalWord());
 
         item = item.with("word_index", master.getWordIndex());
 

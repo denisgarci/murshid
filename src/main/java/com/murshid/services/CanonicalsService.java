@@ -2,6 +2,7 @@ package com.murshid.services;
 
 import com.murshid.models.enums.DictionarySource;
 import com.murshid.morphology.AllCanonizers;
+import com.murshid.persistence.domain.views.CanonicalWrapper;
 
 import javax.annotation.Nonnull;
 import javax.inject.Inject;
@@ -14,6 +15,17 @@ import java.util.stream.Collectors;
 @Named
 public class CanonicalsService {
 
+
+    public List<CanonicalWrapper> findDictionaryEntries(@Nonnull String hindiWord){
+
+        List<CanonicalWrapper> result = new ArrayList<>();
+        result.addAll( wikitionaryService.findByHindiWord(hindiWord).stream().map(we -> new CanonicalWrapper(DictionarySource.WIKITIONARY, we)).collect(Collectors.toList()));
+        result.addAll( prattsService.findByHindiWord(hindiWord).stream().map(we -> new CanonicalWrapper(DictionarySource.PRATTS, we)).collect(Collectors.toList()));
+        result.addAll( rekhtaService.findByHindiWord(hindiWord).stream().map(we -> new CanonicalWrapper(DictionarySource.REKHTA, we)).collect(Collectors.toList()));
+        result.addAll( gonzaloService.findByHindiWord(hindiWord).stream().map(we -> new CanonicalWrapper(DictionarySource.GONZALO, we)).collect(Collectors.toList()));
+
+        return result;
+    }
 
 
     public List<CanonicalWrapper> suggestCanonicals(@Nonnull String inflected){
@@ -29,35 +41,6 @@ public class CanonicalsService {
 
         return result;
     }
-
-    static class CanonicalWrapper{
-        private DictionarySource dictionarySource;
-        private Object entry;
-
-        public CanonicalWrapper(DictionarySource dictionarySource, Object entry){
-            this.dictionarySource = dictionarySource;
-            this.entry = entry;
-        }
-
-        public DictionarySource getDictionarySource() {
-            return dictionarySource;
-        }
-
-        public CanonicalWrapper setDictionarySource(DictionarySource dictionarySource) {
-            this.dictionarySource = dictionarySource;
-            return this;
-        }
-
-        public Object getEntry() {
-            return entry;
-        }
-
-        public CanonicalWrapper setEntry(Object entry) {
-            this.entry = entry;
-            return this;
-        }
-    }
-
 
     @Inject
     protected WikitionaryService wikitionaryService;

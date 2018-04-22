@@ -23,5 +23,10 @@ public class DictionaryKey implements Serializable{
         return this;
     }
 
+    public String toString() {
+        return hindiWord.concat("_").concat(Integer.toString(wordIndex));
+
+    }
+
 
 }

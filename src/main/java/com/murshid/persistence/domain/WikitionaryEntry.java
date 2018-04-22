@@ -4,12 +4,13 @@ import com.murshid.models.DictionaryKey;
 import com.murshid.models.enums.Accidence;
 import com.murshid.models.enums.PartOfSpeech;
 import com.murshid.persistence.AccidenceColumnConverter;
+import com.murshid.services.HasDictionaryKey;
 
 import javax.persistence.*;
 import java.util.List;
 
 @Entity(name = "wikitionary")
-public class WikitionaryEntry {
+public class WikitionaryEntry implements HasDictionaryKey{
 
     @EmbeddedId
     private DictionaryKey dictionaryKey;
@@ -96,4 +97,13 @@ public class WikitionaryEntry {
         return this;
     }
 
+    @Override
+    public int getWordIndex() {
+        return dictionaryKey.wordIndex;
+    }
+
+    @Override
+    public String getHindiWord() {
+        return dictionaryKey.hindiWord;
+    }
 }

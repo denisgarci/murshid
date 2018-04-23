@@ -23,7 +23,7 @@ public class MasterServiceTest {
     @Test
     public void explode() throws Exception {
 
-        CanonicalKey canonicalKey = new CanonicalKey().setDictionarySource(DictionarySource.PRATTS)
+        CanonicalKey canonicalKey = new CanonicalKey().setDictionarySource(DictionarySource.PLATTS)
                 .setCanonicalIndex(0).setCanonicalWord("बोलना");
         Master master = new Master().setCanonicalKeys(Sets.newHashSet(canonicalKey))
                 .setHindiWord("बोलता")

@@ -23,7 +23,7 @@ public class WikitionaryCaller {
     private static String URL = "https://en.wiktionary.org";
 
     public static void main(String[] args) throws Exception{
-        //new PrattsCaller().invokeAll();
+        //new PlattsCaller().invokeAll();
         WikitionaryCaller caller = new WikitionaryCaller();
 
         //String canonicalWord = "हैकल";

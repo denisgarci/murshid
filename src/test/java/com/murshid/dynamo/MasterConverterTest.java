@@ -26,8 +26,8 @@ public class MasterConverterTest {
 
         Set<Accidence> accidenceList = Sets.newHashSet(Accidence.FEMININE, Accidence.SINGULAR);
         Set<CanonicalKey> canonicalKeysList = Sets.newHashSet(
-                new CanonicalKey().setCanonicalIndex(0).setDictionarySource(DictionarySource.GONZALO).setCanonicalWord("भी"),
-                new CanonicalKey().setCanonicalIndex(0).setDictionarySource(DictionarySource.PRATTS).setCanonicalWord("भी"));
+                new CanonicalKey().setCanonicalIndex(0).setDictionarySource(DictionarySource.MURSHID).setCanonicalWord("भी"),
+                new CanonicalKey().setCanonicalIndex(0).setDictionarySource(DictionarySource.PLATTS).setCanonicalWord("भी"));
 
 
         Master master = new Master()
@@ -62,13 +62,13 @@ public class MasterConverterTest {
 
         //create Dictionary Sources
         Map<String, AttributeValue> ckMap1 = new HashMap<>();
-        ckMap1.put("dictionary_source", new AttributeValue().withS(DictionarySource.GONZALO.name()));
+        ckMap1.put("dictionary_source", new AttributeValue().withS(DictionarySource.MURSHID.name()));
         ckMap1.put("canonical_word", new AttributeValue("भी"));
         ckMap1.put("canonical_index", new AttributeValue().withN(Integer.toString(0)));
         AttributeValue ck1Av = new AttributeValue().withM(ckMap1);
 
         Map<String, AttributeValue> ckMap2 = new HashMap<>();
-        ckMap2.put("dictionary_source", new AttributeValue().withS(DictionarySource.PRATTS.name()));
+        ckMap2.put("dictionary_source", new AttributeValue().withS(DictionarySource.PLATTS.name()));
         ckMap2.put("canonical_word", new AttributeValue("भी"));
         ckMap2.put("canonical_index", new AttributeValue().withN(Integer.toString(0)));
         AttributeValue ck2Av = new AttributeValue().withM(ckMap2);
@@ -93,8 +93,8 @@ public class MasterConverterTest {
         assertEquals(master.getWordIndex(), 3);
 
         Set<CanonicalKey> canonicalKeysList = Sets.newHashSet(
-                new CanonicalKey().setCanonicalIndex(0).setDictionarySource(DictionarySource.GONZALO).setCanonicalWord("भी"),
-                new CanonicalKey().setCanonicalIndex(0).setDictionarySource(DictionarySource.PRATTS).setCanonicalWord("भी"));
+                new CanonicalKey().setCanonicalIndex(0).setDictionarySource(DictionarySource.MURSHID).setCanonicalWord("भी"),
+                new CanonicalKey().setCanonicalIndex(0).setDictionarySource(DictionarySource.PLATTS).setCanonicalWord("भी"));
         assertEquals(master.getCanonicalKeys(), canonicalKeysList);
     }
 

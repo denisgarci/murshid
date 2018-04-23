@@ -4,7 +4,6 @@ import com.murshid.dynamo.domain.Master;
 import com.murshid.models.CanonicalKey;
 import com.murshid.services.MasterService;
 import com.murshid.services.SongsService;
-import com.murshid.services.SpellCheckService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
@@ -60,7 +59,7 @@ public class MasterController {
     @PostMapping("/insertNew")
     public ResponseEntity<String> insertNew(@RequestBody Master masterEntry) {
         complementCanonicalKeys(masterEntry);
-        if (isValid(masterEntry)) {
+        if (masterService.isValid(masterEntry)) {
             if (masterService.exists(masterEntry.getHindiWord(), masterEntry.getWordIndex())){
                 LOGGER.info("canonicalWord {} index {} already exists in master", masterEntry.getHindiWord(), masterEntry.getWordIndex());
                 return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
@@ -79,7 +78,7 @@ public class MasterController {
     @PostMapping("/insertNewWithExplode")
     public ResponseEntity<String> insertNewWithExplode(@RequestBody Master masterEntry) {
         complementCanonicalKeys(masterEntry);
-        if (!isValid(masterEntry)) {
+        if (!masterService.isValid(masterEntry)) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
         }
 
@@ -87,7 +86,7 @@ public class MasterController {
 
         //first validate them all
         for (Master master: exploded) {
-            if (isValid(master)) {
+            if (masterService.isValid(master)) {
                 if (masterService.exists(master.getHindiWord(), master.getWordIndex())) {
                     LOGGER.info("canonicalWord {} index {} already exists in master", master.getHindiWord(),
                                 master.getWordIndex());
@@ -113,7 +112,7 @@ public class MasterController {
     @PostMapping("/upsert")
     public ResponseEntity<String> upsert(@RequestBody Master masterEntry) {
         complementCanonicalKeys(masterEntry);
-        if (isValid(masterEntry)) {
+        if (masterService.isValid(masterEntry)) {
             boolean success = masterService.save(masterEntry);
             if (success) {
                 return ResponseEntity.status(HttpStatus.CREATED).build();
@@ -132,48 +131,10 @@ public class MasterController {
         return master;
     }
 
-    private boolean isValid(Master master) {
-        if (master.getPartOfSpeech() == null) {
-            LOGGER.info("partOfSpeech cannot be null");
-            return false;
-        }
-
-        if (master.getHindiWord() == null) {
-            LOGGER.info("canonicalWord cannot be null");
-            return false;
-        }
-
-        if (!spellCheckService.exists(master.getHindiWord())){
-            LOGGER.info("the hindi word {} does not exists in hindi_words ", master.getHindiWord());
-            return false;
-        }
-
-        if (master.getPartOfSpeech() == null) {
-            LOGGER.info("part of speech cannot be null");
-            return false;
-        }
-
-        if (!masterService.validateCanonicalKeys(master)){
-            LOGGER.info("some of the canonical keys are not present");
-            return false;
-        }
-
-        if (!masterService.validateAccidence(master.getPartOfSpeech(), master.getAccidence())){
-            LOGGER.info("inadequate accidence for the POS");
-            return false;
-        }
-
-        return true;
-    }
-
     @Inject
     private MasterService masterService;
 
     @Inject
     private SongsService songsService;
-
-    @Inject
-    private SpellCheckService spellCheckService;
-
 
 }

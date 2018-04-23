@@ -3,8 +3,8 @@ package com.murshid.services;
 import com.google.common.collect.ImmutableMap;
 import com.murshid.models.DictionaryKey;
 import com.murshid.models.enums.DictionarySource;
-import com.murshid.persistence.domain.GonzaloEntry;
-import com.murshid.persistence.domain.PrattsEntry;
+import com.murshid.persistence.domain.MurshidEntry;
+import com.murshid.persistence.domain.PlattsEntry;
 import com.murshid.persistence.domain.RekhtaEntry;
 import com.murshid.persistence.domain.WikitionaryEntry;
 import org.slf4j.Logger;
@@ -64,20 +64,21 @@ public class DictionaryService {
                 };
               }
 
-              case PRATTS: {
+                case PLATTS: {
 
-                //Pratts
-                Optional<PrattsEntry> prattsEntry = prattsService.findOne(word, wordIndex);
+                //Platts
+                Optional<PlattsEntry> prattsEntry = plattsService.findOne(word, wordIndex);
                 if (prattsEntry.isPresent()){
-                    PrattsEntry we = prattsEntry.get();
-                    String key = DictionarySource.PRATTS.name()
+                    PlattsEntry we = prattsEntry.get();
+                    String key = DictionarySource.PLATTS.name()
                             .concat("_")
                             .concat(we.getHindiWord())
                             .concat("_")
                             .concat(Integer.toString(we.getWordIndex()));
                     Map<String, String> value = ImmutableMap.of("meaning", we.getMeaning(),
                                                                 "hindiWord", we.getHindiWord(),
-                                                                "dictionarySource", DictionarySource.PRATTS.name());
+                                                                "origin", we.getOrigin(),
+                                                                "dictionarySource", DictionarySource.PLATTS.name());
                     result.put(key, value);
                 };
               }
@@ -100,21 +101,21 @@ public class DictionaryService {
                 };
               }
 
-             case GONZALO: {
+                case MURSHID: {
 
-                 //Gonzalo
-                 Optional<GonzaloEntry> gonzaloEntry = gonzaloService.findOne(word, wordIndex);
+                 //Murshid
+                 Optional<MurshidEntry> gonzaloEntry = murshidService.findOne(word, wordIndex);
                  if (gonzaloEntry.isPresent()){
-                   GonzaloEntry we = gonzaloEntry.get();
+                   MurshidEntry we = gonzaloEntry.get();
 
-                   String key = DictionarySource.GONZALO.name()
+                   String key = DictionarySource.MURSHID.name()
                              .concat("_")
                              .concat(we.getHindiWord())
                              .concat("_")
                              .concat(Integer.toString(we.getWordIndex()));
                      Map<String, String> value = ImmutableMap.of("meaning", we.getMeaning(),
                                                                  "hindiWord", we.getHindiWord(),
-                                                                 "dictionarySource", DictionarySource.GONZALO.name());
+                                                                 "dictionarySource", DictionarySource.MURSHID.name());
                      result.put(key, value);
                  };
              }
@@ -128,10 +129,10 @@ public class DictionaryService {
     private WikitionaryService wikitionaryService;
 
     @Inject
-    private PrattsService prattsService;
+    private PlattsService plattsService;
 
     @Inject
-    private GonzaloService gonzaloService;
+    private MurshidService murshidService;
 
     @Inject
     private RekhtaService rekhtaService;

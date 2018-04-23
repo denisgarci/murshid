@@ -15,8 +15,8 @@ import com.murshid.models.converters.DynamoAccessor;
 import com.murshid.models.converters.MasterConverter;
 import com.murshid.models.enums.Accidence;
 import com.murshid.models.enums.PartOfSpeech;
-import com.murshid.persistence.domain.GonzaloEntry;
-import com.murshid.persistence.domain.PrattsEntry;
+import com.murshid.persistence.domain.MurshidEntry;
+import com.murshid.persistence.domain.PlattsEntry;
 import com.murshid.persistence.domain.RekhtaEntry;
 import com.murshid.persistence.domain.WikitionaryEntry;
 import com.murshid.utils.SongUtils;
@@ -68,6 +68,24 @@ public class MasterService {
         return scanResult.getItems()
                 .stream().map(MasterConverter::fromAvMap)
                 .collect(Collectors.toList());
+    }
+
+    public void validateAll(){
+
+        ScanRequest scanRequest = new ScanRequest().withTableName("master");
+
+        ScanResult scanResult = DynamoAccessor.client.scan(scanRequest);
+        List<Master> masters = scanResult.getItems()
+                .stream().map(MasterConverter::fromAvMap)
+                .collect(Collectors.toList());
+
+        for(Master master: masters){
+            if (!isValid(master)){
+                throw new RuntimeException(String.format("master entry invalid hindiWord=%s wordIndex=%s", master.getHindiWord(), master.getWordIndex()));
+            }
+        }
+
+
     }
 
     /**
@@ -792,6 +810,40 @@ public class MasterService {
 
     }
 
+    public boolean isValid(Master master) {
+        if (master.getPartOfSpeech() == null) {
+            LOGGER.info("partOfSpeech cannot be null");
+            return false;
+        }
+
+        if (master.getHindiWord() == null) {
+            LOGGER.info("canonicalWord cannot be null");
+            return false;
+        }
+
+        if (!spellCheckService.exists(master.getHindiWord())){
+            LOGGER.info("the hindi word {} does not exists in hindi_words ", master.getHindiWord());
+            return false;
+        }
+
+        if (master.getPartOfSpeech() == null) {
+            LOGGER.info("part of speech cannot be null");
+            return false;
+        }
+
+        if (!validateCanonicalKeys(master)){
+            LOGGER.info("some of the canonical keys are not present");
+            return false;
+        }
+
+        if (!validateAccidence(master.getPartOfSpeech(), master.getAccidence())){
+            LOGGER.info("inadequate accidence for the POS");
+            return false;
+        }
+
+        return true;
+    }
+
     /**
      * checks if all canonical keys contained in Master (if any)
      * really exist in the respective entities
@@ -807,18 +859,18 @@ public class MasterService {
             DictionaryKey dk = new DictionaryKey().setHindiWord(ck.canonicalWord).setWordIndex(ck.canonicalIndex);
 
             switch (ck.dictionarySource){
-                case PRATTS:
-                    Optional<PrattsEntry> prattsEntry = prattsService.findOne(dk);
-                    if (!prattsEntry.isPresent()){
+                case PLATTS:
+                    Optional<PlattsEntry> plattsEntry = plattsService.findOne(dk);
+                    if (!plattsEntry.isPresent()){
                         LOGGER.info("the PRATTS canonical entry canonicalWord={} canonicalIndex={} indicated in Master does not exist", master.getHindiWord(), master.getWordIndex());
                         return false;
-                    }else if (!isDerivatePOS(prattsEntry.get().getPartOfSpeech(), master.getPartOfSpeech())){
-                        LOGGER.info("the POS indicated in Master ({}) is not a derivate of the entry in PRATTS ({})", master.getPartOfSpeech(), prattsEntry.get().getPartOfSpeech());
+                    }else if (!isDerivatePOS(plattsEntry.get().getPartOfSpeech(), master.getPartOfSpeech())){
+                        LOGGER.info("the POS indicated in Master ({}) is not a derivate of the entry in PRATTS ({})", master.getPartOfSpeech(), plattsEntry.get().getPartOfSpeech());
                         return false;
                     }
                     break;
-                case GONZALO:
-                    Optional<GonzaloEntry> gonzaloEntry = gonzaloService.findOne(dk);
+                case MURSHID:
+                    Optional<MurshidEntry> gonzaloEntry = murshidService.findOne(dk);
                     if (!gonzaloEntry.isPresent()){
                         LOGGER.info("the GONZALO canonical entry canonicalWord={} canonicalIndex={} indicated in Master does not exist", master.getHindiWord(), master.getWordIndex());
                         return false;
@@ -890,13 +942,17 @@ public class MasterService {
     private WikitionaryService wikitionaryService;
 
     @Inject
-    private PrattsService prattsService;
+    private PlattsService plattsService;
 
     @Inject
-    private GonzaloService gonzaloService;
+    private MurshidService murshidService;
 
     @Inject
     private RekhtaService rekhtaService;
+
+    @Inject
+    private SpellCheckService spellCheckService;
+
 
 
 }

@@ -24,7 +24,7 @@ public class ShabdkoshCaller {
     private static String URL = "http://www.shabdkosh.com";
 
     public static void main(String[] args) throws Exception{
-        //new PrattsCaller().invokeAll();
+        //new PlattsCaller().invokeAll();
         ShabdkoshCaller caller = new ShabdkoshCaller();
 
         //String canonicalWord = "हैकल";

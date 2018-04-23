@@ -72,6 +72,7 @@ public class CanonicalKey implements Serializable{
 
     public static CanonicalKey  fromAvMap(Map<String, AttributeValue> avMap){
         CanonicalKey canonicalKey = new CanonicalKey();
+        if (avMap.containsKey("canonical_word"))
         canonicalKey.setCanonicalWord(avMap.get("canonical_word").getS());
         canonicalKey.setCanonicalIndex(Integer.valueOf(avMap.get("canonical_index").getN()));
         canonicalKey.setDictionarySource(DictionarySource.valueOf(avMap.get("dictionary_source").getS()));

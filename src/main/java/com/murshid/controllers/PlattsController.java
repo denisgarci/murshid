@@ -1,8 +1,8 @@
 package com.murshid.controllers;
 
-import com.murshid.persistence.domain.RekhtaEntry;
-import com.murshid.persistence.repo.RekhtaRepository;
-import com.murshid.services.RekhtaService;
+import com.google.common.collect.Lists;
+import com.murshid.persistence.domain.PlattsEntry;
+import com.murshid.services.PlattsService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
@@ -14,28 +14,30 @@ import javax.inject.Inject;
 import java.util.List;
 
 @Controller
-@RequestMapping("rekhta")
-public class RekhtaController {
+@RequestMapping("platts")
+public class PlattsController {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(RekhtaController.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(PlattsController.class);
+
+
+    @GetMapping("/findAnywhere")
+    public @ResponseBody
+    List<PlattsEntry> findInKeyAndBody(@RequestParam(name = "word") String word) {
+        List list = Lists.newArrayList(plattsService.findAnywhere(word));
+        return list;
+    }
 
     @PostMapping
-    public ResponseEntity<String> persist(@RequestBody RekhtaEntry rekhtaEntry) {
-        if (isValid(rekhtaEntry)) {
-            rekhtaService.save(rekhtaEntry);
+    public ResponseEntity<String> persistPratts(@RequestBody PlattsEntry plattsEntry) {
+        if (isValid(plattsEntry)) {
+            plattsService.save(plattsEntry);
             return ResponseEntity.status(HttpStatus.CREATED).build();
         } else {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
         }
     }
 
-    @GetMapping("/findByHindiWord")
-    public @ResponseBody
-    List<RekhtaEntry> findByWord(@RequestParam(name="hindiWord") String hindiWord) {
-        return rekhtaService.findByHindiWord(hindiWord);
-    }
-
-    private boolean isValid(RekhtaEntry plattsEntry) {
+    private boolean isValid(PlattsEntry plattsEntry) {
         if (plattsEntry.getPartOfSpeech() == null) {
             LOGGER.info("partOfSpeech cannot be null");
             return false;
@@ -46,7 +48,7 @@ public class RekhtaController {
             return false;
         } else {
             if (plattsEntry.getDictionaryKey().hindiWord == null) {
-                LOGGER.info("dictionary entry key cannot be null");
+                LOGGER.info("hindi canonicalWord cannot be null");
                 return false;
             }
         }
@@ -57,7 +59,7 @@ public class RekhtaController {
         }
 
         if (plattsEntry.getMeaning() == null) {
-            LOGGER.info("meaning cannot be null");
+            LOGGER.info("body cannot be null");
             return false;
         }
 
@@ -65,9 +67,6 @@ public class RekhtaController {
     }
 
     @Inject
-    private RekhtaService rekhtaService;
-
-    @Inject
-    private RekhtaRepository rekhtaRepository;
+    private PlattsService plattsService;
 
 }

@@ -28,7 +28,7 @@ public class RekhtaCaller {
 
 
     public static void main(String[] args) throws Exception{
-        //new PrattsCaller().invokeAll();
+        //new PlattsCaller().invokeAll();
         RekhtaCaller caller = new RekhtaCaller();
 
         URL url = caller.createUrlWithParams("हैकल");

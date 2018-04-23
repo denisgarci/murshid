@@ -8,6 +8,7 @@ import com.murshid.dynamo.domain.Song;
 import com.murshid.dynamo.repo.MasterRepository;
 import com.murshid.dynamo.repo.SongRepository;
 import com.murshid.models.converters.DynamoAccessor;
+import com.murshid.services.MasterService;
 import com.murshid.services.SongsService;
 import com.murshid.services.WikitionaryLetterIngestor;
 import org.slf4j.Logger;
@@ -29,15 +30,17 @@ public class IngestorApplication {
 	public static void main(String[] args) throws Exception{
 		context = SpringApplication.run(IngestorApplication.class, args);
 
-		//reindexAlvida();
+		validateAll();
 
         //sameCanonical();
         //songRepo();
         //createIndex();
         //findByIndex();
+
+//        changeEnums();
 //
 //
-//        GonzaloRepository gonzaloRepository = context.getBean(GonzaloRepository.class);
+//        MurshidRepository gonzaloRepository = context.getBean(MurshidRepository.class);
 //
 //        DictionaryKey dictionaryKey = new DictionaryKey().setCanonicalWord("बैरीयां").setCanonicalIndex(0);
 //
@@ -45,7 +48,7 @@ public class IngestorApplication {
 //
 //		List<Accidence> accidence = Lists.newArrayList(Accidence.MASCULINE, Accidence.PLURAL_NUMBER);
 //
-//        GonzaloEntry ge = gonzaloRepository.save(new GonzaloEntry().setAccidence(accidence)
+//        MurshidEntry ge = gonzaloRepository.save(new MurshidEntry().setAccidence(accidence)
 //                .setUrduWord("بيریاں")
 //				.setDictionaryKey(dictionaryKey)
 //                .setCanonicalKey(canonicalKey)
@@ -53,6 +56,12 @@ public class IngestorApplication {
 
 
 	}
+
+    private static void validateAll() throws InterruptedException{
+        MasterService masterService = context.getBean(MasterService.class);
+        masterService.validateAll();
+        LOGGER.info("finished validating");
+    }
 
     private static void reindexAlvida() throws InterruptedException{
         SongsService songsService = context.getBean(SongsService.class);

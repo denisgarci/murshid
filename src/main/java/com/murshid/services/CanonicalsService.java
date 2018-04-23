@@ -20,9 +20,9 @@ public class CanonicalsService {
 
         List<CanonicalWrapper> result = new ArrayList<>();
         result.addAll( wikitionaryService.findByHindiWord(hindiWord).stream().map(we -> new CanonicalWrapper(DictionarySource.WIKITIONARY, we)).collect(Collectors.toList()));
-        result.addAll( prattsService.findByHindiWord(hindiWord).stream().map(we -> new CanonicalWrapper(DictionarySource.PRATTS, we)).collect(Collectors.toList()));
+        result.addAll(plattsService.findByHindiWord(hindiWord).stream().map(we -> new CanonicalWrapper(DictionarySource.PLATTS, we)).collect(Collectors.toList()));
         result.addAll( rekhtaService.findByHindiWord(hindiWord).stream().map(we -> new CanonicalWrapper(DictionarySource.REKHTA, we)).collect(Collectors.toList()));
-        result.addAll( gonzaloService.findByHindiWord(hindiWord).stream().map(we -> new CanonicalWrapper(DictionarySource.GONZALO, we)).collect(Collectors.toList()));
+        result.addAll(murshidService.findByHindiWord(hindiWord).stream().map(we -> new CanonicalWrapper(DictionarySource.MURSHID, we)).collect(Collectors.toList()));
 
         return result;
     }
@@ -34,9 +34,9 @@ public class CanonicalsService {
 
         for(String cw : possibleCanonicalWords) {
             result.addAll( wikitionaryService.findByHindiWord(cw).stream().map(we -> new CanonicalWrapper(DictionarySource.WIKITIONARY, we)).collect(Collectors.toList()));
-            result.addAll( prattsService.findByHindiWord(cw).stream().map(we -> new CanonicalWrapper(DictionarySource.PRATTS, we)).collect(Collectors.toList()));
+            result.addAll(plattsService.findByHindiWord(cw).stream().map(we -> new CanonicalWrapper(DictionarySource.PLATTS, we)).collect(Collectors.toList()));
             result.addAll( rekhtaService.findByHindiWord(cw).stream().map(we -> new CanonicalWrapper(DictionarySource.REKHTA, we)).collect(Collectors.toList()));
-            result.addAll( gonzaloService.findByHindiWord(cw).stream().map(we -> new CanonicalWrapper(DictionarySource.GONZALO, we)).collect(Collectors.toList()));
+            result.addAll(murshidService.findByHindiWord(cw).stream().map(we -> new CanonicalWrapper(DictionarySource.MURSHID, we)).collect(Collectors.toList()));
         }
 
         return result;
@@ -45,11 +45,11 @@ public class CanonicalsService {
     @Inject
     protected WikitionaryService wikitionaryService;
     @Inject
-    protected PrattsService prattsService;
+    protected PlattsService plattsService;
     @Inject
     protected RekhtaService rekhtaService;
     @Inject
-    protected GonzaloService gonzaloService;
+    protected MurshidService murshidService;
 
 
 }

@@ -1,7 +1,6 @@
 package com.murshid.controllers;
 
 import com.murshid.persistence.domain.RekhtaEntry;
-import com.murshid.persistence.repo.RekhtaRepository;
 import com.murshid.services.RekhtaService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -21,7 +20,7 @@ public class RekhtaController {
 
     @PostMapping
     public ResponseEntity<String> persist(@RequestBody RekhtaEntry rekhtaEntry) {
-        if (isValid(rekhtaEntry)) {
+        if (rekhtaService.isValid(rekhtaEntry)) {
             rekhtaService.save(rekhtaEntry);
             return ResponseEntity.status(HttpStatus.CREATED).build();
         } else {
@@ -35,39 +34,9 @@ public class RekhtaController {
         return rekhtaService.findByHindiWord(hindiWord);
     }
 
-    private boolean isValid(RekhtaEntry plattsEntry) {
-        if (plattsEntry.getPartOfSpeech() == null) {
-            LOGGER.info("partOfSpeech cannot be null");
-            return false;
-        }
 
-        if (plattsEntry.getDictionaryKey() == null) {
-            LOGGER.info("dictionary key cannot be null");
-            return false;
-        } else {
-            if (plattsEntry.getDictionaryKey().hindiWord == null) {
-                LOGGER.info("dictionary entry key cannot be null");
-                return false;
-            }
-        }
-
-        if (plattsEntry.getUrduWord() == null) {
-            LOGGER.info("urduWord cannot be null");
-            return false;
-        }
-
-        if (plattsEntry.getMeaning() == null) {
-            LOGGER.info("meaning cannot be null");
-            return false;
-        }
-
-        return true;
-    }
 
     @Inject
     private RekhtaService rekhtaService;
-
-    @Inject
-    private RekhtaRepository rekhtaRepository;
 
 }

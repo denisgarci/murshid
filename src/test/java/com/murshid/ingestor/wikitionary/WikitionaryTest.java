@@ -21,7 +21,7 @@ import static org.junit.Assert.assertTrue;
 
 public class WikitionaryTest {
 
-    @Test
+    //@Test
     public void posParagraphExtraction() throws Exception {
 
         String word = "रब";
@@ -56,7 +56,7 @@ public class WikitionaryTest {
     }
 
 
-    @Test
+    //@Test
     public void etymologiesExtractionBuut() throws Exception {
 
         String word = "बूट";

@@ -30,7 +30,6 @@ public class IngestorApplication {
 	public static void main(String[] args) throws Exception{
 		context = SpringApplication.run(IngestorApplication.class, args);
 
-		validateAll();
 
         //sameCanonical();
         //songRepo();
@@ -56,6 +55,9 @@ public class IngestorApplication {
 
 
 	}
+
+
+
 
     private static void validateAll() throws InterruptedException{
         MasterService masterService = context.getBean(MasterService.class);

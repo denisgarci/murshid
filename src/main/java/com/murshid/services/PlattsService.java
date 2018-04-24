@@ -45,6 +45,8 @@ public class PlattsService {
         return findOne(dictionaryKey);
     }
 
+
+
     public Optional<PlattsEntry> findOne(DictionaryKey key){
         List<PlattsEntry> result = plattsRepository.findByDictionaryKey(key);
         if (result.size() > 1){

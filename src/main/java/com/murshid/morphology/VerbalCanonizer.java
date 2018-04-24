@@ -49,7 +49,7 @@ public class VerbalCanonizer {
                                 .setAccidence(Sets.newHashSet(Accidence.IMPERATIVE, Accidence.SINGULAR, Accidence._2ND)));
         }
 
-        //absolutive
+        //absolutives
         {
             String canonicalForm = inflectedForm.concat("ना");
             results.add(new CanonicalResult().setPossiblePOS(PartOfSpeech.ABSOLUTIVE)
@@ -105,6 +105,18 @@ public class VerbalCanonizer {
             results.add(new CanonicalResult().setPossiblePOS(PartOfSpeech.VERB)
                                 .setCanonicalForm(canonicalForm).setAccidence(Sets.newHashSet(Accidence.FUTURE, Accidence.SINGULAR, Accidence._1ST, Accidence.MASCULINE)));
         }
+       //finished in UUNA (छूना becomes छुऊँगा)
+        if (inflectedForm.endsWith("ुऊँगा") ){
+            String canonicalForm = inflectedForm.substring(0, inflectedForm.length()-5).concat("ूना");
+            results.add(new CanonicalResult().setPossiblePOS(PartOfSpeech.VERB)
+                                .setCanonicalForm(canonicalForm).setAccidence(Sets.newHashSet(Accidence.FUTURE, Accidence.SINGULAR, Accidence._1ST, Accidence.MASCULINE)));
+        }
+        //finished in IINA (पीना becomes पिऊँगा)
+        if (inflectedForm.endsWith("िऊँगा") ){
+            String canonicalForm = inflectedForm.substring(0, inflectedForm.length()-5).concat("ीना");
+            results.add(new CanonicalResult().setPossiblePOS(PartOfSpeech.VERB)
+                                .setCanonicalForm(canonicalForm).setAccidence(Sets.newHashSet(Accidence.FUTURE, Accidence.SINGULAR, Accidence._1ST, Accidence.MASCULINE)));
+        }
 
         if (inflectedForm.endsWith("ेगा") ){
             String canonicalForm = inflectedForm.substring(0, inflectedForm.length()-3).concat("ना");
@@ -113,9 +125,42 @@ public class VerbalCanonizer {
             results.add(new CanonicalResult().setPossiblePOS(PartOfSpeech.VERB)
                                 .setCanonicalForm(canonicalForm).setAccidence(Sets.newHashSet(Accidence.FUTURE, Accidence.SINGULAR, Accidence._3RD, Accidence.MASCULINE)));
         }
+        //finished in UUNA (छूना becomes छुएगा)
+        if (inflectedForm.endsWith("ुएगा") ){
+            String canonicalForm = inflectedForm.substring(0, inflectedForm.length()-4).concat("ूना");
+            results.add(new CanonicalResult().setPossiblePOS(PartOfSpeech.VERB)
+                                .setCanonicalForm(canonicalForm).setAccidence(Sets.newHashSet(Accidence.FUTURE, Accidence.SINGULAR, Accidence._2ND, Accidence.MASCULINE)));
+            results.add(new CanonicalResult().setPossiblePOS(PartOfSpeech.VERB)
+                                .setCanonicalForm(canonicalForm).setAccidence(Sets.newHashSet(Accidence.FUTURE, Accidence.SINGULAR, Accidence._3RD, Accidence.MASCULINE)));
+        }
+        //finished in IINA (पीना becomes पिएगा)
+        if (inflectedForm.endsWith("िएगा") ){
+            String canonicalForm = inflectedForm.substring(0, inflectedForm.length()-4).concat("ीना");
+            results.add(new CanonicalResult().setPossiblePOS(PartOfSpeech.VERB)
+                                .setCanonicalForm(canonicalForm).setAccidence(Sets.newHashSet(Accidence.FUTURE, Accidence.SINGULAR, Accidence._2ND, Accidence.MASCULINE)));
+            results.add(new CanonicalResult().setPossiblePOS(PartOfSpeech.VERB)
+                                .setCanonicalForm(canonicalForm).setAccidence(Sets.newHashSet(Accidence.FUTURE, Accidence.SINGULAR, Accidence._3RD, Accidence.MASCULINE)));
+        }
+
 
         if (inflectedForm.endsWith("ेंगे") ){
             String canonicalForm = inflectedForm.substring(0, inflectedForm.length()-4).concat("ना");
+            results.add(new CanonicalResult().setPossiblePOS(PartOfSpeech.VERB)
+                                .setCanonicalForm(canonicalForm).setAccidence(Sets.newHashSet(Accidence.FUTURE, Accidence.PLURAL, Accidence._1ST, Accidence.MASCULINE)));
+            results.add(new CanonicalResult().setPossiblePOS(PartOfSpeech.VERB)
+                                .setCanonicalForm(canonicalForm).setAccidence(Sets.newHashSet(Accidence.FUTURE, Accidence.PLURAL, Accidence._3RD, Accidence.MASCULINE)));
+        }
+        //finished in UUNA (छूना becomes छुएँगे)
+        if (inflectedForm.endsWith("ुएँगे") ){
+            String canonicalForm = inflectedForm.substring(0, inflectedForm.length()-5).concat("ूना");
+            results.add(new CanonicalResult().setPossiblePOS(PartOfSpeech.VERB)
+                                .setCanonicalForm(canonicalForm).setAccidence(Sets.newHashSet(Accidence.FUTURE, Accidence.PLURAL, Accidence._1ST, Accidence.MASCULINE)));
+            results.add(new CanonicalResult().setPossiblePOS(PartOfSpeech.VERB)
+                                .setCanonicalForm(canonicalForm).setAccidence(Sets.newHashSet(Accidence.FUTURE, Accidence.PLURAL, Accidence._3RD, Accidence.MASCULINE)));
+        }
+        //finished in IINA (पीना becomes पिएँगे)
+        if (inflectedForm.endsWith("िएँगे") ){
+            String canonicalForm = inflectedForm.substring(0, inflectedForm.length()-5).concat("ीना");
             results.add(new CanonicalResult().setPossiblePOS(PartOfSpeech.VERB)
                                 .setCanonicalForm(canonicalForm).setAccidence(Sets.newHashSet(Accidence.FUTURE, Accidence.PLURAL, Accidence._1ST, Accidence.MASCULINE)));
             results.add(new CanonicalResult().setPossiblePOS(PartOfSpeech.VERB)
@@ -127,6 +172,18 @@ public class VerbalCanonizer {
             results.add(new CanonicalResult().setPossiblePOS(PartOfSpeech.VERB)
                                 .setCanonicalForm(canonicalForm).setAccidence(Sets.newHashSet(Accidence.FUTURE, Accidence.PLURAL, Accidence._2ND, Accidence.MASCULINE)));
         }
+        //finished in UUNA (छूना becomes छुओगे)
+        if (inflectedForm.endsWith("ुओगे") ){
+            String canonicalForm = inflectedForm.substring(0, inflectedForm.length()-4).concat("ूना");
+            results.add(new CanonicalResult().setPossiblePOS(PartOfSpeech.VERB)
+                                .setCanonicalForm(canonicalForm).setAccidence(Sets.newHashSet(Accidence.FUTURE, Accidence.PLURAL, Accidence._2ND, Accidence.MASCULINE)));
+        }
+        //finished in IINA (पीना becomes पिओगे)
+        if (inflectedForm.endsWith("िओगे") ){
+            String canonicalForm = inflectedForm.substring(0, inflectedForm.length()-4).concat("ीना");
+            results.add(new CanonicalResult().setPossiblePOS(PartOfSpeech.VERB)
+                                .setCanonicalForm(canonicalForm).setAccidence(Sets.newHashSet(Accidence.FUTURE, Accidence.PLURAL, Accidence._2ND, Accidence.MASCULINE)));
+        }
 
 
         if (inflectedForm.endsWith("ूँगी") ){
@@ -134,10 +191,38 @@ public class VerbalCanonizer {
             results.add(new CanonicalResult().setPossiblePOS(PartOfSpeech.VERB)
                                 .setCanonicalForm(canonicalForm).setAccidence(Sets.newHashSet(Accidence.FUTURE, Accidence.SINGULAR, Accidence._1ST, Accidence.FEMININE)));
         }
+        //finished in UUNA (छूना becomes छुऊँगी)
+        if (inflectedForm.endsWith("ुऊँगी") ){
+            String canonicalForm = inflectedForm.substring(0, inflectedForm.length()-5).concat("ूना");
+            results.add(new CanonicalResult().setPossiblePOS(PartOfSpeech.VERB)
+                                .setCanonicalForm(canonicalForm).setAccidence(Sets.newHashSet(Accidence.FUTURE, Accidence.SINGULAR, Accidence._1ST, Accidence.FEMININE)));
+        }
+        //finished in IINA (पीना becomes पिऊँगी)
+        if (inflectedForm.endsWith("िऊँगी") ){
+            String canonicalForm = inflectedForm.substring(0, inflectedForm.length()-5).concat("ीना");
+            results.add(new CanonicalResult().setPossiblePOS(PartOfSpeech.VERB)
+                                .setCanonicalForm(canonicalForm).setAccidence(Sets.newHashSet(Accidence.FUTURE, Accidence.SINGULAR, Accidence._1ST, Accidence.MASCULINE)));
+        }
 
 
         if (inflectedForm.endsWith("ेगी") ){
             String canonicalForm = inflectedForm.substring(0, inflectedForm.length()-3).concat("ना");
+            results.add(new CanonicalResult().setPossiblePOS(PartOfSpeech.VERB)
+                                .setCanonicalForm(canonicalForm).setAccidence(Sets.newHashSet(Accidence.FUTURE, Accidence.SINGULAR, Accidence._2ND, Accidence.FEMININE)));
+            results.add(new CanonicalResult().setPossiblePOS(PartOfSpeech.VERB)
+                                .setCanonicalForm(canonicalForm).setAccidence(Sets.newHashSet(Accidence.FUTURE, Accidence.SINGULAR, Accidence._3RD, Accidence.FEMININE)));
+        }
+        //finished in UUNA (छूना becomes छुएगी)
+        if (inflectedForm.endsWith("ुएगी") ){
+            String canonicalForm = inflectedForm.substring(0, inflectedForm.length()-4).concat("ूना");
+            results.add(new CanonicalResult().setPossiblePOS(PartOfSpeech.VERB)
+                                .setCanonicalForm(canonicalForm).setAccidence(Sets.newHashSet(Accidence.FUTURE, Accidence.SINGULAR, Accidence._2ND, Accidence.FEMININE)));
+            results.add(new CanonicalResult().setPossiblePOS(PartOfSpeech.VERB)
+                                .setCanonicalForm(canonicalForm).setAccidence(Sets.newHashSet(Accidence.FUTURE, Accidence.SINGULAR, Accidence._3RD, Accidence.FEMININE)));
+        }
+        //finished in IINA (पीना becomes पिएगी)
+        if (inflectedForm.endsWith("िएगी") ){
+            String canonicalForm = inflectedForm.substring(0, inflectedForm.length()-4).concat("ीना");
             results.add(new CanonicalResult().setPossiblePOS(PartOfSpeech.VERB)
                                 .setCanonicalForm(canonicalForm).setAccidence(Sets.newHashSet(Accidence.FUTURE, Accidence.SINGULAR, Accidence._2ND, Accidence.FEMININE)));
             results.add(new CanonicalResult().setPossiblePOS(PartOfSpeech.VERB)
@@ -151,9 +236,37 @@ public class VerbalCanonizer {
             results.add(new CanonicalResult().setPossiblePOS(PartOfSpeech.VERB)
                                 .setCanonicalForm(canonicalForm).setAccidence(Sets.newHashSet(Accidence.FUTURE, Accidence.PLURAL, Accidence._3RD, Accidence.FEMININE)));
         }
+        //finished in UUNA (छूना becomes छुएँगी)
+        if (inflectedForm.endsWith("ुएँगी") ){
+            String canonicalForm = inflectedForm.substring(0, inflectedForm.length()-5).concat("ूना");
+            results.add(new CanonicalResult().setPossiblePOS(PartOfSpeech.VERB)
+                                .setCanonicalForm(canonicalForm).setAccidence(Sets.newHashSet(Accidence.FUTURE, Accidence.PLURAL, Accidence._1ST, Accidence.FEMININE)));
+            results.add(new CanonicalResult().setPossiblePOS(PartOfSpeech.VERB)
+                                .setCanonicalForm(canonicalForm).setAccidence(Sets.newHashSet(Accidence.FUTURE, Accidence.PLURAL, Accidence._3RD, Accidence.FEMININE)));
+        }
+        //finished in IINA (पीना becomes पिएँगी)
+        if (inflectedForm.endsWith("िएँगी") ){
+            String canonicalForm = inflectedForm.substring(0, inflectedForm.length()-5).concat("ीना");
+            results.add(new CanonicalResult().setPossiblePOS(PartOfSpeech.VERB)
+                                .setCanonicalForm(canonicalForm).setAccidence(Sets.newHashSet(Accidence.FUTURE, Accidence.PLURAL, Accidence._1ST, Accidence.FEMININE)));
+            results.add(new CanonicalResult().setPossiblePOS(PartOfSpeech.VERB)
+                                .setCanonicalForm(canonicalForm).setAccidence(Sets.newHashSet(Accidence.FUTURE, Accidence.PLURAL, Accidence._3RD, Accidence.FEMININE)));
+        }
 
         if (inflectedForm.endsWith("ोगी") ){
             String canonicalForm = inflectedForm.substring(0, inflectedForm.length()-3).concat("ना");
+            results.add(new CanonicalResult().setPossiblePOS(PartOfSpeech.VERB)
+                                .setCanonicalForm(canonicalForm).setAccidence(Sets.newHashSet(Accidence.FUTURE, Accidence.PLURAL, Accidence._2ND, Accidence.FEMININE)));
+        }
+        //finished in UUNA (छूना becomes छुओगी)
+        if (inflectedForm.endsWith("ुओगी") ){
+            String canonicalForm = inflectedForm.substring(0, inflectedForm.length()-4).concat("ूना");
+            results.add(new CanonicalResult().setPossiblePOS(PartOfSpeech.VERB)
+                                .setCanonicalForm(canonicalForm).setAccidence(Sets.newHashSet(Accidence.FUTURE, Accidence.PLURAL, Accidence._2ND, Accidence.FEMININE)));
+        }
+        //finished in IINA (पीना becomes पिओगी)
+        if (inflectedForm.endsWith("िओगी ") ){
+            String canonicalForm = inflectedForm.substring(0, inflectedForm.length()-4).concat("ीना");
             results.add(new CanonicalResult().setPossiblePOS(PartOfSpeech.VERB)
                                 .setCanonicalForm(canonicalForm).setAccidence(Sets.newHashSet(Accidence.FUTURE, Accidence.PLURAL, Accidence._2ND, Accidence.FEMININE)));
         }
@@ -188,19 +301,19 @@ public class VerbalCanonizer {
 
         //participle - perfective
         if (inflectedForm.endsWith("ा") ){
-            String canonicalForm = inflectedForm.substring(0, inflectedForm.length()-2).concat("ना");
+            String canonicalForm = inflectedForm.substring(0, inflectedForm.length()-1).concat("ना");
             results.add(new CanonicalResult().setPossiblePOS(PartOfSpeech.PARTICIPLE)
                                 .setCanonicalForm(canonicalForm).setAccidence(Sets.newHashSet(Accidence.PERFECTIVE, Accidence.MASCULINE, Accidence.SINGULAR)));
         }
 
         if (inflectedForm.endsWith("े") ){
-            String canonicalForm = inflectedForm.substring(0, inflectedForm.length()-2).concat("ना");
+            String canonicalForm = inflectedForm.substring(0, inflectedForm.length()-1).concat("ना");
             results.add(new CanonicalResult().setPossiblePOS(PartOfSpeech.PARTICIPLE)
                                 .setCanonicalForm(canonicalForm).setAccidence(Sets.newHashSet(Accidence.PERFECTIVE, Accidence.MASCULINE, Accidence.PLURAL)));
         }
 
         if (inflectedForm.endsWith("ी") ){
-            String canonicalForm = inflectedForm.substring(0, inflectedForm.length()-2).concat("ना");
+            String canonicalForm = inflectedForm.substring(0, inflectedForm.length()-1).concat("ना");
             results.add(new CanonicalResult().setPossiblePOS(PartOfSpeech.PARTICIPLE)
                                 .setCanonicalForm(canonicalForm).setAccidence(Sets.newHashSet(Accidence.PERFECTIVE, Accidence.FEMININE, Accidence.SINGULAR)));
             results.add(new CanonicalResult().setPossiblePOS(PartOfSpeech.PARTICIPLE)

@@ -12,7 +12,7 @@ import static org.junit.Assert.assertTrue;
 public class VerbalCanonizerFuturesLongVowelTest {
 
     @Test
-    public void futuresInII() throws Exception {
+    public void masculineFuturesInII() throws Exception {
 
         String drinkCanonical = "पीना";
 
@@ -55,11 +55,49 @@ public class VerbalCanonizerFuturesLongVowelTest {
         );
         assertTrue(results.containsAll(expected));
 
-        String theyWillDrinkMasc = "पिएँगे";
-        results = VerbalCanonizer.process(theyWillDrinkMasc);
+    }
+
+    @Test
+    public void feminineFuturesInII() throws Exception {
+
+        String drinkCanonical = "पीना";
+
+        String iWillDrinkFem = "पिऊँगी";
+        Set<CanonicalResult> results = VerbalCanonizer.process(iWillDrinkFem);
+
+        Set <CanonicalResult> expected = Sets.newHashSet(
+                new CanonicalResult().setPossiblePOS(PartOfSpeech.VERB)
+                        .setCanonicalForm(drinkCanonical).setAccidence(Sets.newHashSet(Accidence.FUTURE, Accidence._1ST, Accidence.SINGULAR, Accidence.FEMININE))
+        );
+        assertTrue(results.containsAll(expected));
+
+        String youSingularWillDrinkFem = "पिएगी";
+        results = VerbalCanonizer.process(youSingularWillDrinkFem);
         expected = Sets.newHashSet(
                 new CanonicalResult().setPossiblePOS(PartOfSpeech.VERB)
-                        .setCanonicalForm(drinkCanonical).setAccidence(Sets.newHashSet(Accidence.FUTURE, Accidence._3RD, Accidence.PLURAL, Accidence.MASCULINE))
+                        .setCanonicalForm(drinkCanonical).setAccidence(Sets.newHashSet(Accidence.FUTURE, Accidence._2ND, Accidence.SINGULAR, Accidence.FEMININE)),
+                new CanonicalResult().setPossiblePOS(PartOfSpeech.VERB)
+                        .setCanonicalForm(drinkCanonical).setAccidence(Sets.newHashSet(Accidence.FUTURE, Accidence._3RD, Accidence.SINGULAR, Accidence.FEMININE))
+        );
+        assertTrue(results.containsAll(expected));
+
+
+        String weWillDrinkFem = "पिएँगी";
+        results = VerbalCanonizer.process(weWillDrinkFem);
+        expected = Sets.newHashSet(
+                new CanonicalResult().setPossiblePOS(PartOfSpeech.VERB)
+                        .setCanonicalForm(drinkCanonical).setAccidence(Sets.newHashSet(Accidence.FUTURE, Accidence._1ST, Accidence.PLURAL, Accidence.FEMININE)),
+                new CanonicalResult().setPossiblePOS(PartOfSpeech.VERB)
+                        .setCanonicalForm(drinkCanonical).setAccidence(Sets.newHashSet(Accidence.FUTURE, Accidence._3RD, Accidence.PLURAL, Accidence.FEMININE))
+
+        );
+        assertTrue(results.containsAll(expected));
+
+        String youPlurallWillDrinkFem = "पिओगी";
+        results = VerbalCanonizer.process(youPlurallWillDrinkFem);
+        expected = Sets.newHashSet(
+                new CanonicalResult().setPossiblePOS(PartOfSpeech.VERB)
+                        .setCanonicalForm(drinkCanonical).setAccidence(Sets.newHashSet(Accidence.FUTURE, Accidence._2ND, Accidence.PLURAL, Accidence.FEMININE))
         );
         assertTrue(results.containsAll(expected));
 

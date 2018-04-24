@@ -201,7 +201,7 @@ public class VerbalCanonizer {
         if (inflectedForm.endsWith("िऊँगी") ){
             String canonicalForm = inflectedForm.substring(0, inflectedForm.length()-5).concat("ीना");
             results.add(new CanonicalResult().setPossiblePOS(PartOfSpeech.VERB)
-                                .setCanonicalForm(canonicalForm).setAccidence(Sets.newHashSet(Accidence.FUTURE, Accidence.SINGULAR, Accidence._1ST, Accidence.MASCULINE)));
+                                .setCanonicalForm(canonicalForm).setAccidence(Sets.newHashSet(Accidence.FUTURE, Accidence.SINGULAR, Accidence._1ST, Accidence.FEMININE)));
         }
 
 
@@ -265,7 +265,7 @@ public class VerbalCanonizer {
                                 .setCanonicalForm(canonicalForm).setAccidence(Sets.newHashSet(Accidence.FUTURE, Accidence.PLURAL, Accidence._2ND, Accidence.FEMININE)));
         }
         //finished in IINA (पीना becomes पिओगी)
-        if (inflectedForm.endsWith("िओगी ") ){
+        if (inflectedForm.endsWith("िओगी") ){
             String canonicalForm = inflectedForm.substring(0, inflectedForm.length()-4).concat("ीना");
             results.add(new CanonicalResult().setPossiblePOS(PartOfSpeech.VERB)
                                 .setCanonicalForm(canonicalForm).setAccidence(Sets.newHashSet(Accidence.FUTURE, Accidence.PLURAL, Accidence._2ND, Accidence.FEMININE)));

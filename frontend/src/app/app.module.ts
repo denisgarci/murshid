@@ -9,6 +9,8 @@ import { SongcontainerComponent } from './body/songcontainer/songcontainer.compo
 import { DictionariescontainerComponent } from './body/dictionariescontainer/dictionariescontainer.component';
 import { TranslationscontainerComponent } from './body/translationscontainer/translationscontainer.component';
 
+import { SongsService } from './services/songs.service';
+
 
 @NgModule({
   declarations: [
@@ -22,7 +24,7 @@ import { TranslationscontainerComponent } from './body/translationscontainer/tra
   imports: [
     BrowserModule
   ],
-  providers: [],
+  providers: [SongsService],
   bootstrap: [AppComponent]
 })
 export class AppModule { }

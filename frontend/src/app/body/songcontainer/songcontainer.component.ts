@@ -1,4 +1,5 @@
-import { Component, OnInit } from '@angular/core';
+import {Component, ElementRef, OnInit, Renderer2} from '@angular/core';
+import { SongsService } from '../../services/songs.service';
 
 @Component({
   selector: 'app-songcontainer',
@@ -7,7 +8,9 @@ import { Component, OnInit } from '@angular/core';
 })
 export class SongcontainerComponent implements OnInit {
 
-  constructor() { }
+  constructor(private songsService: SongsService, private elementRef: ElementRef, private renderer: Renderer2) {
+    this.renderer.setProperty(this.elementRef.nativeElement, 'innerHTML', songsService.getSpans());
+  }
 
   ngOnInit() {
   }

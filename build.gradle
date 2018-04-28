@@ -4,9 +4,12 @@ buildscript {
 	}
 	repositories {
 		mavenCentral()
+        jcenter()
+        maven {url "https://plugins.gradle.org/m2/"}
 	}
 	dependencies {
 		classpath("org.springframework.boot:spring-boot-gradle-plugin:${springBootVersion}")
+        classpath "com.moowork.gradle:gradle-node-plugin:1.1.1"
 	}
 }
 
@@ -15,6 +18,7 @@ apply plugin: 'eclipse'
 apply plugin: 'idea'
 apply plugin: 'org.springframework.boot'
 apply plugin: 'io.spring.dependency-management'
+apply plugin:"com.moowork.node"
 
 springBoot {
     mainClass = 'com.murshid.IngestorApplication'
@@ -22,8 +26,8 @@ springBoot {
 
 group = 'com.murshid'
 version = '0.0.1-SNAPSHOT'
-sourceCompatibility = 1.8
-targetCompatibility = 1.8
+sourceCompatibility = 1.9
+targetCompatibility = 1.9
 
 repositories {
 	mavenCentral()
@@ -93,3 +97,31 @@ task integrationTest(type: Test) {
     classpath = sourceSets.integrationTest.runtimeClasspath
 
 }
+
+node{
+    version = "7.5.0"
+    download = true
+    nodeModulesDir = file("frontend")
+}
+
+task buildClientDev(type: NpmTask, dependsOn: 'npmInstall'){
+    group = 'build'
+    description = 'Compile client side folder for development'
+    args = ['run','buildDev']
+}
+
+task buildClientWatch(type: NpmTask, dependsOn: 'npmInstall'){
+    group = 'application'
+    description = "Build and watches the client side assets for rebuilding"
+    args = ['run','buildWatch']
+}
+
+task buildClient(type:NpmTask, dependsOn:'npmInstall'){
+    group = 'build'
+    description = "Compile client side folder for production"
+    args = ['run','build']
+}
+
+bootRun.dependsOn(buildClientDev)
+
+jar.dependsOn(buildClient)

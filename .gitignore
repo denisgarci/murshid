@@ -27,3 +27,5 @@ nbdist/
 logs/**
 out/**
 *.log
+
+frontend/node_modules/**

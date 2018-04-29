@@ -41,7 +41,7 @@ public class Practice {
                 result.append(token);
             }
         }
-        System.out.println(result.toString());
+        System.out.println(result.toString().replaceAll("\\\"", "\\\\\""));
 
     }
 
@@ -51,7 +51,7 @@ public class Practice {
 
 
     public static String getSong(String fileName) throws IOException{
-        BufferedReader br = new BufferedReader(new InputStreamReader(new FileInputStream("/Users/gonzalodiaz/dev/ingestor/src/main/resources/songs/" + fileName ), "UTF-8"));
+        BufferedReader br = new BufferedReader(new InputStreamReader(new FileInputStream("/Users/gonzalodiaz/dev/murshid/src/main/resources/songs/" + fileName ), "UTF-8"));
         String line = null;
         StringBuilder sb = new StringBuilder();
         while ((line = br.readLine()) != null) {

@@ -1,5 +1,6 @@
 import { BrowserModule } from '@angular/platform-browser';
 import { NgModule } from '@angular/core';
+import {HttpClientModule} from "@angular/common/http";
 
 
 import { AppComponent } from './app.component';
@@ -12,6 +13,7 @@ import { TranslationscontainerComponent } from './body/translationscontainer/tra
 import { SongsService } from './services/songs.service';
 
 
+
 @NgModule({
   declarations: [
     AppComponent,
@@ -22,9 +24,9 @@ import { SongsService } from './services/songs.service';
     TranslationscontainerComponent
   ],
   imports: [
-    BrowserModule
+    BrowserModule, HttpClientModule
   ],
   providers: [SongsService],
-  bootstrap: [AppComponent]
+  bootstrap: [ AppComponent ]
 })
 export class AppModule { }

@@ -1,5 +1,6 @@
 package com.murshid.controllers;
 
+import com.murshid.dynamo.domain.Song;
 import com.murshid.persistence.domain.views.WordListMasterEntry;
 import com.murshid.services.SongsService;
 import org.slf4j.Logger;
@@ -7,12 +8,10 @@ import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.*;
 
 import javax.inject.Inject;
+import java.util.Optional;
 
 @Controller
 @RequestMapping("songs")
@@ -29,6 +28,14 @@ public class SongsController {
         }else{
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
         }
+    }
+
+    @CrossOrigin(origins = "http://localhost:4200")
+    @GetMapping("/findByLatinName")
+    @ResponseBody
+    public Song findByLatinName(@RequestParam(name = "songLatinName") String songLatinName) {
+        Optional<Song> song = songsService.findByLatinTitle(songLatinName);
+        return song.orElse(null);
     }
 
     @PostMapping("/addEntryToWordListMaster")

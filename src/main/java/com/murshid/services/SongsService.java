@@ -75,9 +75,17 @@ public class SongsService {
 
             return true;
         }
-
-
     }
+
+    public Optional<Song> findByLatinTitle(String songTitleLatin){
+        Song song = songRepository.findOne(songTitleLatin);
+        if (song == null){
+            return Optional.empty();
+        }else {
+            return Optional.of(song);
+        }
+    }
+
 
     /**
      * Grabs a song from the Dynamo Songs, and tells which of its word are not in the spell check repository

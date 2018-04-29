@@ -37,6 +37,11 @@ public class Song {
     @Column(name = "word_list_master")
     private List<WordListMasterEntry> wordListMaster;
 
+    @JsonProperty("html")
+    @Column(name = "html")
+    private String html;
+
+
 
     public String getTitleHindi() {
         return titleHindi;
@@ -99,6 +104,15 @@ public class Song {
 
     public Song setWordListMaster(List<WordListMasterEntry> wordListMaster) {
         this.wordListMaster = wordListMaster;
+        return this;
+    }
+
+    public String getHtml() {
+        return html;
+    }
+
+    public Song setHtml(String html) {
+        this.html = html;
         return this;
     }
 

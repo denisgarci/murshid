@@ -41,19 +41,20 @@ public class SongConverter {
             song.setWordList((Map<String, String>) item.get("word_list"));
         }
 
+        if (item.isPresent("word_list_master")) {
+            List<WordListMasterEntry> wordListMasterEntries = Lists.newArrayList();
+            List<Map<String, Object>> itemList = item.getList("word_list_master");
+            List<WordListMasterEntry> wlmEntries = itemList.stream()
+                    .map(a -> WordListMasterEntryConverter.fromMap(a))
+                    .collect(Collectors.toList());
 
+            song.setWordListMaster(wlmEntries);
+        }
 
+        if (item.isPresent("html")){
+            song.setHtml(item.getString("html"));
+        }
 
-
-            if (item.isPresent("word_list_master")) {
-                List<WordListMasterEntry> wordListMasterEntries = Lists.newArrayList();
-                List<Map<String, Object>> itemList = item.getList("word_list_master");
-                List<WordListMasterEntry> wlmEntries = itemList.stream()
-                        .map(a -> WordListMasterEntryConverter.fromMap(a))
-                        .collect(Collectors.toList());
-
-                song.setWordListMaster(wlmEntries);
-            }
 
 
         return song;
@@ -85,6 +86,8 @@ public class SongConverter {
 
         List<WordListMasterEntry> wordListMasterEntries = song.getWordListMaster();
         List<Map> items = WordListMasterEntryConverter.toMaps(wordListMasterEntries);
+
+        item = item.withMap("hmtl", song.getWordList());
 
 
         item = item.withList("word_list_master", items);

@@ -19,10 +19,10 @@ export class SongcontainerComponent implements OnInit {
   message:string;
 
   ngOnInit() {
-    this.songsService.currentMessage.subscribe(message => {
+    this.songsService.songSelectionChangeObservable.subscribe(message => {
       this.message = message;
       this.updateContainerContent();
-    })
+    });
   }
 
   updateContainerContent() {
@@ -44,8 +44,9 @@ export class SongcontainerComponent implements OnInit {
     var allRelevant = document.getElementsByClassName("relevant");
 
     for (let index = 0; index < allRelevant.length; index++){
-      allRelevant[index].addEventListener("mouseenter", function() {
-        console.log("over " + allRelevant[index].id)
+      allRelevant[index].addEventListener("mouseenter", () =>  {
+        this.songsService.itemHoverChange.next(allRelevant[index].id);
+        //console.log("over " + allRelevant[index].id)
         //inElement(allRelevant[index].id);
       });
     }

@@ -10,19 +10,28 @@ import {IMasterEntries} from "../models/IMasterEntries";
 @Injectable()
 export class SongsService {
 
-  private messageSource = new BehaviorSubject<string>("select a song");
-  currentMessage = this.messageSource.asObservable();
+  //song-related
+  private songSelectionChange = new BehaviorSubject<string>("select a song");
+  public songSelectionChangeObservable = this.songSelectionChange.asObservable();
 
   public currentSong: SongModel;
-
   public geo: IGeo = {};
-
   public masterEntries: IMasterEntries = {};
+
+  //item-related
+  public itemHoverChange = new BehaviorSubject<string>("select a span");
+  public itemHoverChangeObservable = this.itemHoverChange.asObservable();
+
+
 
   constructor(private http: HttpClient) { }
 
-  changeMessage(message: string) {
+  changeSelectedSong(message: string) {
     this.retrieveSong(message);
+  }
+
+  changeSelectedSpan(id: string){
+    console.log("id changed to" + id);
   }
 
   retrieveSong(songTitleLatin: string): void {
@@ -31,7 +40,7 @@ export class SongsService {
         if ( data!= null ) {
           this.currentSong = data;
           this.populateGeo(data);
-          this.messageSource.next(data.title_latin);
+          this.songSelectionChange.next(data.title_latin);
         }else{
           alert("Song not found");
         }
@@ -49,8 +58,6 @@ export class SongsService {
         })
     })
     this.masterEntries = JSON.parse(song.master_entries);
-    console.log("geo is now " + this.geo.toString())
-    console.log("masterentries is now " + this.masterEntries.toString())
   }
 
   private buildMasterKey(mk: MasterKey){

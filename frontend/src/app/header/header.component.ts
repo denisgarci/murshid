@@ -1,4 +1,4 @@
-import {Component, OnInit, Output, EventEmitter} from '@angular/core';
+import {Component, OnInit} from '@angular/core';
 import {SongsService} from "../services/songs.service";
 
 @Component({
@@ -8,14 +8,12 @@ import {SongsService} from "../services/songs.service";
 })
 export class HeaderComponent implements OnInit {
 
-  @Output() songNameUpdated = new EventEmitter();
-
   constructor(private songsService: SongsService) {
 
   }
 
   onSearchClicked(latinSongName: string){
-    this.songsService.changeMessage(latinSongName);
+    this.songsService.changeSelectedSong(latinSongName);
   }
 
   ngOnInit() {

@@ -2,7 +2,6 @@ package com.murshid.models.converters;
 
 import com.amazonaws.services.dynamodbv2.document.Item;
 import com.amazonaws.services.dynamodbv2.model.AttributeValue;
-import com.google.common.collect.Sets;
 import com.murshid.dynamo.domain.Master;
 import com.murshid.models.CanonicalKey;
 import com.murshid.models.enums.Accidence;
@@ -40,7 +39,10 @@ public class MasterConverter {
 
 
         if (item.isPresent("canonical_keys")){
-            master.setCanonicalKeys(Sets.newHashSet((List)item.get("canonical_keys")));
+            List<Object> cksObjList = (List)item.get("canonical_keys");
+            Set<CanonicalKey> cksSet = cksObjList.stream().map(obj -> CanonicalKey.fromMap((Map)obj))
+                    .collect(Collectors.toSet());
+            master.setCanonicalKeys(cksSet);
         }
 
 

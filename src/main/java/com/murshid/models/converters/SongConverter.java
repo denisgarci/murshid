@@ -55,6 +55,11 @@ public class SongConverter {
             song.setHtml(item.getString("html"));
         }
 
+        if (item.isPresent("master_entries")){
+            song.setMasterEntries((String)item.get("master_entries"));
+        }
+
+
 
 
         return song;
@@ -87,10 +92,11 @@ public class SongConverter {
         List<WordListMasterEntry> wordListMasterEntries = song.getWordListMaster();
         List<Map> items = WordListMasterEntryConverter.toMaps(wordListMasterEntries);
 
-        item = item.withMap("hmtl", song.getWordList());
-
+        item = item.withString("html", song.getHtml());
 
         item = item.withList("word_list_master", items);
+
+        item = item.withString("master_entries", song.getMasterEntries());
 
         return item;
     }

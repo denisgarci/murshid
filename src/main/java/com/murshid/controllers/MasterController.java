@@ -1,6 +1,7 @@
 package com.murshid.controllers;
 
 import com.murshid.dynamo.domain.Master;
+import com.murshid.dynamo.domain.Song;
 import com.murshid.models.CanonicalKey;
 import com.murshid.services.MasterService;
 import com.murshid.services.SongsService;
@@ -12,9 +13,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
 import javax.inject.Inject;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 @Controller
 @RequestMapping("master")
@@ -54,6 +53,30 @@ public class MasterController {
     List findInByCanonicalWord(@RequestParam(name = "canonicalWord") String canonicalWord) {
         List result = masterService.findByCanonicalWord(canonicalWord);
         return result;
+    }
+
+    @GetMapping("/findAllInSong")
+    public @ResponseBody
+    List<Master> findAllInSong(@RequestParam(name = "songLatinName") String songLatinName) {
+        Optional<Song> song = songsService.findByLatinTitle(songLatinName);
+        if (song.isPresent()){
+           return masterService.allEntriesForSong(song.get());
+        }else{
+            LOGGER.info("no song found with name={}", songLatinName);
+            return Collections.emptyList();
+        }
+    }
+
+    @GetMapping("/findAllInSongJS")
+    public @ResponseBody
+    Map<String, Object> findAllInSongJs(@RequestParam(name = "songLatinName") String songLatinName) {
+        Optional<Song> song = songsService.findByLatinTitle(songLatinName);
+        if (song.isPresent()){
+            return masterService.allEntriesForSongJS(song.get());
+        }else{
+            LOGGER.info("no song found with name={}", songLatinName);
+            return Collections.emptyMap();
+        }
     }
 
     @PostMapping("/insertNew")

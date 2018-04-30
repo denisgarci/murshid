@@ -7,6 +7,5 @@ export class SongModel{
   song: string;
   word_list_master: object[];
   word_list: object;
-
-
+  master_entries: string;
 }

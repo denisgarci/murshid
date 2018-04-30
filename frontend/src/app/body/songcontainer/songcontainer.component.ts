@@ -29,7 +29,13 @@ export class SongcontainerComponent implements OnInit {
     if (this.songsService.currentSong != null)
     {
       let divElement = this.elementRef.nativeElement.firstElementChild;
-      this.renderer.setProperty(divElement, 'innerHTML', this.songsService.currentSong.html);
+
+      //cloning is a practical way of removing all previous listeners from the divElement
+      let newDiv = divElement.cloneNode(true);
+      divElement.parentNode.replaceChild(newDiv, divElement);
+
+      this.renderer.setProperty(newDiv, 'innerHTML', this.songsService.currentSong.html);
+      this.init();
     }
   }
 

@@ -41,7 +41,19 @@ public class Song {
     @Column(name = "html")
     private String html;
 
+    @JsonProperty("master_entries")
+    @Column(name = "master_entries")
+    private String masterEntries;
 
+
+    public String getMasterEntries() {
+        return masterEntries;
+    }
+
+    public Song setMasterEntries(String masterEntries) {
+        this.masterEntries = masterEntries;
+        return this;
+    }
 
     public String getTitleHindi() {
         return titleHindi;

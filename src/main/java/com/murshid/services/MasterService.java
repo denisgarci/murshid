@@ -5,6 +5,7 @@ import com.amazonaws.services.dynamodbv2.model.AttributeValue;
 import com.amazonaws.services.dynamodbv2.model.ScanRequest;
 import com.amazonaws.services.dynamodbv2.model.ScanResult;
 import com.google.common.collect.Sets;
+import com.google.gson.Gson;
 import com.murshid.dynamo.domain.Master;
 import com.murshid.dynamo.domain.Song;
 import com.murshid.dynamo.repo.MasterRepository;
@@ -19,6 +20,7 @@ import com.murshid.persistence.domain.MurshidEntry;
 import com.murshid.persistence.domain.PlattsEntry;
 import com.murshid.persistence.domain.RekhtaEntry;
 import com.murshid.persistence.domain.WikitionaryEntry;
+import com.murshid.persistence.domain.views.MasterKey;
 import com.murshid.utils.SongUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -32,6 +34,8 @@ import java.util.stream.Collectors;
 @Named
 public class MasterService {
     private static final Logger LOGGER = LoggerFactory.getLogger(MasterService.class);
+
+    private static Gson gsonMapper = new Gson();
 
     private  static Set<PartOfSpeech> verbDerivates = Sets.newHashSet(PartOfSpeech.VERB, PartOfSpeech.ABSOLUTIVE, PartOfSpeech.VERBAL_NOUN,
       PartOfSpeech.PARTICIPLE, PartOfSpeech.INFINITIVE);
@@ -67,6 +71,54 @@ public class MasterService {
         ScanResult scanResult = DynamoAccessor.client.scan(scanRequest);
         return scanResult.getItems()
                 .stream().map(MasterConverter::fromAvMap)
+                .collect(Collectors.toList());
+    }
+
+    /**
+     * returns all Master entries relevant for a song, but instead of in List form, in a Map<String, Object> form
+     * that is suitable to be transformed into a Javascript object
+     *
+     * @param song      a Song model
+     * @return          a Map<String, Object> similar easily transformable into a JS object
+     */
+    public Map<String, Object> allEntriesForSongJS(Song song){
+        List<Master> masterList = allEntriesForSong(song);
+        Map<String, Object> result = new HashMap<>();
+        masterList.forEach(master -> {
+            Map<String, Object> value = new HashMap<>();
+            value.put("accidence", master.getAccidence());
+            value.put("canonical_word", master.getCanonicalWord());
+            value.put("part_of_speech", master.getPartOfSpeech());
+            List<String> dictionaryKeys = master.getCanonicalKeys().stream()
+                    .map( CanonicalKey::toKey)
+                    .collect(Collectors.toList());
+            value.put("canonical_keys", dictionaryKeys);
+
+            result.put(master.getKey(), value);
+        });
+        song.setMasterEntries(gsonMapper.toJson(result).toString());
+        songRepository.save(song);
+
+        return result;
+    }
+
+    /**
+     * Retrieves all Master entries relevant for a Song.
+     * The song is assumed to have the word_list_master member populated
+     * @param song         a song model
+     * @return             a list (not necessarily ordered) of said master keys
+     */
+    public List<Master> allEntriesForSong(Song song){
+
+        //collect all master keys, without repetition
+        Set<MasterKey> mks = song.getWordListMaster()
+                .stream().map(wlm -> wlm.getMasterKey())
+                .collect(Collectors.toSet());
+
+        return mks.stream().map(mk ->
+            masterRepository.findOne(mk.getHindiWord(), mk.getWordIndex()))
+                .filter(Optional::isPresent)
+                .map(Optional::get)
                 .collect(Collectors.toList());
     }
 

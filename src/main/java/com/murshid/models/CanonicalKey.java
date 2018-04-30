@@ -13,6 +13,7 @@ import javax.persistence.Embeddable;
 import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
 import java.io.Serializable;
+import java.math.BigDecimal;
 import java.util.Map;
 
 @Embeddable
@@ -79,6 +80,15 @@ public class CanonicalKey implements Serializable{
         return canonicalKey;
     }
 
+    public static CanonicalKey  fromMap(Map<String, Object> avMap){
+        CanonicalKey canonicalKey = new CanonicalKey();
+        canonicalKey.setCanonicalWord((String)avMap.get("canonical_word"));
+        BigDecimal bdCi = (BigDecimal) avMap.get("canonical_index");
+        canonicalKey.setCanonicalIndex(bdCi.intValue());
+        canonicalKey.setDictionarySource(DictionarySource.valueOf((String)avMap.get("dictionary_source")));
+        return canonicalKey;
+    }
+
     @Override
     public boolean equals(Object obj) {
         return EqualsBuilder.reflectionEquals(this, obj);
@@ -91,5 +101,11 @@ public class CanonicalKey implements Serializable{
                 .append(getCanonicalIndex())
                 .append(getDictionarySource())
                 .toHashCode();
+    }
+
+    public String toKey(){
+        return this.dictionarySource.name().concat("_")
+                .concat(this.getCanonicalWord()).concat("_")
+                .concat(Integer.toString(this.canonicalIndex));
     }
 }

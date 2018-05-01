@@ -3,6 +3,7 @@ package com.murshid.persistence.domain;
 import com.murshid.models.CanonicalKey;
 import com.murshid.models.DictionaryKey;
 import com.murshid.models.enums.Accidence;
+import com.murshid.models.enums.DictionarySource;
 import com.murshid.models.enums.PartOfSpeech;
 import com.murshid.persistence.AccidenceColumnConverter;
 import com.murshid.services.HasDictionaryKey;
@@ -84,6 +85,15 @@ public class MurshidEntry implements HasDictionaryKey{
     public MurshidEntry setMeaning(String meaning) {
         this.meaning = meaning;
         return this;
+    }
+
+    @Override
+    public String getStringKey() {
+        return DictionarySource.MURSHID.name()
+                .concat("_")
+                .concat(getHindiWord())
+                .concat("_")
+                .concat(Integer.toString(getWordIndex()));
     }
 
     public String getHindiWord(){

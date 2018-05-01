@@ -1,6 +1,7 @@
 package com.murshid.persistence.domain;
 
 import com.murshid.models.DictionaryKey;
+import com.murshid.models.enums.DictionarySource;
 import com.murshid.models.enums.PartOfSpeech;
 import com.murshid.services.HasDictionaryKey;
 
@@ -68,6 +69,15 @@ public class RekhtaEntry implements HasDictionaryKey{
     public RekhtaEntry setUrduWord(String urduWord) {
         this.urduWord = urduWord;
         return this;
+    }
+
+    @Override
+    public String getStringKey() {
+        return DictionarySource.REKHTA.name()
+                .concat("_")
+                .concat(getHindiWord())
+                .concat("_")
+                .concat(Integer.toString(getWordIndex()));
     }
 
     @Override

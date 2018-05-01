@@ -59,8 +59,9 @@ public class SongConverter {
             song.setMasterEntries((String)item.get("master_entries"));
         }
 
-
-
+        if (item.isPresent("dictionary_entries")){
+            song.setDictionaryEntries((String)item.get("dictionary_entries"));
+        }
 
         return song;
     }
@@ -97,6 +98,8 @@ public class SongConverter {
         item = item.withList("word_list_master", items);
 
         item = item.withString("master_entries", song.getMasterEntries());
+
+        item = item.withString("dictionary_entries", song.getDictionaryEntries());
 
         return item;
     }

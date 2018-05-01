@@ -41,6 +41,12 @@ public class Song {
     @Column(name = "html")
     private String html;
 
+    @JsonProperty("dictionary_entries")
+    @Column(name = "dictionary_entries")
+    private String dictionaryEntries;
+
+
+
     @JsonProperty("master_entries")
     @Column(name = "master_entries")
     private String masterEntries;
@@ -125,6 +131,15 @@ public class Song {
 
     public Song setHtml(String html) {
         this.html = html;
+        return this;
+    }
+
+    public String getDictionaryEntries() {
+        return dictionaryEntries;
+    }
+
+    public Song setDictionaryEntries(String dictionaryEntries) {
+        this.dictionaryEntries = dictionaryEntries;
         return this;
     }
 

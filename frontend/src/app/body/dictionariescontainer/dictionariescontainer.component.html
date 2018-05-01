@@ -1,3 +1,15 @@
-<p>
-  dictionariescontainer works!
-</p>
+<div>
+ <h2>{{content.accidence}}</h2>
+ <br/>
+  of
+ <br/>
+ <h1>{{content.canonical_word}}</h1>
+ <br/>
+ <div *ngFor="let dicEntry of content.dictionary_entries">
+    <strong>{{dicEntry.dictionary_name}}</strong>
+    <br/>
+    <p>
+      {{dicEntry.meaning}}
+    </p>
+ </div>
+</div>

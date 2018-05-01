@@ -2,6 +2,7 @@ package com.murshid.persistence.domain;
 
 import com.murshid.models.DictionaryKey;
 import com.murshid.models.enums.Accidence;
+import com.murshid.models.enums.DictionarySource;
 import com.murshid.models.enums.PartOfSpeech;
 import com.murshid.persistence.AccidenceColumnConverter;
 import com.murshid.services.HasDictionaryKey;
@@ -95,6 +96,15 @@ public class WikitionaryEntry implements HasDictionaryKey{
     public WikitionaryEntry setEtymology(String etymology) {
         this.etymology = etymology;
         return this;
+    }
+
+    @Override
+    public String getStringKey() {
+        return DictionarySource.WIKITIONARY.name()
+                .concat("_")
+                .concat(getHindiWord())
+                .concat("_")
+                .concat(Integer.toString(getWordIndex()));
     }
 
     @Override

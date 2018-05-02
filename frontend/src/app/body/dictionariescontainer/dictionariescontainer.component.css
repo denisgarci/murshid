@@ -1,0 +1,16 @@
+.dictionaries_container{
+  padding: 10px;
+  border: 1px solid green;
+  width: 400px;
+  display: flex;
+  flex-direction: column;
+}
+
+.dictionary_name {
+  border-radius: 3px;
+  height: 20px;
+  border: 1px solid orange;
+  color: orange;
+  padding-left: 10px;
+  padding-right: 10px;
+}

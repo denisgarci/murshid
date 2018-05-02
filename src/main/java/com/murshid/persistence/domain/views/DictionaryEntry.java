@@ -1,6 +1,7 @@
 package com.murshid.persistence.domain.views;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.google.gson.annotations.SerializedName;
 import com.murshid.models.enums.DictionarySource;
 import com.murshid.models.enums.PartOfSpeech;
 
@@ -9,14 +10,18 @@ import com.murshid.models.enums.PartOfSpeech;
  */
 public class DictionaryEntry {
 
+    @SerializedName("dictionary_source")
     private DictionarySource dictionarySource;
 
+    @SerializedName("part_of_speech")
     private PartOfSpeech partOfSpeech;
 
     private String meaning;
 
+    @SerializedName("hindi_word")
     private String hindiWord;
 
+    @SerializedName("word_index")
     private int wordIndex;
 
     public DictionarySource getDictionarySource() {

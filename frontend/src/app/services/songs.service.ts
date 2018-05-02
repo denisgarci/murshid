@@ -6,6 +6,7 @@ import { IGeo } from '../models/IGeo';
 import {WordListMaster} from "../models/WordListMaster";
 import {MasterKey} from "../models/MasterKey";
 import {IMasterEntries} from "../models/IMasterEntries";
+import {IDictionaryEntries} from "../models/IDictionaryEntries";
 
 @Injectable()
 export class SongsService {
@@ -17,9 +18,10 @@ export class SongsService {
   public currentSong: SongModel;
   public geo: IGeo = {};
   public masterEntries: IMasterEntries = {};
+  public dictionaryEntries: IDictionaryEntries = {};
 
   //item-related
-  public itemHoverChange = new BehaviorSubject<string>("select a span");
+  public itemHoverChange = new BehaviorSubject<string>(null);
   public itemHoverChangeObservable = this.itemHoverChange.asObservable();
 
 
@@ -47,22 +49,23 @@ export class SongsService {
     });
   }
 
-  populateGeo(song: SongModel){
-      this.geo = {};
-      this.masterEntries = {};
+  populateGeo(song: SongModel) {
+    this.geo = {};
+    this.masterEntries = {};
 
-      song.word_list_master.forEach(entry =>{
-        let wlm = entry as WordListMaster;
-        wlm.indices.forEach(id => {
-          this.geo[String(id)] = this.buildMasterKey(wlm.master_key);
-        })
-    })
+    song.word_list_master.forEach(entry => {
+      let wlm = entry as WordListMaster;
+      wlm.indices.forEach(id => {
+        this.geo[String(id)] = this.buildMasterKey(wlm.master_key);
+      })
+    });
+
+    this.dictionaryEntries = JSON.parse(song.dictionary_entries);
     this.masterEntries = JSON.parse(song.master_entries);
   }
 
   private buildMasterKey(mk: MasterKey){
-    let wordWithUnderscore = mk.hindi_word.replace(/ /g,"_");
-    return wordWithUnderscore + "_" + mk.word_index;
+    return mk.hindi_word + "_" + mk.word_index;
   }
 
 }

@@ -1,15 +1,13 @@
-<div>
- <h2>{{content.accidence}}</h2>
- <br/>
-  of
- <br/>
- <h1>{{content.canonical_word}}</h1>
- <br/>
- <div *ngFor="let dicEntry of content.dictionary_entries">
-    <strong>{{dicEntry.dictionary_name}}</strong>
-    <br/>
-    <p>
-      {{dicEntry.meaning}}
-    </p>
- </div>
+<div class="dictionaries_container">
+  <div *ngIf="content">
+   <h4 *ngIf="content.accidence">{{content.accidence}}</h4>
+   <div *ngIf="content.accidence">of</div>
+   <h2>{{content.canonical_word}}</h2>
+   <div *ngFor="let dicEntry of content.dictionary_entries">
+      <span class="dictionary_name">{{dicEntry.dictionary_source}}</span>
+      <p>
+        {{dicEntry.meaning}}
+      </p>
+   </div>
+  </div>
 </div>

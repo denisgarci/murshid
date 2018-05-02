@@ -18,20 +18,28 @@ export class DictionariescontainerComponent implements OnInit {
   ngOnInit() {
     this.songsService.itemHoverChangeObservable.subscribe(message => {
       console.log("hovered over  " + message);
-      this.content = null;
+
+      if (message == null) return;
+
       var dec = new DictionariesContent();
-      dec.canonical_word = "CanWordna";
-      dec.accidence = Array.of('Masculine', 'Singular');
 
-      let de1 = new DictionaryEntry();
-      de1.meaning ="To behold, to see";
-      de1.dictionary_name = 'Platts';
+      let masterKey = this.songsService.geo[message];
+      if (masterKey == null){
+        console.log("no master key found for span=" + message );
+        return;
+      }
 
-      let de2 = new DictionaryEntry();
-      de2.meaning ="To see, to watch, to understand";
-      de2.dictionary_name = 'Murshid';
+      let masterEntry = this.songsService.masterEntries[masterKey];
 
-      dec.dictionary_entries = Array.of(de1, de2);
+      dec.canonical_word = masterEntry.canonical_word;
+      dec.accidence = masterEntry.accidence;
+      dec.dictionary_entries = [];
+
+      let dictionaryEntries = this.songsService.dictionaryEntries;
+
+      masterEntry.canonical_keys.forEach(ck =>{
+         dec.dictionary_entries.push(dictionaryEntries[ck]);
+      });
 
       this.content = dec;
 

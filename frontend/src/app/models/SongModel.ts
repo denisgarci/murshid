@@ -1,3 +1,5 @@
+import {s} from "@angular/core/src/render3";
+
 export class SongModel{
   html: string;
   title_hindi: string;
@@ -8,4 +10,5 @@ export class SongModel{
   word_list_master: object[];
   word_list: object;
   master_entries: string;
+  dictionary_entries: string;
 }

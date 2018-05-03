@@ -2,7 +2,7 @@ package com.murshid.models.converters;
 
 import com.amazonaws.services.dynamodbv2.document.Item;
 import com.amazonaws.services.dynamodbv2.model.AttributeValue;
-import com.murshid.dynamo.domain.Master;
+import com.murshid.dynamo.domain.Inflected;
 import com.murshid.models.CanonicalKey;
 import com.murshid.models.enums.Accidence;
 import com.murshid.models.enums.PartOfSpeech;
@@ -15,28 +15,36 @@ import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-public class MasterConverter {
+public class InflectedConverter {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(MasterConverter.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(InflectedConverter.class);
 
-    public static Master convert(Item item){
-        Master master = new Master();
-        if (item.isPresent("hindi_word")){
-            master.setHindiWord(item.getString("hindi_word"));
+    public static Inflected convert(Item item){
+        Inflected master = new Inflected();
+
+        if (item.isPresent("inflected_hindi")){
+            master.setInflectedHindi(item.getString("inflected_hindi"));
         }
 
-        if (item.isPresent("word_index")){
-            master.setWordIndex(item.getInt("word_index"));
+        if (item.isPresent("inflected_urdu")){
+            master.setInflectedUrdu(item.getString("inflected_urdu"));
+        }
+
+        if (item.isPresent("inflected_hindi_index")){
+            master.setInflectedHindiIndex(item.getInt("inflected_hindi_index"));
         }
 
         if (item.isPresent("part_of_speech")){
             master.setPartOfSpeech(PartOfSpeech.valueOf(item.getString("part_of_speech")));
         }
 
-        if (item.isPresent("canonical_word")){
-            master.setCanonicalWord(item.getString("canonical_word"));
+        if (item.isPresent("canonical_hindi")){
+            master.setCanonicalHindi(item.getString("canonical_hindi"));
         }
 
+        if (item.isPresent("canonical_urdu")){
+            master.setCanonicalUrdu(item.getString("canonical_urdu"));
+        }
 
         if (item.isPresent("canonical_keys")){
             List<Object> cksObjList = (List)item.get("canonical_keys");
@@ -53,7 +61,7 @@ public class MasterConverter {
         return master;
     }
 
-    public static Map<String, AttributeValue> convertToAvMap(Master master){
+    public static Map<String, AttributeValue> convertToAvMap(Inflected master){
 
         List<AttributeValue> canonicalKeys = master.getCanonicalKeys().stream()
                 .map(ck -> {
@@ -78,22 +86,27 @@ public class MasterConverter {
         accsList.setL(accidences);
 
         Map<String, AttributeValue> result = new HashMap<>();
-        result.put("hindi_word", new AttributeValue(master.getHindiWord()));
-        result.put("word_index", new AttributeValue(Integer.toString(master.getWordIndex())));
+        result.put("inflected_hindi", new AttributeValue(master.getInflectedHindi()));
+        result.put("inflected_urdu", new AttributeValue(master.getInflectedUrdu()));
+        result.put("inflected_hindi_index", new AttributeValue(Integer.toString(master.getInflectedHindiIndex())));
         result.put("part_of_speech", new AttributeValue(master.getPartOfSpeech().name()));
-        result.put("canonical_word", new AttributeValue(master.getCanonicalWord()));
+        result.put("canonical_hindi", new AttributeValue(master.getCanonicalHindi()));
+        result.put("canonical_urdu", new AttributeValue(master.getCanonicalUrdu()));
         result.put("canonical_keys", cksList);
         result.put("accidence", accsList  );
 
         return result;
     }
 
-    public static Master fromAvMap(Map<String, AttributeValue> sAvs){
-        Master master = new Master();
-        master.setHindiWord(sAvs.get("hindi_word").getS())
+    public static Inflected fromAvMap(Map<String, AttributeValue> sAvs){
+        Inflected master = new Inflected();
+        master
+                .setInflectedHindi(sAvs.get("inflected_hindi").getS())
+                .setInflectedUrdu(sAvs.get("inflected_urdu").getS())
                 .setPartOfSpeech(PartOfSpeech.valueOf(sAvs.get("part_of_speech").getS()))
-                .setCanonicalWord(sAvs.get("canonical_word").getS())
-                .setWordIndex(Integer.valueOf(sAvs.get("word_index").getN()));
+                .setCanonicalHindi(sAvs.get("canonical_hindi").getS())
+                .setCanonicalUrdu(sAvs.get("canonical_urdu").getS())
+                .setInflectedHindiIndex(Integer.valueOf(sAvs.get("inflected_hindi_index").getN()));
 
         Set<CanonicalKey> canonicalKeys = sAvs.get("canonical_keys")
                 .getL().stream()
@@ -117,14 +130,18 @@ public class MasterConverter {
         return master;
     }
 
-    public static Item convert(Master master){
+    public static Item convert(Inflected master){
         Item item = new Item();
 
-        item = item.with("hindi_word", master.getHindiWord());
+        item = item.with("inflected_hindi", master.getInflectedHindi());
 
-        item = item.with("canonical_word", master.getCanonicalWord());
+        item = item.with("inflected_urdu", master.getInflectedUrdu());
 
-        item = item.with("word_index", master.getWordIndex());
+        item = item.with("canonical_hindi", master.getCanonicalHindi());
+
+        item = item.with("canonical_urdu", master.getCanonicalUrdu());
+
+        item = item.with("inflected_hindi_index", master.getInflectedHindiIndex());
 
         item = item.with("part_of_speech", master.getPartOfSpeech().name());
 

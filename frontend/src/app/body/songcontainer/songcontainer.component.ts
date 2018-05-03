@@ -45,10 +45,16 @@ export class SongcontainerComponent implements OnInit {
 
     for (let index = 0; index < allRelevant.length; index++){
       allRelevant[index].addEventListener("mouseenter", () =>  {
-        this.songsService.itemHoverChange.next(allRelevant[index].id);
-        //console.log("over " + allRelevant[index].id)
-        //inElement(allRelevant[index].id);
+        let spanSelected = allRelevant[index];
+        this.songsService.itemHoverChange.next(spanSelected.id);
+        spanSelected.classList.add("selectedRed");
       });
+
+      allRelevant[index].addEventListener("mouseleave", () =>  {
+        let spanSelected = allRelevant[index];
+        spanSelected.classList.remove("selectedRed");
+      });
+
     }
   }
 

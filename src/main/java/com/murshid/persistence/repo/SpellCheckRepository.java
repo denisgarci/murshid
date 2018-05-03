@@ -15,6 +15,8 @@ public interface SpellCheckRepository extends CrudRepository<SpellCheckEntry, St
     @Query(value = "SELECT * FROM spell_check WHERE active = true and initial = ?1 AND  hindi_word not in (select entry from attempts where source= ?2 ) ", nativeQuery = true)
     List<HindiWord> selectByInitialExceptAllTried(String initial, String dictionarySource);
 
+    SpellCheckEntry findByHindiWord(String hindiWord);
+
 
     @Query(value = "SELECT distinct h.initial FROM spell_check h")
     List<Character> selectDistinctInitials();

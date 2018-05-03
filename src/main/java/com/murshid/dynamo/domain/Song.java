@@ -1,11 +1,10 @@
 package com.murshid.dynamo.domain;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.murshid.persistence.domain.views.WordListMasterEntry;
+import com.murshid.persistence.domain.views.SongWordsToInflectedTable;
 
 import javax.persistence.Column;
 import java.util.List;
-import java.util.Map;
 
 public class Song {
 
@@ -29,13 +28,9 @@ public class Song {
     @Column(name = "song")
     private String song;
 
-    @JsonProperty("word_list")
-    @Column(name = "word_list")
-    private Map<String, String> wordList;
-
     @JsonProperty("word_list_master")
     @Column(name = "word_list_master")
-    private List<WordListMasterEntry> wordListMaster;
+    private List<SongWordsToInflectedTable> wordListMaster;
 
     @JsonProperty("html")
     @Column(name = "html")
@@ -47,17 +42,17 @@ public class Song {
 
 
 
-    @JsonProperty("master_entries")
-    @Column(name = "master_entries")
-    private String masterEntries;
+    @JsonProperty("inflected_entries")
+    @Column(name = "inflected_entries")
+    private String inflectedEntries;
 
 
-    public String getMasterEntries() {
-        return masterEntries;
+    public String getInflectedEntries() {
+        return inflectedEntries;
     }
 
-    public Song setMasterEntries(String masterEntries) {
-        this.masterEntries = masterEntries;
+    public Song setInflectedEntries(String inflectedEntries) {
+        this.inflectedEntries = inflectedEntries;
         return this;
     }
 
@@ -107,20 +102,11 @@ public class Song {
         return this;
     }
 
-    public Map<String, String> getWordList() {
-        return wordList;
-    }
-
-    public Song setWordList(Map<String, String> wordList) {
-        this.wordList = wordList;
-        return this;
-    }
-
-    public List<WordListMasterEntry> getWordListMaster() {
+    public List<SongWordsToInflectedTable> getWordListMaster() {
         return wordListMaster;
     }
 
-    public Song setWordListMaster(List<WordListMasterEntry> wordListMaster) {
+    public Song setWordListMaster(List<SongWordsToInflectedTable> wordListMaster) {
         this.wordListMaster = wordListMaster;
         return this;
     }

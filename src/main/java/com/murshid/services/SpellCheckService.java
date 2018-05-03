@@ -29,6 +29,15 @@ public class SpellCheckService {
         }
     }
 
+    public String getUrduSpelling(String hindiWord){
+        SpellCheckEntry spellCheckEntry = spellCheckRepository.findByHindiWord(hindiWord);
+        if (spellCheckEntry!= null){
+            return spellCheckEntry.getUrduWord();
+        }else{
+            return null;
+        }
+    }
+
     @Inject
     private SpellCheckRepository spellCheckRepository;
 }

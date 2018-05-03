@@ -1,7 +1,7 @@
 package com.murshid.services;
 
 import com.google.common.collect.Sets;
-import com.murshid.dynamo.domain.Master;
+import com.murshid.dynamo.domain.Inflected;
 import com.murshid.models.CanonicalKey;
 import com.murshid.models.enums.Accidence;
 import com.murshid.models.enums.DictionarySource;
@@ -18,28 +18,28 @@ import static org.junit.Assert.assertTrue;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest
-public class MasterServiceTest {
+public class InflectedServiceTest {
 
     @Test
     public void explode() throws Exception {
 
         CanonicalKey canonicalKey = new CanonicalKey().setDictionarySource(DictionarySource.PLATTS)
                 .setCanonicalIndex(0).setCanonicalWord("बोलना");
-        Master master = new Master().setCanonicalKeys(Sets.newHashSet(canonicalKey))
-                .setHindiWord("बोलता")
+        Inflected master = new Inflected().setCanonicalKeys(Sets.newHashSet(canonicalKey))
+                .setInflectedHindi("बोलता")
                 .setAccidence(Sets.newHashSet(Accidence.MASCULINE, Accidence.DIRECT, Accidence.SINGULAR))
                 .setPartOfSpeech(PartOfSpeech.PARTICIPLE);
 
-         List<Master> result = masterService.explode(master);
+         List<Inflected> result = inflectedService.explode(master);
 
-        Master expectedMasculineVocativeSingular = new Master().setCanonicalKeys(Sets.newHashSet(canonicalKey))
-                .setHindiWord("बोलते")
+        Inflected expectedMasculineVocativeSingular = new Inflected().setCanonicalKeys(Sets.newHashSet(canonicalKey))
+                .setInflectedHindi("बोलते")
                 .setAccidence(Sets.newHashSet(Accidence.MASCULINE, Accidence.VOCATIVE, Accidence.SINGULAR))
                 .setPartOfSpeech(PartOfSpeech.PARTICIPLE);
 
 
-        Master expectedFeminineDirectPlural = new Master().setCanonicalKeys(Sets.newHashSet(canonicalKey))
-                .setHindiWord("बोलतीं")
+        Inflected expectedFeminineDirectPlural = new Inflected().setCanonicalKeys(Sets.newHashSet(canonicalKey))
+                .setInflectedHindi("बोलतीं")
                 .setAccidence(Sets.newHashSet(Accidence.FEMININE, Accidence.DIRECT, Accidence.PLURAL))
                 .setPartOfSpeech(PartOfSpeech.PARTICIPLE);
 
@@ -49,6 +49,6 @@ public class MasterServiceTest {
     }
 
     @Inject
-    private MasterService masterService;
+    private InflectedService inflectedService;
 
 }

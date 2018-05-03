@@ -4,12 +4,12 @@ import com.amazonaws.services.dynamodbv2.document.Item;
 import com.amazonaws.services.dynamodbv2.document.Table;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
-import com.murshid.dynamo.domain.Master;
+import com.murshid.dynamo.domain.Inflected;
 import com.murshid.dynamo.domain.Song;
 import com.murshid.dynamo.repo.SongRepository;
 import com.murshid.models.converters.DynamoAccessor;
 import com.murshid.models.converters.WordListMasterEntryConverter;
-import com.murshid.persistence.domain.views.WordListMasterEntry;
+import com.murshid.persistence.domain.views.SongWordsToInflectedTable;
 import com.murshid.persistence.repo.SpellCheckRepository;
 import com.murshid.utils.SongUtils;
 import org.slf4j.Logger;
@@ -113,7 +113,7 @@ public class SongsService {
         if (song.isPresent()){
             Set<String> tokens = SongUtils.hindiTokens(song.get());
             for (String token: tokens){
-                List<Master> inMaster =  masterService.getByInflectedWord(token);
+                List<Inflected> inMaster =  inflectedService.getByInflectedWord(token);
                 if (inMaster.isEmpty()){
                     result.add(token);
                 }
@@ -142,54 +142,45 @@ public class SongsService {
         return result;
     }
 
-    public boolean validate(@Nonnull String songTitleLatin, WordListMasterEntry wordListMasterEntry){
+    public boolean validate(@Nonnull String songTitleLatin, SongWordsToInflectedTable songWordsToInflectedTable){
         Song song = songRepository.findOne(songTitleLatin);
         if (song == null){
             LOGGER.error("the song {} was not found in Master", songTitleLatin);
             return false;
         }
 
-        Map<String, String> wordList = song.getWordList();
-        for (int i = 0; i < wordListMasterEntry.getIndices().size(); i++ ){
-            String index = wordListMasterEntry.getIndices().get(i);
-            if (!wordList.containsKey(index)){
-                LOGGER.error("the index {} was not found in the word list of {}", index, songTitleLatin);
-                return false;
-            }
-        };
-
-        String hindiWord= wordListMasterEntry.getMasterKey().getHindiWord();
-        int wordIndex = wordListMasterEntry.getMasterKey().getWordIndex();
-        if (!masterService.exists(hindiWord, wordIndex)){
-            LOGGER.error("the Master key with hindiWord {} and wordIndex={} does not exist", hindiWord, wordIndex);
+        String hindiWord= songWordsToInflectedTable.getInflectedKey().getInflectedHindi();
+        int wordIndex = songWordsToInflectedTable.getInflectedKey().getInflectedHindiIndex();
+        if (!inflectedService.exists(hindiWord, wordIndex)){
+            LOGGER.error("the inflected key with inflected_hindi {} and inflected_hindi_index={} does not exist", hindiWord, wordIndex);
             return false;
         }
 
-        if (song.getWordListMaster().contains(wordListMasterEntry)){
-            LOGGER.error("the song {} already contains this wordListMasterEntry entry={}", songTitleLatin,
-                         wordListMasterEntry);
+        if (song.getWordListMaster().contains(songWordsToInflectedTable)){
+            LOGGER.error("the song {} already contains this songWordsToInflectedTable entry={}", songTitleLatin,
+                         songWordsToInflectedTable);
             return false;
         }
 
         return true;
     }
 
-    public void addEntryToWordListMaster(@Nonnull String songTitleLatin, WordListMasterEntry wordListMasterEntry){
-        List<String> indices = wordListMasterEntry.getIndices();
+    public void addEntryToWordListMaster(@Nonnull String songTitleLatin, SongWordsToInflectedTable songWordsToInflectedTable){
+        List<String> indices = songWordsToInflectedTable.getIndices();
 
         Song song = songRepository.findOne(songTitleLatin);
         Map<String, String> result = new LinkedHashMap<>();
         if (song != null){
             Map<String, Object> entry = new HashMap<>();
-            entry.put("indices", wordListMasterEntry.getIndices());
+            entry.put("song_word_indices", songWordsToInflectedTable.getIndices());
 
             Map<String, Object> masterKey = new HashMap<>();
-            masterKey.put("hindi_word", wordListMasterEntry.getMasterKey().getHindiWord());
-            masterKey.put("word_index", wordListMasterEntry.getMasterKey().getWordIndex());
+            masterKey.put("inflected_hindi", songWordsToInflectedTable.getInflectedKey().getInflectedHindi());
+            masterKey.put("inflected_hindi_index", songWordsToInflectedTable.getInflectedKey().getInflectedHindiIndex());
 
-            entry.put("master_key", masterKey);
+            entry.put("inflected_key", masterKey);
 
-            List<WordListMasterEntry> wordListMasterField = song.getWordListMaster();
+            List<SongWordsToInflectedTable> wordListMasterField = song.getWordListMaster();
             if (wordListMasterField == null){
                 wordListMasterField = Lists.newArrayList();
                 song.setWordListMaster(wordListMasterField);
@@ -199,15 +190,6 @@ public class SongsService {
         }
     }
 
-    public void redoWordIndex(String songTitleLatin){
-        Song song = songRepository.findOne(songTitleLatin);
-        if (song != null){
-          Map<String, String> wordMap = createSongIndex(songTitleLatin);
-          song.setWordList(wordMap);
-        }
-        songRepository.save(song);
-    }
-
     @Inject
     private SongRepository songRepository;
 
@@ -215,7 +197,7 @@ public class SongsService {
     private SpellCheckRepository spellCheckRepository;
 
     @Inject
-    private MasterService masterService;
+    private InflectedService inflectedService;
 
 
 

@@ -8,36 +8,36 @@ import org.apache.commons.lang3.builder.HashCodeBuilder;
 
 import java.util.List;
 
-public class WordListMasterEntry {
+public class SongWordsToInflectedTable {
 
     private static Gson gson = new Gson();
 
-    @SerializedName("indices")
+    @SerializedName("song_word_indices")
     List<String> indices;
 
 
-    @SerializedName("master_key")
-    MasterKey masterKey;
+    @SerializedName("inflected_key")
+    InflectedKey inflectedKey;
 
 
-    @JsonProperty("indices")
+    @JsonProperty("song_word_indices")
     public List<String> getIndices() {
         return indices;
     }
 
-    public WordListMasterEntry setIndices(List<String> indices) {
+    public SongWordsToInflectedTable setIndices(List<String> indices) {
         this.indices = indices;
         return this;
     }
 
 
-    @JsonProperty("master_key")
-    public MasterKey getMasterKey() {
-        return masterKey;
+    @JsonProperty("inflected_key")
+    public InflectedKey getInflectedKey() {
+        return inflectedKey;
     }
 
-    public WordListMasterEntry setMasterKey(MasterKey masterKey) {
-        this.masterKey = masterKey;
+    public SongWordsToInflectedTable setInflectedKey(InflectedKey inflectedKey) {
+        this.inflectedKey = inflectedKey;
         return this;
     }
 
@@ -45,13 +45,13 @@ public class WordListMasterEntry {
     public boolean equals(Object o) {
         if (this == o) { return true; }
 
-        if (!(o instanceof WordListMasterEntry)) { return false; }
+        if (!(o instanceof SongWordsToInflectedTable)) { return false; }
 
-        WordListMasterEntry that = (WordListMasterEntry) o;
+        SongWordsToInflectedTable that = (SongWordsToInflectedTable) o;
 
         return new EqualsBuilder()
                 .append(getIndices(), that.getIndices())
-                .append(getMasterKey(), that.getMasterKey())
+                .append(getInflectedKey(), that.getInflectedKey())
                 .isEquals();
     }
 
@@ -59,7 +59,7 @@ public class WordListMasterEntry {
     public int hashCode() {
         return new HashCodeBuilder(17, 37)
                 .append(getIndices())
-                .append(getMasterKey())
+                .append(getInflectedKey())
                 .toHashCode();
     }
 

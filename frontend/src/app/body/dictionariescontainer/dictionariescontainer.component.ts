@@ -17,7 +17,6 @@ export class DictionariescontainerComponent implements OnInit {
 
   ngOnInit() {
     this.songsService.itemHoverChangeObservable.subscribe(message => {
-      console.log("hovered over  " + message);
 
       if (message == null) return;
 

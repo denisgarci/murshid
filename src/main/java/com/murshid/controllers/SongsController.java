@@ -1,7 +1,7 @@
 package com.murshid.controllers;
 
 import com.murshid.dynamo.domain.Song;
-import com.murshid.persistence.domain.views.WordListMasterEntry;
+import com.murshid.persistence.domain.views.SongWordsToInflectedTable;
 import com.murshid.services.SongsService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -39,11 +39,11 @@ public class SongsController {
     }
 
     @PostMapping("/addEntryToWordListMaster")
-    public ResponseEntity<String> insertNew(@RequestParam(name = "songLatinName") String songLatinName, @RequestBody WordListMasterEntry wordListMasterEntry) {
-        if (!songsService.validate(songLatinName, wordListMasterEntry)){
+    public ResponseEntity<String> insertNew(@RequestParam(name = "songLatinName") String songLatinName, @RequestBody SongWordsToInflectedTable songWordsToInflectedTable) {
+        if (!songsService.validate(songLatinName, songWordsToInflectedTable)){
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
         }else {
-            songsService.addEntryToWordListMaster(songLatinName, wordListMasterEntry);
+            songsService.addEntryToWordListMaster(songLatinName, songWordsToInflectedTable);
             return ResponseEntity.status(HttpStatus.CREATED).build();
         }
     }

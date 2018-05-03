@@ -4,3 +4,12 @@
   flex-wrap: wrap;
   justify-content: space-around;
 }
+
+/deep/ .selectedRed {
+  color: red;
+}
+
+
+/deep/ .selectedGreen {
+  color: green;
+}

@@ -3,7 +3,7 @@ package com.murshid.models.converters;
 import com.amazonaws.services.dynamodbv2.document.Item;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.murshid.dynamo.domain.Song;
-import com.murshid.persistence.domain.views.WordListMasterEntry;
+import com.murshid.persistence.domain.views.SongWordsToInflectedTable;
 import jersey.repackaged.com.google.common.collect.Lists;
 
 import java.io.IOException;
@@ -37,14 +37,10 @@ public class SongConverter {
             song.setMedia((List<String>) item.get("media"));
         }
 
-        if (item.isPresent("word_list")){
-            song.setWordList((Map<String, String>) item.get("word_list"));
-        }
-
         if (item.isPresent("word_list_master")) {
-            List<WordListMasterEntry> wordListMasterEntries = Lists.newArrayList();
+            List<SongWordsToInflectedTable> wordListMasterEntries = Lists.newArrayList();
             List<Map<String, Object>> itemList = item.getList("word_list_master");
-            List<WordListMasterEntry> wlmEntries = itemList.stream()
+            List<SongWordsToInflectedTable> wlmEntries = itemList.stream()
                     .map(a -> WordListMasterEntryConverter.fromMap(a))
                     .collect(Collectors.toList());
 
@@ -56,7 +52,7 @@ public class SongConverter {
         }
 
         if (item.isPresent("master_entries")){
-            song.setMasterEntries((String)item.get("master_entries"));
+            song.setInflectedEntries((String)item.get("master_entries"));
         }
 
         if (item.isPresent("dictionary_entries")){
@@ -66,11 +62,11 @@ public class SongConverter {
         return song;
     }
 
-    private static WordListMasterEntry fromJson(String json){
+    private static SongWordsToInflectedTable fromJson(String json){
         try{
-             return mapper.readValue(json, WordListMasterEntry.class);
+             return mapper.readValue(json, SongWordsToInflectedTable.class);
         }catch (IOException ex){
-            throw new RuntimeException("cannpt understand this json as a WordListMasterEntry" + json);
+            throw new RuntimeException("cannpt understand this json as a SongWordsToInflectedTable" + json);
         }
     }
 
@@ -88,16 +84,14 @@ public class SongConverter {
 
         item = item.withList("media", song.getMedia());
 
-        item = item.withMap("word_list", song.getWordList());
-
-        List<WordListMasterEntry> wordListMasterEntries = song.getWordListMaster();
+        List<SongWordsToInflectedTable> wordListMasterEntries = song.getWordListMaster();
         List<Map> items = WordListMasterEntryConverter.toMaps(wordListMasterEntries);
 
         item = item.withString("html", song.getHtml());
 
         item = item.withList("word_list_master", items);
 
-        item = item.withString("master_entries", song.getMasterEntries());
+        item = item.withString("master_entries", song.getInflectedEntries());
 
         item = item.withString("dictionary_entries", song.getDictionaryEntries());
 

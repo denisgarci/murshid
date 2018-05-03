@@ -5,10 +5,9 @@ import com.amazonaws.services.dynamodbv2.document.Index;
 import com.amazonaws.services.dynamodbv2.document.Table;
 import com.amazonaws.services.dynamodbv2.model.*;
 import com.murshid.dynamo.domain.Song;
-import com.murshid.dynamo.repo.MasterRepository;
 import com.murshid.dynamo.repo.SongRepository;
 import com.murshid.models.converters.DynamoAccessor;
-import com.murshid.services.MasterService;
+import com.murshid.services.InflectedService;
 import com.murshid.services.SongsService;
 import com.murshid.services.WikitionaryLetterIngestor;
 import org.slf4j.Logger;
@@ -30,12 +29,12 @@ public class IngestorApplication {
 	public static void main(String[] args) throws Exception{
 		context = SpringApplication.run(IngestorApplication.class, args);
 
-
+        //validateAll();
         //sameCanonical();
         //songRepo();
         //createIndex();
         //findByIndex();
-
+        //createIndex();
 //        changeEnums();
 //
 //
@@ -60,41 +59,30 @@ public class IngestorApplication {
 
 
     private static void validateAll() throws InterruptedException{
-        MasterService masterService = context.getBean(MasterService.class);
+        InflectedService masterService = context.getBean(InflectedService.class);
         masterService.validateAll();
         LOGGER.info("finished validating");
     }
 
-    private static void reindexAlvida() throws InterruptedException{
-        SongsService songsService = context.getBean(SongsService.class);
-        songsService.redoWordIndex("Alvida");
-    }
-
     private static void createIndex() throws InterruptedException{
-        Table table = DynamoAccessor.dynamoDB.getTable("master");
+        Table table = DynamoAccessor.dynamoDB.getTable("inflected");
 
         Index index = table.createGSI(
                 new CreateGlobalSecondaryIndexAction()
-                        .withIndexName("idx-canonical_word")
+                        .withIndexName("idx-canonical_hindi")
                         .withKeySchema(
-                                new KeySchemaElement("canonical_word", KeyType.HASH))
+                                new KeySchemaElement("canonical_hindi", KeyType.HASH))
                         .withProvisionedThroughput(
                                 new ProvisionedThroughput(3L, 3L))
                         .withProjection(
                                 new Projection()
                                         .withProjectionType(ProjectionType.KEYS_ONLY)),
-                new AttributeDefinition("canonical_word",
+                new AttributeDefinition("canonical_hindi",
                                         ScalarAttributeType.S));
         index.waitForActive();
         LOGGER.info("index created");
 
     }
-
-    private static void findByIndex(){
-        MasterRepository masterRepository = context.getBean(MasterRepository.class);
-        masterRepository.findByCanonicalWord("का");
-    }
-
 
     private static void songRepo(){
         SongRepository processor = context.getBean(SongRepository.class);

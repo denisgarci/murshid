@@ -1,9 +1,9 @@
 package com.murshid.controllers;
 
-import com.murshid.dynamo.domain.Master;
+import com.murshid.dynamo.domain.Inflected;
 import com.murshid.dynamo.domain.Song;
 import com.murshid.models.CanonicalKey;
-import com.murshid.services.MasterService;
+import com.murshid.services.InflectedService;
 import com.murshid.services.SongsService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -16,10 +16,10 @@ import javax.inject.Inject;
 import java.util.*;
 
 @Controller
-@RequestMapping("master")
-public class MasterController {
+@RequestMapping("inflected")
+public class InflectedController {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(MasterController.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(InflectedController.class);
 
 
     @GetMapping("/tokensNotInMaster")
@@ -34,33 +34,26 @@ public class MasterController {
         return songsService.newWordsInSong(songName);
     }
 
-    @GetMapping("/createMasterEntries")
-    public @ResponseBody
-    Map<String, Object> createMasterEntries(@RequestParam(name = "songName") String songName) {
-
-       return  masterService.createMasterEntries(songName);
-    }
-
     @GetMapping("/findWord")
     public @ResponseBody
     List findInKeyAndBody(@RequestParam(name = "hindiWord") String word) {
-        List result = masterService.getByInflectedWord(word);
+        List result = inflectedService.getByInflectedWord(word);
         return result;
     }
 
     @GetMapping("/findByCanonicalWord")
     public @ResponseBody
     List findInByCanonicalWord(@RequestParam(name = "canonicalWord") String canonicalWord) {
-        List result = masterService.findByCanonicalWord(canonicalWord);
+        List result = inflectedService.findByCanonicalWord(canonicalWord);
         return result;
     }
 
     @GetMapping("/findAllInSong")
     public @ResponseBody
-    List<Master> findAllInSong(@RequestParam(name = "songLatinName") String songLatinName) {
+    List<Inflected> findAllInSong(@RequestParam(name = "songLatinName") String songLatinName) {
         Optional<Song> song = songsService.findByLatinTitle(songLatinName);
         if (song.isPresent()){
-           return masterService.allEntriesForSong(song.get());
+           return inflectedService.allEntriesForSong(song.get());
         }else{
             LOGGER.info("no song found with name={}", songLatinName);
             return Collections.emptyList();
@@ -72,7 +65,7 @@ public class MasterController {
     Map<String, Object> findAllInSongJs(@RequestParam(name = "songLatinName") String songLatinName) {
         Optional<Song> song = songsService.findByLatinTitle(songLatinName);
         if (song.isPresent()){
-            return masterService.allEntriesForSongJS(song.get());
+            return inflectedService.allEntriesForSongJS(song.get());
         }else{
             LOGGER.info("no song found with name={}", songLatinName);
             return Collections.emptyMap();
@@ -80,14 +73,14 @@ public class MasterController {
     }
 
     @PostMapping("/insertNew")
-    public ResponseEntity<String> insertNew(@RequestBody Master masterEntry) {
+    public ResponseEntity<String> insertNew(@RequestBody Inflected masterEntry) {
         complementCanonicalKeys(masterEntry);
-        if (masterService.isValid(masterEntry)) {
-            if (masterService.exists(masterEntry.getHindiWord(), masterEntry.getWordIndex())){
-                LOGGER.info("canonicalWord {} index {} already exists in master", masterEntry.getHindiWord(), masterEntry.getWordIndex());
+        if (inflectedService.isValid(masterEntry)) {
+            if (inflectedService.exists(masterEntry.getInflectedHindi(), masterEntry.getInflectedHindiIndex())){
+                LOGGER.info("inflected hindi word {} index {} already exists in inflected table in DynamoDB", masterEntry.getInflectedHindi(), masterEntry.getInflectedHindiIndex());
                 return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
             }
-            boolean success = masterService.save(masterEntry);
+            boolean success = inflectedService.save(masterEntry);
             if (success) {
                 return ResponseEntity.status(HttpStatus.CREATED).build();
             }else {
@@ -99,20 +92,20 @@ public class MasterController {
     }
 
     @PostMapping("/insertNewWithExplode")
-    public ResponseEntity<String> insertNewWithExplode(@RequestBody Master masterEntry) {
+    public ResponseEntity<String> insertNewWithExplode(@RequestBody Inflected masterEntry) {
         complementCanonicalKeys(masterEntry);
-        if (!masterService.isValid(masterEntry)) {
+        if (!inflectedService.isValid(masterEntry)) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
         }
 
-        List<Master> exploded = masterService.explode(masterEntry);
+        List<Inflected> exploded = inflectedService.explode(masterEntry);
 
         //first validate them all
-        for (Master master: exploded) {
-            if (masterService.isValid(master)) {
-                if (masterService.exists(master.getHindiWord(), master.getWordIndex())) {
-                    LOGGER.info("canonicalWord {} index {} already exists in master", master.getHindiWord(),
-                                master.getWordIndex());
+        for (Inflected master: exploded) {
+            if (inflectedService.isValid(master)) {
+                if (inflectedService.exists(master.getInflectedHindi(), master.getInflectedHindiIndex())) {
+                    LOGGER.info("inflected hindi word {} index {} already exists in the inflected table in DynamoBD", master.getInflectedHindi(),
+                                master.getInflectedHindiIndex());
                     return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
                 }
             } else {
@@ -121,8 +114,8 @@ public class MasterController {
         }
 
         //then write
-        for (Master master: exploded) {
-            boolean success = masterService.save(master);
+        for (Inflected master: exploded) {
+            boolean success = inflectedService.save(master);
             if (!success) {
                 return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
             }
@@ -133,10 +126,10 @@ public class MasterController {
 
 
     @PostMapping("/upsert")
-    public ResponseEntity<String> upsert(@RequestBody Master masterEntry) {
+    public ResponseEntity<String> upsert(@RequestBody Inflected masterEntry) {
         complementCanonicalKeys(masterEntry);
-        if (masterService.isValid(masterEntry)) {
-            boolean success = masterService.save(masterEntry);
+        if (inflectedService.isValid(masterEntry)) {
+            boolean success = inflectedService.save(masterEntry);
             if (success) {
                 return ResponseEntity.status(HttpStatus.CREATED).build();
             }else {
@@ -147,15 +140,15 @@ public class MasterController {
         }
     }
 
-    private Master complementCanonicalKeys(Master master){
+    private Inflected complementCanonicalKeys(Inflected master){
         for (CanonicalKey ck: master.getCanonicalKeys()){
-            ck.setCanonicalWord(master.getCanonicalWord());
+            ck.setCanonicalWord(master.getCanonicalHindi());
         }
         return master;
     }
 
     @Inject
-    private MasterService masterService;
+    private InflectedService inflectedService;
 
     @Inject
     private SongsService songsService;

@@ -30,7 +30,7 @@ public class DictionaryService {
      * @return a Map, transformable into a JSon object
      */
     public Map<String, DictionaryEntry> createDictionaryEntries(Song song) {
-        Map<String, Object> masterEntries =  gson.fromJson(song.getMasterEntries(), Map.class);
+        Map<String, Object> masterEntries =  gson.fromJson(song.getInflectedEntries(), Map.class);
         Set<String> canonicalKeys = masterEntries.entrySet().stream()
                 .map(me -> (Map) me.getValue()).map(valMap -> (List<String>) valMap.get("canonical_keys"))
                 .flatMap(l -> l.stream()).collect(Collectors.toSet());

@@ -73,14 +73,14 @@ public class InflectedController {
     }
 
     @PostMapping("/insertNew")
-    public ResponseEntity<String> insertNew(@RequestBody Inflected masterEntry) {
-        complementCanonicalKeys(masterEntry);
-        if (inflectedService.isValid(masterEntry)) {
-            if (inflectedService.exists(masterEntry.getInflectedHindi(), masterEntry.getInflectedHindiIndex())){
-                LOGGER.info("inflected hindi word {} index {} already exists in inflected table in DynamoDB", masterEntry.getInflectedHindi(), masterEntry.getInflectedHindiIndex());
+    public ResponseEntity<String> insertNew(@RequestBody Inflected inflected) {
+        complementCanonicalKeys(inflected);
+        if (inflectedService.isValid(inflected)) {
+            if (inflectedService.exists(inflected.getInflectedHindi(), inflected.getInflectedHindiIndex())){
+                LOGGER.info("inflected hindi word {} index {} already exists in inflected table in DynamoDB", inflected.getInflectedHindi(), inflected.getInflectedHindiIndex());
                 return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
             }
-            boolean success = inflectedService.save(masterEntry);
+            boolean success = inflectedService.save(inflected);
             if (success) {
                 return ResponseEntity.status(HttpStatus.CREATED).build();
             }else {
@@ -92,13 +92,13 @@ public class InflectedController {
     }
 
     @PostMapping("/insertNewWithExplode")
-    public ResponseEntity<String> insertNewWithExplode(@RequestBody Inflected masterEntry) {
-        complementCanonicalKeys(masterEntry);
-        if (!inflectedService.isValid(masterEntry)) {
+    public ResponseEntity<String> insertNewWithExplode(@RequestBody Inflected inflected) {
+        complementCanonicalKeys(inflected);
+        if (!inflectedService.isValid(inflected)) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
         }
 
-        List<Inflected> exploded = inflectedService.explode(masterEntry);
+        List<Inflected> exploded = inflectedService.explode(inflected);
 
         //first validate them all
         for (Inflected master: exploded) {
@@ -126,10 +126,10 @@ public class InflectedController {
 
 
     @PostMapping("/upsert")
-    public ResponseEntity<String> upsert(@RequestBody Inflected masterEntry) {
-        complementCanonicalKeys(masterEntry);
-        if (inflectedService.isValid(masterEntry)) {
-            boolean success = inflectedService.save(masterEntry);
+    public ResponseEntity<String> upsert(@RequestBody Inflected inflected) {
+        complementCanonicalKeys(inflected);
+        if (inflectedService.isValid(inflected)) {
+            boolean success = inflectedService.save(inflected);
             if (success) {
                 return ResponseEntity.status(HttpStatus.CREATED).build();
             }else {
@@ -140,11 +140,11 @@ public class InflectedController {
         }
     }
 
-    private Inflected complementCanonicalKeys(Inflected master){
-        for (CanonicalKey ck: master.getCanonicalKeys()){
-            ck.setCanonicalWord(master.getCanonicalHindi());
+    private Inflected complementCanonicalKeys(Inflected inflected){
+        for (CanonicalKey ck: inflected.getCanonicalKeys()){
+            ck.setCanonicalWord(inflected.getCanonicalHindi());
         }
-        return master;
+        return inflected;
     }
 
     @Inject

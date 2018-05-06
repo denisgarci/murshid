@@ -2,6 +2,8 @@ package com.murshid.dynamo.domain;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.google.common.collect.Sets;
+import com.google.gson.annotations.SerializedName;
 import com.murshid.models.CanonicalKey;
 import com.murshid.models.enums.Accidence;
 import com.murshid.models.enums.PartOfSpeech;
@@ -11,6 +13,7 @@ import org.apache.commons.lang3.builder.HashCodeBuilder;
 import javax.persistence.Column;
 import java.util.HashSet;
 import java.util.Set;
+import java.util.TreeSet;
 
 public class Inflected {
 
@@ -38,7 +41,11 @@ public class Inflected {
     @Column(name = "canonical_urdu")
     private String canonicalUrdu;
 
-    private Set<Accidence> accidence;
+    private TreeSet<Accidence> accidence;
+
+    @SerializedName("accidence_labels")
+    @JsonProperty("accodence_labels")
+    private Set<String> accidenceLabels;
 
     @JsonProperty("canonical_keys")
     @Column(name = "canonical_keys")
@@ -54,7 +61,16 @@ public class Inflected {
     }
 
     public Inflected setAccidence(Set<Accidence> accidence) {
-        this.accidence = accidence;
+        if (accidence != null){
+            TreeSet<Accidence> treeSet = Sets.newTreeSet();
+            treeSet.addAll(accidence);
+            this.accidence = treeSet;
+
+            //labels
+            Set<String> accidenceLabels = Sets.newLinkedHashSet();
+            treeSet.forEach(acc -> accidenceLabels.add(acc.getLabel()));
+            this.accidenceLabels = accidenceLabels;
+        }
         return this;
     }
 
@@ -82,6 +98,15 @@ public class Inflected {
 
     public Inflected setInflectedHindiIndex(int inflectedHindiIndex) {
         this.inflectedHindiIndex = inflectedHindiIndex;
+        return this;
+    }
+
+    public Set<String> getAccidenceLabels() {
+        return accidenceLabels;
+    }
+
+    public Inflected setAccidenceLabels(Set<String> accidenceLabels) {
+        this.accidenceLabels = accidenceLabels;
         return this;
     }
 

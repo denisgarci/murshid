@@ -32,7 +32,8 @@ export class DictionariescontainerComponent implements OnInit {
       dec.canonical_hindi = inflectedEntry.canonical_hindi;
       dec.inflected_hindi = inflectedEntry.inflected_hindi;
       dec.accidence = inflectedEntry.accidence;
-      dec.part_of_speech = inflectedEntry.part_of_speech;
+      dec.accidence_labels = inflectedEntry.accidence_labels;
+      dec.inflected_part_of_speech_label = inflectedEntry.part_of_speech;
       dec.dictionary_entries = [];
 
       let dictionaryEntries = this.songsService.dictionaryEntries;

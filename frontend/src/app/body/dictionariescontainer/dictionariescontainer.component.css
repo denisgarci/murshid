@@ -24,3 +24,12 @@
 .dictionary_global_header{
   padding: 5px;
 }
+
+.accidence_word{
+  padding-left: 5px;
+}
+
+.canonical_hindi{
+  font-weight: bold;
+  padding-left: 5px;
+}

@@ -91,6 +91,7 @@ public class InflectedService {
             value.put("inflected_hindi", inflected.getInflectedHindi());
             value.put("inflected_urdu", inflected.getInflectedUrdu());
             value.put("accidence", inflected.getAccidence());
+            value.put("accidence_labels", inflected.getAccidenceLabels());
             value.put("part_of_speech", inflected.getpartOfSpeecLabel());
             value.put("canonical_hindi", inflected.getCanonicalHindi());
             value.put("canonical_urdu", inflected.getCanonicalUrdu());

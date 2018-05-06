@@ -4,16 +4,19 @@ import static com.murshid.models.enums.AccidenceCategory.*;
 
 public enum Accidence {
     MASCULINE("masculine", GENDER), FEMININE("feminine", GENDER), NEUTER("neuter", GENDER),
+    DIRECT("direct", CASE), OBLIQUE("oblique", CASE), VOCATIVE("vocative", CASE),
     PLURAL("plural", NUMBER), SINGULAR("singular", NUMBER),
-    LONG_FORM("long form", FORM_LENGTH),
-    INDICATIVE("indicative", MODE), SUBJUNCTIVE("subjunctive", MODE), CONDITIONAL("conditional", MODE), IMPERATIVE("imperative", MODE), PRESUMPTIVE("presumptive", MODE),
-    FACTUAL("factual", FACTUALITY), CONTRAFACTUAL("contrafactual", FACTUALITY),
     _1ST("first person", PERSON), _2ND("second person", PERSON), _3RD("thrid person", PERSON),
-    ACTIVE("active", VOICE), PASSIVE("passive", VOICE),
-    NON_ASPECTUAL("non aspectual", ASPECT), HABITUAL("habitual", ASPECT), CONTINUOUS("continuous", ASPECT), PERFECTIVE("perfective", ASPECT), IMPERFECTIVE("imperfective", ASPECT),
     PRESENT("present", TENSE), FUTURE("future", TENSE), PAST("past", TENSE), PLUSQUAMPERFECT("plusquamperfect", TENSE),
-    DIRECT("direct", CASE), OBLIQUE("oblique", CASE), VOCATIVE("vocative", CASE);
+    ACTIVE("active", VOICE), PASSIVE("passive", VOICE),
+    INDICATIVE("indicative", MODE), SUBJUNCTIVE("subjunctive", MODE), CONDITIONAL("conditional", MODE), IMPERATIVE("imperative", MODE), PRESUMPTIVE("presumptive", MODE),
+    NON_ASPECTUAL("non aspectual", ASPECT), HABITUAL("habitual", ASPECT), CONTINUOUS("continuous", ASPECT), PERFECTIVE("perfective", ASPECT), IMPERFECTIVE("imperfective", ASPECT),
+    FACTUAL("factual", FACTUALITY), CONTRAFACTUAL("contrafactual", FACTUALITY),
+    LONG_FORM("long form", FORM_LENGTH);
 
+    public String getLabel() {
+        return label;
+    }
 
     private String label;
     private AccidenceCategory accidenceCategory;
@@ -35,7 +38,5 @@ public enum Accidence {
     public AccidenceCategory getAccidenceCategory() {
         return accidenceCategory;
     }
-
-
 
 }

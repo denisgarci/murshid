@@ -2,12 +2,15 @@
   <div *ngIf="content">
 
     <div class="dictionary_global_header">
-      <span>{{content.inflected_hindi}}</span> &nbsp;-&nbsp; <span>{{content.part_of_speech}}</span>
+      <span>{{content.inflected_hindi}}</span> &nbsp;-&nbsp; <span>{{content.inflected_part_of_speech_label}}</span>
     </div>
 
-    <h4 *ngIf="content.accidence">{{content.accidence}}</h4>
-    <div *ngIf="content.accidence">of</div>
-    <h3 *ngIf="content.accidence">{{content.canonical_hindi}}</h3>
+    <div *ngIf="content.accidence_labels" >
+      <span class="accidence_word" *ngFor="let accidenceLabel of content.accidence_labels">{{accidenceLabel}}</span>
+      <span class="accidence_word">of</span>
+      <span class="canonical_hindi">{{content.canonical_hindi}}</span>
+    </div>
+
     <br/>
     <div *ngFor="let dicEntry of content.dictionary_entries">
       <span class="dictionary_name">{{dicEntry.dictionary_source}}</span>

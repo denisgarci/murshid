@@ -1,11 +1,10 @@
 .dictionaries_container{
   padding: 10px;
-  border: 1px solid green;
   order: 1;
   flex-grow: 0;
   flex-shrink: 0;
-  flex-basis: 400px;
-  width: 400px;
+  flex-basis: 500px;
+  width: 500px;
   align-self: flex-start;
 
   display: flex;
@@ -25,11 +24,26 @@
   padding: 5px;
 }
 
+.part_of_speech {
+  font-family: Tahoma, Arial, sans-serif;
+  color: darkgrey;
+}
+
 .accidence_word{
   padding-left: 5px;
+  font-style: italic;
+  font-family: Tahoma, Arial, sans-serif;
+  color: darkgrey;
 }
 
 .canonical_hindi{
   font-weight: bold;
   padding-left: 5px;
+}
+
+.dictionary_entry_content{
+  margin-top: 8px;
+  text-align: justify;
+  text-justify: inter-word;
+  font-family: Tahoma, Arial, sans-serif;
 }

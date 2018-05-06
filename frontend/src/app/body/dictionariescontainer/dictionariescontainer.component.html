@@ -2,7 +2,7 @@
   <div *ngIf="content">
 
     <div class="dictionary_global_header">
-      <span>{{content.inflected_hindi}}</span> &nbsp;-&nbsp; <span>{{content.inflected_part_of_speech_label}}</span>
+      <span>{{content.inflected_hindi}}</span> &nbsp;-&nbsp; <span class="part_of_speech">{{content.inflected_part_of_speech_label}}</span>
     </div>
 
     <div *ngIf="content.accidence_labels" >
@@ -14,7 +14,7 @@
     <br/>
     <div *ngFor="let dicEntry of content.dictionary_entries">
       <span class="dictionary_name">{{dicEntry.dictionary_source}}</span>
-      <p>
+      <p class="dictionary_entry_content">
         {{dicEntry.meaning}}
       </p>
     </div>

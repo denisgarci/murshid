@@ -1,5 +1,6 @@
 package com.murshid.dynamo.domain;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.murshid.models.CanonicalKey;
 import com.murshid.models.enums.Accidence;
@@ -25,8 +26,7 @@ public class Inflected {
     @Column(name = "inflected_hindi_index")
     private int inflectedHindiIndex;
 
-
-    @JsonProperty("part_of_speech")
+    @JsonIgnore
     @Column(name = "part_of_speech")
     private PartOfSpeech partOfSpeech;
 
@@ -43,6 +43,11 @@ public class Inflected {
     @JsonProperty("canonical_keys")
     @Column(name = "canonical_keys")
     private Set<CanonicalKey> canonicalKeys;
+
+    @JsonProperty("part_of_speech")
+    public String getpartOfSpeecLabel(){
+        return partOfSpeech.getLabel();
+    }
 
     public Set<Accidence> getAccidence() {
         return accidence;

@@ -20,45 +20,45 @@ public class InflectedConverter {
     private static final Logger LOGGER = LoggerFactory.getLogger(InflectedConverter.class);
 
     public static Inflected convert(Item item){
-        Inflected master = new Inflected();
+        Inflected inflected = new Inflected();
 
         if (item.isPresent("inflected_hindi")){
-            master.setInflectedHindi(item.getString("inflected_hindi"));
+            inflected.setInflectedHindi(item.getString("inflected_hindi"));
         }
 
         if (item.isPresent("inflected_urdu")){
-            master.setInflectedUrdu(item.getString("inflected_urdu"));
+            inflected.setInflectedUrdu(item.getString("inflected_urdu"));
         }
 
         if (item.isPresent("inflected_hindi_index")){
-            master.setInflectedHindiIndex(item.getInt("inflected_hindi_index"));
+            inflected.setInflectedHindiIndex(item.getInt("inflected_hindi_index"));
         }
 
         if (item.isPresent("part_of_speech")){
-            master.setPartOfSpeech(PartOfSpeech.valueOf(item.getString("part_of_speech")));
+            inflected.setPartOfSpeech(PartOfSpeech.valueOf(item.getString("part_of_speech")));
         }
 
         if (item.isPresent("canonical_hindi")){
-            master.setCanonicalHindi(item.getString("canonical_hindi"));
+            inflected.setCanonicalHindi(item.getString("canonical_hindi"));
         }
 
         if (item.isPresent("canonical_urdu")){
-            master.setCanonicalUrdu(item.getString("canonical_urdu"));
+            inflected.setCanonicalUrdu(item.getString("canonical_urdu"));
         }
 
         if (item.isPresent("canonical_keys")){
             List<Object> cksObjList = (List)item.get("canonical_keys");
             Set<CanonicalKey> cksSet = cksObjList.stream().map(obj -> CanonicalKey.fromMap((Map)obj))
                     .collect(Collectors.toSet());
-            master.setCanonicalKeys(cksSet);
+            inflected.setCanonicalKeys(cksSet);
         }
 
 
         if (item.isPresent("accidence")){
-            master.setAccidence(((List<String>)item.get("accidence")).stream().map(Accidence::valueOf).collect(Collectors.toSet()));
+            inflected.setAccidence(((List<String>)item.get("accidence")).stream().map(Accidence::valueOf).collect(Collectors.toSet()));
         }
 
-        return master;
+        return inflected;
     }
 
     public static Map<String, AttributeValue> convertToAvMap(Inflected master){

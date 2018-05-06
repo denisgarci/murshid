@@ -36,8 +36,8 @@ public class InflectedController {
 
     @GetMapping("/findWord")
     public @ResponseBody
-    List findInKeyAndBody(@RequestParam(name = "hindiWord") String word) {
-        List result = inflectedService.getByInflectedWord(word);
+    List<Inflected> findInKeyAndBody(@RequestParam(name = "hindiWord") String word) {
+        List<Inflected> result = inflectedService.getByInflectedWord(word);
         return result;
     }
 

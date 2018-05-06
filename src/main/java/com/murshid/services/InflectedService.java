@@ -84,22 +84,22 @@ public class InflectedService {
      * @return          a Map<String, Object> similar easily transformable into a JS object
      */
     public Map<String, Object> generateInflectedEntries(Song song){
-        List<Inflected> masterList = allEntriesForSong(song);
+        List<Inflected> inflectedList = allEntriesForSong(song);
         Map<String, Object> result = new HashMap<>();
-        masterList.forEach(master -> {
+        inflectedList.forEach(inflected -> {
             Map<String, Object> value = new HashMap<>();
-            value.put("inflected_hindi", master.getInflectedHindi());
-            value.put("inflected_urdu", master.getInflectedUrdu());
-            value.put("accidence", master.getAccidence());
-            value.put("part_of_speech", master.getPartOfSpeech());
-            value.put("canonical_hindi", master.getCanonicalHindi());
-            value.put("canonical_urdu", master.getCanonicalUrdu());
-            List<String> dictionaryKeys = master.getCanonicalKeys().stream()
+            value.put("inflected_hindi", inflected.getInflectedHindi());
+            value.put("inflected_urdu", inflected.getInflectedUrdu());
+            value.put("accidence", inflected.getAccidence());
+            value.put("part_of_speech", inflected.getpartOfSpeecLabel());
+            value.put("canonical_hindi", inflected.getCanonicalHindi());
+            value.put("canonical_urdu", inflected.getCanonicalUrdu());
+            List<String> dictionaryKeys = inflected.getCanonicalKeys().stream()
                     .map( CanonicalKey::toKey)
                     .collect(Collectors.toList());
             value.put("canonical_keys", dictionaryKeys);
 
-            result.put(master.getKey(), value);
+            result.put(inflected.getKey(), value);
         });
         song.setInflectedEntries(gsonMapper.toJson(result).toString());
         songRepository.save(song);

@@ -1,0 +1,12 @@
+.translations_container{
+  padding: 10px;
+  border: 1px solid cyan;
+
+  order: 1;
+  flex-grow: 1;
+  flex-shrink: 0;
+  flex-basis: 400px;
+  font-family: Tahoma, Arial, SansSerif;
+  font-size: 15px;
+  line-height: 154%;
+}

@@ -28,6 +28,15 @@ public class Song {
     @Column(name = "song")
     private String song;
 
+    @JsonProperty("english_translation")
+    @Column(name = "english_translation")
+    private String englishTranslation;
+
+    @JsonProperty("english_translation_html")
+    @Column(name = "english_translation_html")
+    private String englishTranslationHtml;
+
+
     @JsonProperty("word_list_master")
     @Column(name = "word_list_master")
     private List<SongWordsToInflectedTable> wordListMaster;
@@ -126,6 +135,24 @@ public class Song {
 
     public Song setDictionaryEntries(String dictionaryEntries) {
         this.dictionaryEntries = dictionaryEntries;
+        return this;
+    }
+
+    public String getEnglishTranslation() {
+        return englishTranslation;
+    }
+
+    public Song setEnglishTranslation(String englishTranslation) {
+        this.englishTranslation = englishTranslation;
+        return this;
+    }
+
+    public String getEnglishTranslationHtml() {
+        return englishTranslationHtml;
+    }
+
+    public Song setEnglishTranslationHtml(String englishTranslationHtml) {
+        this.englishTranslationHtml = englishTranslationHtml;
         return this;
     }
 

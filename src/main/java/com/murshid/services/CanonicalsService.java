@@ -16,16 +16,7 @@ import java.util.stream.Collectors;
 public class CanonicalsService {
 
 
-    public List<CanonicalWrapper> findDictionaryEntries(@Nonnull String hindiWord){
 
-        List<CanonicalWrapper> result = new ArrayList<>();
-        result.addAll( wikitionaryService.findByHindiWord(hindiWord).stream().map(we -> new CanonicalWrapper(DictionarySource.WIKITIONARY, we)).collect(Collectors.toList()));
-        result.addAll(plattsService.findByHindiWord(hindiWord).stream().map(we -> new CanonicalWrapper(DictionarySource.PLATTS, we)).collect(Collectors.toList()));
-        result.addAll( rekhtaService.findByHindiWord(hindiWord).stream().map(we -> new CanonicalWrapper(DictionarySource.REKHTA, we)).collect(Collectors.toList()));
-        result.addAll(murshidService.findByHindiWord(hindiWord).stream().map(we -> new CanonicalWrapper(DictionarySource.MURSHID, we)).collect(Collectors.toList()));
-
-        return result;
-    }
 
 
     public List<CanonicalWrapper> suggestCanonicals(@Nonnull String inflected){

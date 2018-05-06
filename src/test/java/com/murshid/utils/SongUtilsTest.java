@@ -49,7 +49,7 @@ public class SongUtilsTest {
     public void extractHindiTokens() throws Exception {
         String test = " तद मैं कमली\nतद मैं कमली \n\n मैं";
 
-        Set<String> hindiTokens = SongUtils.hindiTokens(test);
+        Set<String> hindiTokens = SongUtils.wordTokens(test);
 
         Set<String> expected = com.google.common.collect.ImmutableSet.of("कमली", "तद", "मैं");
 
@@ -60,7 +60,7 @@ public class SongUtilsTest {
     public void extractHindiTokensWithBrackets() throws Exception {
         String test = " तद मैं कमली\nतद [refrain] मैं कमली \n\n मैं [repeats refrain]";
 
-        Set<String> hindiTokens = SongUtils.hindiTokens(test);
+        Set<String> hindiTokens = SongUtils.wordTokens(test);
 
         Set<String> expected = com.google.common.collect.ImmutableSet.of("कमली", "तद", "मैं");
 

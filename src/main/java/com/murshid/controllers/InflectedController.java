@@ -22,7 +22,7 @@ public class InflectedController {
     private static final Logger LOGGER = LoggerFactory.getLogger(InflectedController.class);
 
 
-    @GetMapping("/tokensNotInMaster")
+    @GetMapping("/tokensNotInInflected")
     public @ResponseBody
     Set<String> tokensNotInMaster(@RequestParam(name = "songName") String songName) {
         return songsService.wordTokensNotInMaster(songName);
@@ -48,24 +48,12 @@ public class InflectedController {
         return result;
     }
 
-    @GetMapping("/findAllInSong")
-    public @ResponseBody
-    List<Inflected> findAllInSong(@RequestParam(name = "songLatinName") String songLatinName) {
-        Optional<Song> song = songsService.findByLatinTitle(songLatinName);
-        if (song.isPresent()){
-           return inflectedService.allEntriesForSong(song.get());
-        }else{
-            LOGGER.info("no song found with name={}", songLatinName);
-            return Collections.emptyList();
-        }
-    }
-
-    @GetMapping("/findAllInSongJS")
+    @GetMapping("/generateInflectedEntriesInSong")
     public @ResponseBody
     Map<String, Object> findAllInSongJs(@RequestParam(name = "songLatinName") String songLatinName) {
         Optional<Song> song = songsService.findByLatinTitle(songLatinName);
         if (song.isPresent()){
-            return inflectedService.allEntriesForSongJS(song.get());
+            return inflectedService.generateInflectedEntries(song.get());
         }else{
             LOGGER.info("no song found with name={}", songLatinName);
             return Collections.emptyMap();

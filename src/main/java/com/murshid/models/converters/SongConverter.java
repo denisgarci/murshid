@@ -33,6 +33,15 @@ public class SongConverter {
             song.setSong(item.getString("song"));
         }
 
+        if (item.isPresent("english_translation")){
+            song.setEnglishTranslation(item.getString("english_translation"));
+        }
+
+        if (item.isPresent("english_translation_html")){
+            song.setEnglishTranslationHtml(item.getString("english_translation_html"));
+        }
+
+
         if (item.isPresent("media")){
             song.setMedia((List<String>) item.get("media"));
         }
@@ -51,8 +60,8 @@ public class SongConverter {
             song.setHtml(item.getString("html"));
         }
 
-        if (item.isPresent("master_entries")){
-            song.setInflectedEntries((String)item.get("master_entries"));
+        if (item.isPresent("inflected_entries")){
+            song.setInflectedEntries((String)item.get("inflected_entries"));
         }
 
         if (item.isPresent("dictionary_entries")){
@@ -76,6 +85,10 @@ public class SongConverter {
 
         item = item.with("song", song.getSong());
 
+        item = item.with("english_translation", song.getEnglishTranslation());
+
+        item = item.with("english_translation_html", song.getEnglishTranslationHtml());
+
         item = item.with("author", song.getAuthor());
 
         item = item.with("title_latin", song.getTitleLatin());
@@ -91,7 +104,7 @@ public class SongConverter {
 
         item = item.withList("word_list_master", items);
 
-        item = item.withString("master_entries", song.getInflectedEntries());
+        item = item.withString("inflected_entries", song.getInflectedEntries());
 
         item = item.withString("dictionary_entries", song.getDictionaryEntries());
 

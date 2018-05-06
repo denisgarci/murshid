@@ -74,16 +74,16 @@ public class InflectedService {
     }
 
     /**
-     * retrieves all Master entries relevant for a song, but instead of in List form, in a Map<String, Object> form
+     * retrieves all Inflected entries relevant for a song, but instead of in List form, in a Map<String, Object> form
      * that is suitable to be transformed into a Javascript object.
      * Then, writes them in String form into the Song's DynamoDB record.
      *
-     * Also returns the Master entries retrieved
+     * Also returns the Inflected entries retrieved
      *
      * @param song      a Song model
      * @return          a Map<String, Object> similar easily transformable into a JS object
      */
-    public Map<String, Object> allEntriesForSongJS(Song song){
+    public Map<String, Object> generateInflectedEntries(Song song){
         List<Inflected> masterList = allEntriesForSong(song);
         Map<String, Object> result = new HashMap<>();
         masterList.forEach(master -> {
@@ -108,7 +108,7 @@ public class InflectedService {
     }
 
     /**
-     * Retrieves all Master entries relevant for a Song.
+     * Retrieves all DynamoDB.Inflected entries relevant for a Song.
      * The song is assumed to have the word_list_master member populated
      * @param song         a song model
      * @return             a list (not necessarily ordered) of said master keys

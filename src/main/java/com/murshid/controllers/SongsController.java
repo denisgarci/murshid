@@ -30,6 +30,31 @@ public class SongsController {
         }
     }
 
+    @PostMapping("/ingestEnglishTranslation")
+    public ResponseEntity<String> ingestEnglishTranslation(@RequestParam(name = "songLatinName") String songLatinName, @RequestParam(name = "songFile") String songFile) {
+
+        boolean result = songsService.ingestEnglishTranslation(songLatinName, songFile);
+        if (result){
+            return ResponseEntity.status(HttpStatus.CREATED).build();
+        }else{
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
+        }
+    }
+
+
+    @PostMapping("/generateSpans")
+    public ResponseEntity<String> generateSoans(@RequestParam(name = "songLatinName") String songLatinName) {
+        songsService.generateSpans(songLatinName);
+        return ResponseEntity.status(HttpStatus.CREATED).build();
+    }
+
+    @PostMapping("/generateEnglishTranslationSpans")
+    public ResponseEntity<String> generateEnglishTranslationSpans(@RequestParam(name = "songLatinName") String songLatinName) {
+        songsService.generateEnglishTranslationSpans(songLatinName);
+        return ResponseEntity.status(HttpStatus.CREATED).build();
+    }
+
+
     @CrossOrigin(origins = "http://localhost:4200")
     @GetMapping("/findByLatinName")
     @ResponseBody

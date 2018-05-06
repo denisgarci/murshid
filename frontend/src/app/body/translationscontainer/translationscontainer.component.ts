@@ -1,4 +1,7 @@
-import { Component, OnInit } from '@angular/core';
+import {Component, ElementRef, OnInit, Renderer2} from '@angular/core';
+import {SongsService} from "../../services/songs.service";
+import {DictionariesContent} from "../../models/DictionariesContent";
+import {SongModel} from "../../models/SongModel";
 
 @Component({
   selector: 'app-translationscontainer',
@@ -7,9 +10,28 @@ import { Component, OnInit } from '@angular/core';
 })
 export class TranslationscontainerComponent implements OnInit {
 
-  constructor() { }
+  englishTranslationHtml: string;
+
+  constructor(private songsService: SongsService, private elementRef: ElementRef, private renderer: Renderer2) { }
 
   ngOnInit() {
+    this.songsService.songSelectionChangeObservable.subscribe(message => {
+      this.updateEnglishTranslationContainerContent();
+    });
+  }
+
+  updateEnglishTranslationContainerContent() {
+    if (this.songsService.currentSong != null)
+    {
+      let divElement = this.elementRef.nativeElement.firstElementChild;
+
+      //cloning is a practical way of removing all previous listeners from the divElement
+      //(this doesn't have listeners for the moment)
+      let newDiv = divElement.cloneNode(true);
+      divElement.parentNode.replaceChild(newDiv, divElement);
+
+      this.renderer.setProperty(newDiv, 'innerHTML', this.songsService.currentSong.english_translation_html);
+    }
   }
 
 }

@@ -10,10 +10,9 @@ import {DictionariesContent} from "../../models/DictionariesContent";
 })
 export class DictionariescontainerComponent implements OnInit {
 
-  @Input()
   content: DictionariesContent;
 
-  constructor(private songsService: SongsService, private elementRef: ElementRef, private renderer: Renderer2) {}
+  constructor(private songsService: SongsService) {}
 
   ngOnInit() {
     this.songsService.itemHoverChangeObservable.subscribe(message => {
@@ -28,32 +27,23 @@ export class DictionariescontainerComponent implements OnInit {
         return;
       }
 
-      let masterEntry = this.songsService.masterEntries[masterKey];
+      let inflectedEntry = this.songsService.inflectedEntries[masterKey];
 
-      dec.canonical_word = masterEntry.canonical_word;
-      dec.accidence = masterEntry.accidence;
+      dec.canonical_hindi = inflectedEntry.canonical_hindi;
+      dec.inflected_hindi = inflectedEntry.inflected_hindi;
+      dec.accidence = inflectedEntry.accidence;
+      dec.part_of_speech = inflectedEntry.part_of_speech;
       dec.dictionary_entries = [];
 
       let dictionaryEntries = this.songsService.dictionaryEntries;
 
-      masterEntry.canonical_keys.forEach(ck =>{
+      inflectedEntry.canonical_keys.forEach(ck =>{
          dec.dictionary_entries.push(dictionaryEntries[ck]);
       });
 
       this.content = dec;
 
     });
-  }
-
-  ngOnChanges(changes: SimpleChanges) {
-    for (let propName in changes) {
-      let change = changes[propName];
-
-      let curVal  = JSON.stringify(change.currentValue);
-      let prevVal = JSON.stringify(change.previousValue);
-
-      console.log("previous value = " + prevVal + " current value = " + curVal);
-    }
   }
 
 }

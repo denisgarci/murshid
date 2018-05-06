@@ -8,10 +8,12 @@ import com.murshid.persistence.domain.MurshidEntry;
 import com.murshid.persistence.domain.PlattsEntry;
 import com.murshid.persistence.domain.RekhtaEntry;
 import com.murshid.persistence.domain.WikitionaryEntry;
+import com.murshid.persistence.domain.views.CanonicalWrapper;
 import com.murshid.persistence.domain.views.DictionaryEntry;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.annotation.Nonnull;
 import javax.inject.Inject;
 import javax.inject.Named;
 import java.util.*;
@@ -111,6 +113,17 @@ public class DictionaryService {
 
         song.setDictionaryEntries(gson.toJson(result));
         songRepository.save(song);
+
+        return result;
+    }
+
+    public List<CanonicalWrapper> findDictionaryEntries(@Nonnull String hindiWord){
+
+        List<CanonicalWrapper> result = new ArrayList<>();
+        result.addAll( wikitionaryService.findByHindiWord(hindiWord).stream().map(we -> new CanonicalWrapper(DictionarySource.WIKITIONARY, we)).collect(Collectors.toList()));
+        result.addAll(plattsService.findByHindiWord(hindiWord).stream().map(we -> new CanonicalWrapper(DictionarySource.PLATTS, we)).collect(Collectors.toList()));
+        result.addAll( rekhtaService.findByHindiWord(hindiWord).stream().map(we -> new CanonicalWrapper(DictionarySource.REKHTA, we)).collect(Collectors.toList()));
+        result.addAll(murshidService.findByHindiWord(hindiWord).stream().map(we -> new CanonicalWrapper(DictionarySource.MURSHID, we)).collect(Collectors.toList()));
 
         return result;
     }

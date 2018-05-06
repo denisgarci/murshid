@@ -4,8 +4,8 @@ import {HttpClient} from "@angular/common/http";
 import { SongModel } from '../models/SongModel';
 import { IGeo } from '../models/IGeo';
 import {WordListMaster} from "../models/WordListMaster";
-import {MasterKey} from "../models/MasterKey";
-import {IMasterEntries} from "../models/IMasterEntries";
+import {InflectedKey} from "../models/InflectedKey";
+import {IInflectedEntries} from "../models/IInflectedEntries";
 import {IDictionaryEntries} from "../models/IDictionaryEntries";
 
 @Injectable()
@@ -17,7 +17,7 @@ export class SongsService {
 
   public currentSong: SongModel;
   public geo: IGeo = {};
-  public masterEntries: IMasterEntries = {};
+  public inflectedEntries: IInflectedEntries = {};
   public dictionaryEntries: IDictionaryEntries = {};
 
   //item-related
@@ -30,10 +30,6 @@ export class SongsService {
 
   changeSelectedSong(message: string) {
     this.retrieveSong(message);
-  }
-
-  changeSelectedSpan(id: string){
-    console.log("id changed to" + id);
   }
 
   retrieveSong(songTitleLatin: string): void {
@@ -51,21 +47,24 @@ export class SongsService {
 
   populateGeo(song: SongModel) {
     this.geo = {};
-    this.masterEntries = {};
+    this.inflectedEntries = {};
 
     song.word_list_master.forEach(entry => {
       let wlm = entry as WordListMaster;
-      wlm.indices.forEach(id => {
-        this.geo[String(id)] = this.buildMasterKey(wlm.master_key);
+      if (wlm.song_word_indices == null){
+        alert(wlm + " has no song_word_indexes")
+      }
+      wlm.song_word_indices.forEach(id => {
+        this.geo[String(id)] = SongsService.buildMasterKey(wlm.inflected_key);
       })
     });
 
     this.dictionaryEntries = JSON.parse(song.dictionary_entries);
-    this.masterEntries = JSON.parse(song.master_entries);
+    this.inflectedEntries = JSON.parse(song.inflected_entries);
   }
 
-  private buildMasterKey(mk: MasterKey){
-    return mk.hindi_word + "_" + mk.word_index;
+  private static buildMasterKey(mk: InflectedKey){
+    return mk.inflected_hindi + "_" + mk.inflected_hindi_index;
   }
 
 }

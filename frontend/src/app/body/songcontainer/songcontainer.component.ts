@@ -16,11 +16,8 @@ export class SongcontainerComponent implements OnInit {
 
   }
 
-  message:string;
-
   ngOnInit() {
     this.songsService.songSelectionChangeObservable.subscribe(message => {
-      this.message = message;
       this.updateContainerContent();
     });
   }

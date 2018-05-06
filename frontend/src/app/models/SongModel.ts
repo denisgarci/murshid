@@ -9,6 +9,8 @@ export class SongModel{
   song: string;
   word_list_master: object[];
   word_list: object;
-  master_entries: string;
+  inflected_entries: string;
   dictionary_entries: string;
+  english_translation: string;
+  english_translation_html: string;
 }

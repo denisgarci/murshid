@@ -30,6 +30,8 @@ public class SongsService {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(WikitionaryLetterIngestor.class);
 
+    static public final String WITH_DELIMITER = "((?<=%1$s)|(?=%1$s))";
+
     /**
      * Rerurns the texts of a song from the Dynamo songs table, if it exists.
      * @param songTitleLatin        the latin title of the desired song
@@ -48,7 +50,37 @@ public class SongsService {
     }
 
     /**
-     * re-ingests a song (already present in the Dynamo Songs) from a file, and re-writes it into Master.
+     * re-ingests the lyrics of a song (already present in the Dynamo Songs) from a file.
+     * @param songTitleLatin
+     * @param fileName
+     * @return
+     */
+    public boolean ingestEnglishTranslation(String songTitleLatin, String fileName){
+
+        Song song = songRepository.findOne(songTitleLatin);
+
+        if (song == null){
+            return false;
+        }else{
+
+            try {
+                String translationText =  new String(Files.readAllBytes(
+                        Paths.get(getClass().getClassLoader()
+                                          .getResource("translations/" + fileName)
+                                          .toURI())));
+
+                song.setEnglishTranslation(translationText);
+                songRepository.save(song);
+            }catch (URISyntaxException | IOException ex){
+                return false;
+            }
+
+            return true;
+        }
+    }
+
+    /**
+     * re-ingests the lyrics of a song (already present in the Dynamo Songs) from a file.
      * @param songTitleLatin
      * @param fileName
      * @return
@@ -95,7 +127,7 @@ public class SongsService {
     public Set<String> newWordsInSong(@Nonnull String songTitleLatin){
         Optional<String> song = getSong(songTitleLatin);
         if (song.isPresent()){
-            Set<String> tokens = SongUtils.hindiTokens(song.get());
+            Set<String> tokens = SongUtils.wordTokens(song.get());
             return tokens.stream().filter(s-> spellCheckRepository.findOne(s) == null).collect(Collectors.toSet());
         }
         return Sets.newTreeSet();
@@ -111,7 +143,7 @@ public class SongsService {
         Optional<String> song = getSong(songTitleLatin);
         Set<String> result = new HashSet<>();
         if (song.isPresent()){
-            Set<String> tokens = SongUtils.hindiTokens(song.get());
+            Set<String> tokens = SongUtils.wordTokens(song.get());
             for (String token: tokens){
                 List<Inflected> inMaster =  inflectedService.getByInflectedWord(token);
                 if (inMaster.isEmpty()){
@@ -122,25 +154,60 @@ public class SongsService {
         return result;
     }
 
-    /**
-     * Locates a song by its latin title, then creates a map of number->word, which will be used
-     * to geographically link those words to Master entries..
-     * @param songTitleLatin        e.g. "Alvida"
-     * @return                      a Map("10", "दिल")
-     */
-    private Map<String, String> createSongIndex(@Nonnull String songTitleLatin){
-        Optional<String> song = getSong(songTitleLatin);
-        Map<String, String> result = new LinkedHashMap<>();
-        if (song.isPresent()){
-            List<String> words = SongUtils.allHindiTokens(song.get());
-            int i = 10;
-            for (String word : words){
-                result.put(Integer.toString(i), word);
-                i+=10;
+    public void generateSpans(@Nonnull String songTitleLatin){
+        Song song = songRepository.findOne(songTitleLatin);
+        if (song != null){
+            StringBuilder result = new StringBuilder();
+            String songText = song.getSong();
+            Set<String> hindiTokens = SongUtils.wordTokens(songText);
+
+            String[] allTokens = songText.split(String.format(WITH_DELIMITER, "\\s+|\\\\n|\\?|\\,"));
+
+            int index = 0;
+            for(String token: allTokens){
+                if (hindiTokens.contains(token)){
+                    index += 10;
+                    result.append("<span class=\"relevant\" id=\"" + index + "\">" + token + "</span>");
+                    result.append(" ");
+                }else if (token.equals(" ")){
+                    result.append("&nbsp;");
+                }else if (token.equals("\n")){
+                    result.append("<br/>");
+                }else {
+                    result.append(token);
+                }
+                songRepository.save(song.setHtml(result.toString()));
             }
         }
-        return result;
     }
+
+    public void generateEnglishTranslationSpans(@Nonnull String songTitleLatin){
+        Song song = songRepository.findOne(songTitleLatin);
+        if (song != null){
+            StringBuilder result = new StringBuilder();
+            String translationText = song.getEnglishTranslation();
+            Set<String> hindiTokens = SongUtils.wordTokens(translationText);
+
+            String[] allTokens = translationText.split(String.format(WITH_DELIMITER, "\\s+|\\\\n|\\?|\\,"));
+
+            int index = 0;
+            for(String token: allTokens){
+                if (hindiTokens.contains(token)){
+                    index += 10;
+                    result.append("<span class=\"translation_word\" id=\"" + index + "\">" + token + "</span>");
+                    result.append(" ");
+                }else if (token.equals(" ")){
+                    result.append("&nbsp;");
+                }else if (token.equals("\n")){
+                    result.append("<br/>");
+                }else {
+                    result.append(token);
+                }
+                songRepository.save(song.setEnglishTranslationHtml(result.toString()));
+            }
+        }
+    }
+
 
     public boolean validate(@Nonnull String songTitleLatin, SongWordsToInflectedTable songWordsToInflectedTable){
         Song song = songRepository.findOne(songTitleLatin);

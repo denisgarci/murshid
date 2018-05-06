@@ -1,6 +1,6 @@
-import {MasterKey} from "./MasterKey";
+import {InflectedKey} from "./InflectedKey";
 
 export class WordListMaster{
-  indices: string[];
-  master_key: MasterKey;
+  song_word_indices: string[];
+  inflected_key: InflectedKey;
 }

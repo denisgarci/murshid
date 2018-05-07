@@ -1,6 +1,5 @@
 package com.murshid.dynamo.domain;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.common.collect.Sets;
 import com.google.gson.annotations.SerializedName;
@@ -29,9 +28,12 @@ public class Inflected {
     @Column(name = "inflected_hindi_index")
     private int inflectedHindiIndex;
 
-    @JsonIgnore
+    @JsonProperty("part_of_speech")
     @Column(name = "part_of_speech")
     private PartOfSpeech partOfSpeech;
+
+    @JsonProperty("part_of_speech_label")
+    private String partOfSpeechLabel;
 
     @JsonProperty("canonical_hindi")
     @Column(name = "canonical_hindi")
@@ -44,14 +46,14 @@ public class Inflected {
     private TreeSet<Accidence> accidence;
 
     @SerializedName("accidence_labels")
-    @JsonProperty("accodence_labels")
+    @JsonProperty("accidence_labels")
     private Set<String> accidenceLabels;
 
     @JsonProperty("canonical_keys")
     @Column(name = "canonical_keys")
     private Set<CanonicalKey> canonicalKeys;
 
-    @JsonProperty("part_of_speech")
+    @JsonProperty("part_of_speech_label")
     public String getpartOfSpeecLabel(){
         return partOfSpeech.getLabel();
     }
@@ -89,6 +91,7 @@ public class Inflected {
 
     public Inflected setPartOfSpeech(PartOfSpeech partOfSpeech) {
         this.partOfSpeech = partOfSpeech;
+        this.partOfSpeechLabel = partOfSpeech.getLabel();
         return this;
     }
 
@@ -99,6 +102,10 @@ public class Inflected {
     public Inflected setInflectedHindiIndex(int inflectedHindiIndex) {
         this.inflectedHindiIndex = inflectedHindiIndex;
         return this;
+    }
+
+    public String getPartOfSpeechLabel() {
+        return partOfSpeechLabel;
     }
 
     public Set<String> getAccidenceLabels() {

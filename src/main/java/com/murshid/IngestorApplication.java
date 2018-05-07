@@ -29,7 +29,7 @@ public class IngestorApplication {
 	public static void main(String[] args) throws Exception{
 		context = SpringApplication.run(IngestorApplication.class, args);
 
-        generateHtml();
+        //generateHtml();
 
 
 	}

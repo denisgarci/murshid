@@ -4,6 +4,7 @@ import com.amazonaws.services.dynamodbv2.document.Item;
 import com.amazonaws.services.dynamodbv2.model.AttributeValue;
 import com.amazonaws.services.dynamodbv2.model.ScanRequest;
 import com.amazonaws.services.dynamodbv2.model.ScanResult;
+import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 import com.google.gson.Gson;
 import com.murshid.dynamo.domain.Inflected;
@@ -92,7 +93,8 @@ public class InflectedService {
             value.put("inflected_urdu", inflected.getInflectedUrdu());
             value.put("accidence", inflected.getAccidence());
             value.put("accidence_labels", inflected.getAccidenceLabels());
-            value.put("part_of_speech", inflected.getpartOfSpeecLabel());
+            value.put("part_of_speech", inflected.getPartOfSpeech());
+            value.put("part_of_speech_label", inflected.getpartOfSpeecLabel());
             value.put("canonical_hindi", inflected.getCanonicalHindi());
             value.put("canonical_urdu", inflected.getCanonicalUrdu());
             List<String> dictionaryKeys = inflected.getCanonicalKeys().stream()
@@ -151,11 +153,52 @@ public class InflectedService {
     }
 
     /**
+     * Utility method for cloning an inflected entry into another similar one
+     * @param original                  the original Inflected entry
+     * @param removeAccidences          what Accidence entries to remove
+     * @param addAccidences             what Accidence entrues to add
+     * @param inflectedHindi            the new Inflected hindi word (the Urud one is retrieved from the database)
+     * @return                          the new Inflected instance
+     */
+    Inflected clone(Inflected original, List<Accidence> removeAccidences, List<Accidence> addAccidences, String inflectedHindi){
+        Inflected target = (Inflected)original.clone();
+        target.getAccidence().removeAll(removeAccidences);
+        target.getAccidence().addAll(addAccidences);
+        target.setInflectedHindi(inflectedHindi);
+        target.setInflectedHindiIndex(suggestNewIndex(inflectedHindi));
+        target.setCanonicalUrdu(spellCheckService.getUrduSpelling(inflectedHindi));
+        return target;
+    }
+
+    Inflected clone(Inflected original, List<Accidence> remove, List<Accidence> add, int removeLetters, String addLetters){
+        String originalInflected = original.getInflectedHindi();
+        String newInflected = originalInflected.substring(0, originalInflected.length()-removeLetters ).concat(addLetters);
+        Inflected target = clone(original, remove, add, newInflected);
+        return target;
+    }
+
+
+    private List<Inflected> explodeSubjunctive(Inflected origin){
+
+        List<Inflected> result = new ArrayList<>();
+
+        result.add(clone(origin, Lists.newArrayList(Accidence._1ST), Lists.newArrayList(Accidence._2ND), 2, "े"));
+        result.add(clone(origin, Lists.newArrayList(Accidence._1ST), Lists.newArrayList(Accidence._3RD), 2, "े"));
+        result.add(clone(origin, Lists.newArrayList(Accidence.SINGULAR), Lists.newArrayList(Accidence.PLURAL), 2, "ें"));
+        result.add(clone(origin, Lists.newArrayList(Accidence.SINGULAR, Accidence._1ST), Lists.newArrayList(Accidence.PLURAL, Accidence._3RD), 2, "ें"));
+        result.add(clone(origin, Lists.newArrayList(Accidence.SINGULAR, Accidence._1ST), Lists.newArrayList(Accidence.PLURAL, Accidence._2ND), 2, "ो"));
+
+        return result;
+    }
+
+
+    /**
      * Returns some basic exploding, starting from a canonical form
      * @param origin        the canonical form
      * @return              a list of exploded forms, including the original
      */
     public List<Inflected> explode(Inflected origin){
+        origin.setInflectedHindiIndex(suggestNewIndex(origin.getInflectedHindi()));
         List<Inflected> result = new ArrayList<>();
         result.add(origin);
         String hindiWord = origin.getInflectedHindi();
@@ -386,9 +429,27 @@ public class InflectedService {
 
             result.addAll(explodeFemininesInII(origin));
 
+        } else if (origin.getPartOfSpeech() == PartOfSpeech.VERB  && origin.getAccidence().containsAll(Lists.newArrayList(Accidence._1ST, Accidence.SINGULAR, Accidence.SUBJUNCTIVE)) && (hindiWord.endsWith("ूँ")) ){
+            result.addAll(explodeSubjunctive(origin));
         }
 
+
         return result;
+    }
+
+    /**
+     * Parses DynameDB.Inflected in search of the minumum possible next index for that inflected word
+     * @param inflectedIndex
+     * @return
+     */
+    private int suggestNewIndex(String inflectedIndex){
+        int index = -1;
+        Iterator<Item> it = masterRepository.findByCanonicalWord(inflectedIndex);
+        while(it.hasNext()){
+            Item item = it.next();
+            index = Math.max(index, item.getInt("inflected_hindi_index"));
+        }
+        return index + 1;
     }
 
     private List<Inflected> explodeMasculinesNotInAAorUUorII(Inflected origin){

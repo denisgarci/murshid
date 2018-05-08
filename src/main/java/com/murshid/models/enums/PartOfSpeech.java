@@ -10,7 +10,7 @@ public enum PartOfSpeech {
     INFINITIVE("Infinitive"), PARTICIPLE("Participle"), ABSOLUTIVE("Absolutive"), VERBAL_NOUN("Verbal noun"),
     SUFFIX("Suffix"), PREFIX("Prefix"),
     ACRONYM("Acronym"), DETERMINER("Determiner"), PROVERB("Proverb"), VERB_FORM("Verb form"), PARTICLE("Particle"),
-    DIACRITIC("Diacritical mark"), PREPOSITION("Preposition"), ADVERBIAL_PHRASE("Adverbial phrase"),
+    DIACRITIC("Diacritical mark"), PREPOSITION("Preposition"), ADVERBIAL_PHRASE("Adverbial phrase"), ADJECTIVAL_PHRASE("Adjectival phrase"),
     COMPOUND_POSTPOSITION("Compound postposition");
 
     private String label;

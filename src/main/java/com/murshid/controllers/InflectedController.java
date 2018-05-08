@@ -63,6 +63,7 @@ public class InflectedController {
     @PostMapping("/insertNew")
     public ResponseEntity<String> insertNew(@RequestBody Inflected inflected) {
         complementCanonicalKeys(inflected);
+        inflected.setInflectedHindiIndex(inflectedService.suggestNewIndex(inflected.getInflectedHindi()));
         if (inflectedService.isValid(inflected)) {
             if (inflectedService.exists(inflected.getInflectedHindi(), inflected.getInflectedHindiIndex())){
                 LOGGER.info("inflected hindi word {} index {} already exists in inflected table in DynamoDB", inflected.getInflectedHindi(), inflected.getInflectedHindiIndex());

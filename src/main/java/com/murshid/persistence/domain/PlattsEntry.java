@@ -26,6 +26,9 @@ public class PlattsEntry implements HasDictionaryKey {
     @Column(name = "meaning", nullable = false)
     private String meaning;
 
+    @Column(name = "extra_meaning", nullable = false)
+    private String extraMeaning;
+
     @Column(name = "origin", nullable = false)
     private String origin;
 
@@ -134,6 +137,14 @@ public class PlattsEntry implements HasDictionaryKey {
                 .concat(Integer.toString(getWordIndex()));
     }
 
+    public String getExtraMeaning() {
+        return extraMeaning;
+    }
+
+    public PlattsEntry setExtraMeaning(String extraMeaning) {
+        this.extraMeaning = extraMeaning;
+        return this;
+    }
 
     @Override
     public String getHindiWord() {

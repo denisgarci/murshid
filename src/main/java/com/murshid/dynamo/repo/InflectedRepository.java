@@ -16,7 +16,7 @@ public class InflectedRepository {
 
     public Optional<Inflected> findOne(String hindiWord, int wordIndex){
         Table table = DynamoAccessor.dynamoDB.getTable("inflected");
-        KeyAttribute keyAttribute = new KeyAttribute("title_latin", hindiWord);
+
         PrimaryKey primaryKey = new PrimaryKey().addComponent("inflected_hindi", hindiWord)
                 .addComponent("inflected_hindi_index", wordIndex);
         Item item = table.getItem(primaryKey);
@@ -25,6 +25,18 @@ public class InflectedRepository {
         }else{
             return Optional.of(InflectedConverter.convert(item));
         }
+    }
+
+    public Iterator<Item> findByInflectedWord(String inflectedHindi){
+        Table table = DynamoAccessor.dynamoDB.getTable("inflected");
+
+        QuerySpec spec = new QuerySpec()
+                .withKeyConditionExpression("inflected_hindi = :v_param")
+                .withValueMap(new ValueMap().withString(":v_param",inflectedHindi));
+
+        ItemCollection<QueryOutcome> items = table.query(spec);
+        Iterator<Item> iter = items.iterator();
+        return iter;
     }
 
     public Iterator<Item> findByCanonicalWord(String canonicalWord){

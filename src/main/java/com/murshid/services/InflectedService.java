@@ -38,7 +38,7 @@ public class InflectedService {
     private static Gson gsonMapper = new Gson();
 
     private  static Set<PartOfSpeech> verbDerivates = Sets.newHashSet(PartOfSpeech.VERB, PartOfSpeech.ABSOLUTIVE, PartOfSpeech.VERBAL_NOUN,
-      PartOfSpeech.PARTICIPLE, PartOfSpeech.INFINITIVE);
+      PartOfSpeech.PARTICIPLE, PartOfSpeech.INFINITIVE, PartOfSpeech.ABSOLUTIVE);
 
     private  static Set<PartOfSpeech> pronounDerivates = Sets.newHashSet(PartOfSpeech.PRONOUN, PartOfSpeech.POSSESSIVE_PRONOUN, PartOfSpeech.PERSONAL_PRONOUN,  PartOfSpeech.DEMONSTRATIVE_PRONOUN);
 
@@ -442,9 +442,9 @@ public class InflectedService {
      * @param inflectedIndex
      * @return
      */
-    private int suggestNewIndex(String inflectedIndex){
+    public int suggestNewIndex(String inflectedIndex){
         int index = -1;
-        Iterator<Item> it = masterRepository.findByCanonicalWord(inflectedIndex);
+        Iterator<Item> it = masterRepository.findByInflectedWord(inflectedIndex);
         while(it.hasNext()){
             Item item = it.next();
             index = Math.max(index, item.getInt("inflected_hindi_index"));
@@ -908,7 +908,9 @@ public class InflectedService {
         }
 
         if (partOfSpeech == PartOfSpeech.VERB){
-            if (!hasPerson || !hasNumber || !hasTense){
+            if (accidence.contains(Accidence.VERB_ROOT) && accidence.size() == 1){
+                return true;
+            }else if (!hasPerson || !hasNumber || !hasTense){
                 LOGGER.info("accidence validation failure: part of speech VERB has to have at least person, number and tense");
                 return false;
             }
@@ -959,7 +961,7 @@ public class InflectedService {
         }
 
         if (!validateCanonicalKeys(master)){
-            LOGGER.info("some of the canonical keys are not present");
+            LOGGER.info("some of the canonical keys are not present or incorrect");
             return false;
         }
 

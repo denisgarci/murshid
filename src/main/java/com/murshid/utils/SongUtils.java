@@ -1,7 +1,10 @@
 package com.murshid.utils;
 
+import com.google.common.collect.Lists;
+
 import javax.annotation.Nonnull;
 import java.util.Arrays;
+import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -36,6 +39,28 @@ public class SongUtils {
         result = result.trim().replaceAll(" +", " "); //replaces any number of spaces with a single one
         String[] tokens = result.split("\\s+"); // \s+ matches all whitespaces (of any size), including blank spaces and carriages returns
         return tokens;
+    }
+
+    public static String[] eliminateThingsWithinBrackets(String[] original){
+        List<String> origList = Lists.newArrayList(original);
+        int index = 0;
+        boolean inSide = false;
+        while (index < origList.size()){
+            if (origList.get(index).equals("[")){
+                inSide = true;
+                origList.remove(index);
+            }else if (origList.get(index).equals("]")){
+                inSide = false;
+                origList.remove(index);
+            } else {
+                if (inSide) {
+                    origList.remove(index);
+                } else {
+                    index++;
+                }
+            }
+        }
+        return origList.toArray(new String[]{});
     }
 
 

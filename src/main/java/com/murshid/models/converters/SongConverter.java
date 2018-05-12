@@ -100,13 +100,19 @@ public class SongConverter {
         List<SongWordsToInflectedTable> wordListMasterEntries = song.getWordListMaster();
         List<Map> items = WordListMasterEntryConverter.toMaps(wordListMasterEntries);
 
-        item = item.withString("html", song.getHtml());
+        if (song.getHtml() != null) {
+            item = item.withString("html", song.getHtml());
+        }
 
         item = item.withList("word_list_master", items);
 
-        item = item.withString("inflected_entries", song.getInflectedEntries());
+        if (song.getInflectedEntries() != null ) {
+            item = item.withString("inflected_entries", song.getInflectedEntries());
+        }
 
-        item = item.withString("dictionary_entries", song.getDictionaryEntries());
+        if (song.getDictionaryEntries() != null) {
+            item = item.withString("dictionary_entries", song.getDictionaryEntries());
+        }
 
         return item;
     }

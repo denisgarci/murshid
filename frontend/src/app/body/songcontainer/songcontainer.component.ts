@@ -50,6 +50,7 @@ export class SongcontainerComponent implements OnInit {
       allRelevant[index].addEventListener("mouseleave", () =>  {
         let spanSelected = allRelevant[index];
         spanSelected.classList.remove("selectedRed");
+
       });
 
     }

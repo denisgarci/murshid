@@ -161,20 +161,43 @@ public class SongsService {
             String songText = song.getSong();
             Set<String> hindiTokens = SongUtils.wordTokens(songText);
 
-            String[] allTokens = songText.split(String.format(WITH_DELIMITER, "\\s+|\\\\n|\\?|\\,"));
+            String[] allTokens = songText.split(String.format(WITH_DELIMITER, "\\s+|\\\\n|\\?|\\,|\\[|\\]"));
+            //allTokens = SongUtils.eliminateThingsWithinBrackets(allTokens);
 
             int index = 0;
-            for(String token: allTokens){
-                if (hindiTokens.contains(token)){
-                    index += 10;
-                    result.append("<span class=\"relevant\" id=\"" + index + "\">" + token + "</span>");
-                    result.append(" ");
-                }else if (token.equals(" ")){
-                    result.append("&nbsp;");
-                }else if (token.equals("\n")){
-                    result.append("<br/>");
-                }else {
+            int tokenIndex = 0;
+            boolean inside = false;
+            while(tokenIndex < allTokens.length){
+                String token = allTokens[tokenIndex];
+
+
+                if (token.equals("[")){
+                    inside = true;
+                    tokenIndex ++;
                     result.append(token);
+                }else if (token.equals("]")){
+                    inside = false;
+                    tokenIndex ++;
+                    result.append(token);
+                } else {
+
+                        if (hindiTokens.contains(token)){
+                            if (!inside) {
+                                index += 10;
+                                result.append("<span class=\"relevant\" id=\"" + index + "\">" + token + "</span>");
+                                result.append(" ");
+                            }else{
+                                result.append(token);
+                            }
+                        }else if (token.equals(" ")){
+                            result.append("&nbsp;");
+                        }else if (token.equals("\n")){
+                            result.append("<br/>");
+                        }else{
+                            result.append(token);
+                        }
+
+                    tokenIndex++;
                 }
                 songRepository.save(song.setHtml(result.toString()));
             }
@@ -189,6 +212,7 @@ public class SongsService {
             Set<String> hindiTokens = SongUtils.wordTokens(translationText);
 
             String[] allTokens = translationText.split(String.format(WITH_DELIMITER, "\\s+|\\\\n|\\?|\\,"));
+            //allTokens = SongUtils.eliminateThingsWithinBrackets(allTokens);
 
             int index = 0;
             for(String token: allTokens){

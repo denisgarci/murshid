@@ -4,6 +4,7 @@ import org.junit.Test;
 
 import java.util.Set;
 
+import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 
@@ -65,6 +66,14 @@ public class SongUtilsTest {
         Set<String> expected = com.google.common.collect.ImmutableSet.of("कमली", "तद", "मैं");
 
         assertEquals(hindiTokens, expected);
+    }
+
+    @Test
+    public void eliminateThingsWithinBrackets(){
+        String[] original = { "1", "2", "[", "3", "4", "]", "5"};
+        String[] result = SongUtils.eliminateThingsWithinBrackets(original);
+        String[] expected = { "1", "2",  "5"};
+        assertArrayEquals(result, expected);
     }
 
 }

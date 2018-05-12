@@ -898,17 +898,11 @@ public class InflectedService {
             }
         }
 
-        if (partOfSpeech == PartOfSpeech.ABSOLUTIVE){
-            if (accidence.isEmpty()){
-                return true;
-            }else{
-                LOGGER.info("accidence validation failure: absolutive cannot have accidences");
-                return false;
-            }
-        }
 
         if (partOfSpeech == PartOfSpeech.VERB){
-            if (accidence.contains(Accidence.VERB_ROOT) && accidence.size() == 1){
+            if (accidence.equals(Sets.newHashSet(Accidence.VERB_ROOT))) {
+                return true;
+            }else if (accidence.equals(Sets.newHashSet(Accidence.ABSOLUTIVE))){
                 return true;
             }else if (!hasPerson || !hasNumber || !hasTense){
                 LOGGER.info("accidence validation failure: part of speech VERB has to have at least person, number and tense");

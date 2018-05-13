@@ -6,6 +6,9 @@
   flex-shrink: 0;
   flex-basis: 400px;
 
+  overflow: auto;
+  height: 800px;
+
 }
 
 

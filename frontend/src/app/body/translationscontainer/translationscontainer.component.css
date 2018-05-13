@@ -9,4 +9,7 @@
   font-family: Tahoma, Arial, SansSerif;
   font-size: 15px;
   line-height: 154%;
+
+  overflow: auto;
+  height: 800px;
 }

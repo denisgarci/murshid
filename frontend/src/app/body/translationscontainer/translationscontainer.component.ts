@@ -3,6 +3,9 @@ import {SongsService} from "../../services/songs.service";
 import {DictionariesContent} from "../../models/DictionariesContent";
 import {SongModel} from "../../models/SongModel";
 
+declare var jquery:any;
+declare var $ :any;
+
 @Component({
   selector: 'app-translationscontainer',
   templateUrl: './translationscontainer.component.html',
@@ -32,6 +35,14 @@ export class TranslationscontainerComponent implements OnInit {
 
       this.renderer.setProperty(newDiv, 'innerHTML', this.songsService.currentSong.english_translation_html);
     }
+  }
+
+  ngAfterViewChecked(){
+    $(".songcontainer-main, .translations_container").on("scroll", function() {
+      $(".songcontainer-main, .translations_container").scrollTop($(this).scrollTop());
+      console.log("reacting to scroll")
+    });
+
   }
 
 }

@@ -1,4 +1,4 @@
-import {Component, ElementRef, Input, OnInit, Renderer2} from '@angular/core';
+import {Component, ElementRef, HostListener, Input, OnInit, Renderer2} from '@angular/core';
 import { SongsService } from '../../services/songs.service';
 import { SongModel } from '../../models/SongModel';
 
@@ -20,6 +20,7 @@ export class SongcontainerComponent implements OnInit {
     this.songsService.songSelectionChangeObservable.subscribe(message => {
       this.updateContainerContent();
     });
+
   }
 
   updateContainerContent() {
@@ -55,6 +56,5 @@ export class SongcontainerComponent implements OnInit {
 
     }
   }
-
 
 }

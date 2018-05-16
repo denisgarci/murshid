@@ -431,6 +431,9 @@ public class InflectedService {
 
         } else if (origin.getPartOfSpeech() == PartOfSpeech.VERB  && origin.getAccidence().containsAll(Lists.newArrayList(Accidence._1ST, Accidence.SINGULAR, Accidence.SUBJUNCTIVE)) && (hindiWord.endsWith("ूँ")) ){
             result.addAll(explodeSubjunctive(origin));
+        } else if (origin.getPartOfSpeech() == PartOfSpeech.ADJECTIVE && origin.getAccidence().containsAll(Lists.newArrayList(Accidence.MASCULINE, Accidence.SINGULAR, Accidence.DIRECT)) &&
+                   !origin.getInflectedHindi().endsWith("ा")){
+            result.addAll(explodeInvariableAdjectives(origin));
         }
 
 
@@ -499,6 +502,34 @@ public class InflectedService {
         return result;
 
     }
+
+    /**
+     * Explodes a masc. sing. direct form into the 11 remaining invariable forms for an adjective
+     * @param origin
+     * @return
+     */
+    private List<Inflected> explodeInvariableAdjectives(Inflected origin){
+        List<Inflected> result = new ArrayList<>();
+        String hindiWord = origin.getInflectedHindi();
+        int index = origin.getInflectedHindiIndex();
+
+        result.add(clone( origin, Lists.newArrayList(Accidence.DIRECT), Lists.newArrayList(Accidence.OBLIQUE), hindiWord));
+        result.add(clone( origin, Lists.newArrayList(Accidence.DIRECT), Lists.newArrayList(Accidence.VOCATIVE), hindiWord));
+        result.add(clone( origin, Lists.newArrayList(Accidence.SINGULAR), Lists.newArrayList(Accidence.PLURAL), hindiWord));
+        result.add(clone( origin, Lists.newArrayList(Accidence.SINGULAR, Accidence.DIRECT), Lists.newArrayList(Accidence.PLURAL, Accidence.OBLIQUE), hindiWord));
+        result.add(clone( origin, Lists.newArrayList(Accidence.SINGULAR, Accidence.DIRECT), Lists.newArrayList(Accidence.PLURAL, Accidence.VOCATIVE), hindiWord));
+
+        result.add(clone( origin, Lists.newArrayList(Accidence.MASCULINE), Lists.newArrayList(Accidence.FEMININE), hindiWord));
+        result.add(clone( origin, Lists.newArrayList(Accidence.MASCULINE, Accidence.DIRECT), Lists.newArrayList(Accidence.FEMININE, Accidence.OBLIQUE), hindiWord));
+        result.add(clone( origin, Lists.newArrayList(Accidence.MASCULINE, Accidence.DIRECT), Lists.newArrayList(Accidence.FEMININE, Accidence.VOCATIVE), hindiWord));
+        result.add(clone( origin, Lists.newArrayList(Accidence.MASCULINE, Accidence.SINGULAR), Lists.newArrayList(Accidence.FEMININE, Accidence.PLURAL), hindiWord));
+        result.add(clone( origin, Lists.newArrayList(Accidence.MASCULINE, Accidence.SINGULAR, Accidence.DIRECT), Lists.newArrayList(Accidence.FEMININE, Accidence.PLURAL, Accidence.OBLIQUE), hindiWord));
+        result.add(clone( origin, Lists.newArrayList(Accidence.MASCULINE, Accidence.SINGULAR, Accidence.DIRECT), Lists.newArrayList(Accidence.FEMININE, Accidence.PLURAL, Accidence.VOCATIVE), hindiWord));
+
+        return result;
+
+    }
+
 
     private List<Inflected> explodeMasculinesInAA(Inflected origin){
         List<Inflected> result = new ArrayList<>();

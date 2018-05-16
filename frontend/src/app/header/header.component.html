@@ -1,4 +1,10 @@
 <div>
-  <input #songLatinName type="text" value="Alvida">
+
+  <select #songLatinName>
+    <option *ngFor="let customer of customers">{{customer}}</option>
+  </select>
+
   <button (click)="onSearchClicked(songLatinName.value)">Search song</button>
+
+
 </div>

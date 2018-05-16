@@ -103,8 +103,9 @@ public class InflectedController {
         }
 
         //then write
-        for (Inflected master: exploded) {
-            boolean success = inflectedService.save(master);
+        for (Inflected inflectedEntry: exploded) {
+            inflectedEntry.setInflectedHindiIndex(inflectedService.suggestNewIndex(inflectedEntry.getInflectedHindi()));
+            boolean success = inflectedService.save(inflectedEntry);
             if (!success) {
                 return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
             }

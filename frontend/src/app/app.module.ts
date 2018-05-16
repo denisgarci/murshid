@@ -11,6 +11,7 @@ import { DictionariescontainerComponent } from './body/dictionariescontainer/dic
 import { TranslationscontainerComponent } from './body/translationscontainer/translationscontainer.component';
 
 import { SongsService } from './services/songs.service';
+import {FormsModule} from "@angular/forms";
 
 
 
@@ -24,7 +25,7 @@ import { SongsService } from './services/songs.service';
     TranslationscontainerComponent
   ],
   imports: [
-    BrowserModule, HttpClientModule
+    BrowserModule, HttpClientModule, FormsModule
   ],
   providers: [SongsService],
   bootstrap: [ AppComponent ]

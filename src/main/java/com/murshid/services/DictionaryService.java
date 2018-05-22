@@ -63,6 +63,7 @@ public class DictionaryService {
                                 .setWordIndex(entry.getWordIndex()));
                     }
                 }
+                break;
 
                 case PLATTS: {
 
@@ -77,6 +78,7 @@ public class DictionaryService {
                                 .setWordIndex(entry.getWordIndex()));
                     }
                 }
+                break;
 
 
                 case REKHTA: {
@@ -92,6 +94,7 @@ public class DictionaryService {
                                 .setWordIndex(entry.getWordIndex()));
                     }
                 }
+                break;
 
                 case MURSHID: {
 
@@ -106,8 +109,9 @@ public class DictionaryService {
                                 .setPartOfSpeech(entry.getPartOfSpeech())
                                 .setWordIndex(entry.getWordIndex()));
                     }
-                    ;
+
                 }
+                break;
             }
         });
 

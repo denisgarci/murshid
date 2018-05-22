@@ -91,13 +91,7 @@ public class InflectedController {
 
         //first validate them all
         for (Inflected master: exploded) {
-            if (inflectedService.isValid(master)) {
-                if (inflectedService.exists(master.getInflectedHindi(), master.getInflectedHindiIndex())) {
-                    LOGGER.info("inflected hindi word {} index {} already exists in the inflected table in DynamoBD", master.getInflectedHindi(),
-                                master.getInflectedHindiIndex());
-                    return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
-                }
-            } else {
+            if (!inflectedService.isValid(master)) {
                 return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
             }
         }

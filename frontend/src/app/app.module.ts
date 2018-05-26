@@ -12,6 +12,7 @@ import { TranslationscontainerComponent } from './body/translationscontainer/tra
 
 import { SongsService } from './services/songs.service';
 import {FormsModule} from "@angular/forms";
+import {Globals} from "./globals";
 
 
 
@@ -27,7 +28,7 @@ import {FormsModule} from "@angular/forms";
   imports: [
     BrowserModule, HttpClientModule, FormsModule
   ],
-  providers: [SongsService],
+  providers: [SongsService, Globals],
   bootstrap: [ AppComponent ]
 })
 export class AppModule { }

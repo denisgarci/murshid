@@ -6,6 +6,5 @@ export class InflectedEntry{
   part_of_speech: string;
   part_of_speech_label: string;
   accidence: string[];
-  accidence_labels: string[];
   canonical_keys: string[];
 }

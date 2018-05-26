@@ -20,7 +20,7 @@ public class WikitionaryDBWriterAllLeters {
         Statement st = null;
         ResultSet rs = null;
 
-        String dbUrl = "jdbc:mysql://localhost:3306/pratts";
+        String dbUrl = "jdbc:mysql://localhost:3306/murshid";
         String user = "root";
         String password = "";
 
@@ -34,7 +34,7 @@ public class WikitionaryDBWriterAllLeters {
             con.setAutoCommit(false);
 
             Statement select = con.createStatement();
-            rs = select.executeQuery("SELECT distinct initial from hindi_words ");
+            rs = select.executeQuery("SELECT distinct initial from spell_check ");
 
             int index = 0;
             ExecutorService pool = Executors.newFixedThreadPool(36);

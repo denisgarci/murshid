@@ -16,9 +16,6 @@ public class DictionaryEntry {
     @SerializedName("part_of_speech")
     private PartOfSpeech partOfSpeech;
 
-    @SerializedName("part_of_speech_label")
-    private String partOfSpeechLabel;
-
     private String meaning;
 
     @SerializedName("hindi_word")
@@ -37,11 +34,6 @@ public class DictionaryEntry {
         return this;
     }
 
-    @JsonProperty("part_of_speech_label")
-    public String getPartOfSpeechLabel() {
-        return partOfSpeechLabel;
-    }
-
     @JsonProperty("part_of_speech")
     public PartOfSpeech getPartOfSpeech() {
         return partOfSpeech;
@@ -49,9 +41,6 @@ public class DictionaryEntry {
 
     public DictionaryEntry setPartOfSpeech(PartOfSpeech partOfSpeech) {
         this.partOfSpeech = partOfSpeech;
-        if (partOfSpeech != null) {
-            this.partOfSpeechLabel = partOfSpeech.getLabel();
-        }
         return this;
     }
 

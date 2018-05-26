@@ -64,7 +64,7 @@ public class InflectedService {
         }
     }
 
-    public List<Inflected> getAllWords(){
+    public List<Inflected> getAll(){
 
         ScanRequest scanRequest = new ScanRequest().withTableName("inflected");
 
@@ -92,9 +92,7 @@ public class InflectedService {
             value.put("inflected_hindi", inflected.getInflectedHindi());
             value.put("inflected_urdu", inflected.getInflectedUrdu());
             value.put("accidence", inflected.getAccidence());
-            value.put("accidence_labels", inflected.getAccidenceLabels());
             value.put("part_of_speech", inflected.getPartOfSpeech());
-            value.put("part_of_speech_label", inflected.getpartOfSpeecLabel());
             value.put("canonical_hindi", inflected.getCanonicalHindi());
             value.put("canonical_urdu", inflected.getCanonicalUrdu());
             List<String> dictionaryKeys = inflected.getCanonicalKeys().stream()
@@ -248,104 +246,10 @@ public class InflectedService {
             result.addAll(participlesAndInfinitivesInAA(origin));
 
         }else if (
-                (origin.getPartOfSpeech() == PartOfSpeech.ADJECTIVE || origin.getPartOfSpeech() == PartOfSpeech.POSSESSIVE_PRONOUN || origin.getPartOfSpeech() == PartOfSpeech.ADVERB)
+                (origin.getPartOfSpeech() == PartOfSpeech.ADJECTIVE || origin.getPartOfSpeech() == PartOfSpeech.POSSESSIVE_PRONOUN || origin.getPartOfSpeech() == PartOfSpeech.ADVERB) && hindiWord.endsWith("ा")){
 
-                && hindiWord.endsWith("ा")){
+            result.addAll(genericExplode(origin));
 
-            Inflected masculineObliqueSingular = (Inflected) origin.clone();
-            masculineObliqueSingular.setInflectedHindiIndex(1);
-            masculineObliqueSingular.setInflectedHindi(hindiWord.substring(0, hindiWord.length()-1).concat("े"));
-            masculineObliqueSingular.getAccidence().remove(Accidence.DIRECT);
-            masculineObliqueSingular.getAccidence().add(Accidence.OBLIQUE);
-            result.add(masculineObliqueSingular);
-
-            Inflected masculineVocativeSingular = (Inflected) origin.clone();
-            masculineVocativeSingular.setInflectedHindiIndex(2);
-            masculineVocativeSingular.setInflectedHindi(hindiWord.substring(0, hindiWord.length()-1).concat("े"));
-            masculineVocativeSingular.getAccidence().remove(Accidence.DIRECT);
-            masculineVocativeSingular.getAccidence().add(Accidence.VOCATIVE);
-            result.add(masculineVocativeSingular);
-
-            Inflected masculineDirectPlural = (Inflected) origin.clone();
-            masculineDirectPlural.setInflectedHindiIndex(3);
-            masculineDirectPlural.setInflectedHindi(hindiWord.substring(0, hindiWord.length()-1).concat("े"));
-            masculineDirectPlural.getAccidence().remove(Accidence.SINGULAR);
-            masculineDirectPlural.getAccidence().add(Accidence.PLURAL);
-            result.add(masculineDirectPlural);
-
-            Inflected masculineObliquePlural = (Inflected) origin.clone();
-            masculineObliquePlural.setInflectedHindiIndex(4);
-            masculineObliquePlural.setInflectedHindi(hindiWord.substring(0, hindiWord.length()-1).concat("े"));
-            masculineObliquePlural.getAccidence().remove(Accidence.SINGULAR);
-            masculineObliquePlural.getAccidence().add(Accidence.PLURAL);
-            masculineObliquePlural.getAccidence().remove(Accidence.DIRECT);
-            masculineObliquePlural.getAccidence().add(Accidence.OBLIQUE);
-            result.add(masculineObliquePlural);
-
-            Inflected masculineVocativePlural = (Inflected) origin.clone();
-            masculineVocativePlural.setInflectedHindiIndex(5);
-            masculineVocativePlural.setInflectedHindi(hindiWord.substring(0, hindiWord.length()-1).concat("े"));
-            masculineVocativePlural.getAccidence().remove(Accidence.SINGULAR);
-            masculineVocativePlural.getAccidence().add(Accidence.PLURAL);
-            masculineVocativePlural.getAccidence().remove(Accidence.DIRECT);
-            masculineVocativePlural.getAccidence().add(Accidence.VOCATIVE);
-            result.add(masculineVocativePlural);
-
-            Inflected feminineDirectSingular = (Inflected) origin.clone();
-            feminineDirectSingular.setInflectedHindiIndex(6);
-            feminineDirectSingular.setInflectedHindi(hindiWord.substring(0, hindiWord.length()-1).concat("ी"));
-            feminineDirectSingular.getAccidence().remove(Accidence.MASCULINE);
-            feminineDirectSingular.getAccidence().add(Accidence.FEMININE);
-            result.add(feminineDirectSingular);
-
-            Inflected feminineObliqueSingular = (Inflected) origin.clone();
-            feminineObliqueSingular.setInflectedHindiIndex(7);
-            feminineObliqueSingular.setInflectedHindi(hindiWord.substring(0, hindiWord.length()-1).concat("ी"));
-            feminineObliqueSingular.getAccidence().remove(Accidence.MASCULINE);
-            feminineObliqueSingular.getAccidence().add(Accidence.FEMININE);
-            feminineObliqueSingular.getAccidence().remove(Accidence.DIRECT);
-            feminineObliqueSingular.getAccidence().add(Accidence.OBLIQUE);
-            result.add(feminineObliqueSingular);
-
-            Inflected feminineVocativeSingular = (Inflected) origin.clone();
-            feminineVocativeSingular.setInflectedHindiIndex(8);
-            feminineVocativeSingular.setInflectedHindi(hindiWord.substring(0, hindiWord.length()-1).concat("ी"));
-            feminineVocativeSingular.getAccidence().remove(Accidence.MASCULINE);
-            feminineVocativeSingular.getAccidence().add(Accidence.FEMININE);
-            feminineVocativeSingular.getAccidence().remove(Accidence.DIRECT);
-            feminineVocativeSingular.getAccidence().add(Accidence.VOCATIVE);
-            result.add(feminineVocativeSingular);
-
-            Inflected feminineDirectPLural = (Inflected) origin.clone();
-            feminineDirectPLural.setInflectedHindiIndex(9);
-            feminineDirectPLural.setInflectedHindi(hindiWord.substring(0, hindiWord.length()-1).concat("ी"));
-            feminineDirectPLural.getAccidence().remove(Accidence.MASCULINE);
-            feminineDirectPLural.getAccidence().add(Accidence.FEMININE);
-            feminineDirectPLural.getAccidence().remove(Accidence.SINGULAR);
-            feminineDirectPLural.getAccidence().add(Accidence.PLURAL);
-            result.add(feminineDirectPLural);
-
-            Inflected feminineObliquePLural = (Inflected) origin.clone();
-            feminineObliquePLural.setInflectedHindiIndex(10);
-            feminineObliquePLural.setInflectedHindi(hindiWord.substring(0, hindiWord.length()-1).concat("ी"));
-            feminineObliquePLural.getAccidence().remove(Accidence.MASCULINE);
-            feminineObliquePLural.getAccidence().add(Accidence.FEMININE);
-            feminineObliquePLural.getAccidence().remove(Accidence.SINGULAR);
-            feminineObliquePLural.getAccidence().add(Accidence.PLURAL);
-            feminineObliquePLural.getAccidence().remove(Accidence.DIRECT);
-            feminineObliquePLural.getAccidence().add(Accidence.OBLIQUE);
-            result.add(feminineObliquePLural);
-
-            Inflected feminineVocativePLural = (Inflected) origin.clone();
-            feminineVocativePLural.setInflectedHindiIndex(11);
-            feminineVocativePLural.setInflectedHindi(hindiWord.substring(0, hindiWord.length()-1).concat("ी"));
-            feminineVocativePLural.getAccidence().remove(Accidence.MASCULINE);
-            feminineVocativePLural.getAccidence().add(Accidence.FEMININE);
-            feminineVocativePLural.getAccidence().remove(Accidence.SINGULAR);
-            feminineVocativePLural.getAccidence().add(Accidence.PLURAL);
-            feminineVocativePLural.getAccidence().remove(Accidence.DIRECT);
-            feminineVocativePLural.getAccidence().add(Accidence.VOCATIVE);
-            result.add(feminineVocativePLural);
         } else if (origin.getPartOfSpeech() == PartOfSpeech.NOUN  && origin.getAccidence().contains(Accidence.MASCULINE) && !hindiWord.endsWith("ा") && !hindiWord.endsWith("ू") && !hindiWord.endsWith("ी") ){
 
                     result.addAll(explodeMasculinesNotInAAorUUorII(origin));
@@ -381,6 +285,27 @@ public class InflectedService {
         return result;
     }
 
+
+    private List<Inflected> genericExplode(Inflected origin){
+        List<Inflected> result = new ArrayList<>();
+
+        result.add(clone( origin, Lists.newArrayList(Accidence.DIRECT), Lists.newArrayList(Accidence.OBLIQUE), 1, "े"));
+        result.add(clone( origin, Lists.newArrayList(Accidence.DIRECT), Lists.newArrayList(Accidence.VOCATIVE), 1, "े"));
+        result.add(clone( origin, Lists.newArrayList(Accidence.SINGULAR), Lists.newArrayList(Accidence.PLURAL), 1, "े"));
+        result.add(clone( origin, Lists.newArrayList(Accidence.SINGULAR, Accidence.DIRECT), Lists.newArrayList(Accidence.PLURAL, Accidence.OBLIQUE), 1, "े"));
+        result.add(clone( origin, Lists.newArrayList(Accidence.SINGULAR, Accidence.DIRECT), Lists.newArrayList(Accidence.PLURAL, Accidence.VOCATIVE), 1, "े"));
+
+        result.add(clone( origin, Lists.newArrayList(Accidence.MASCULINE), Lists.newArrayList(Accidence.FEMININE), 1, "ी"));
+        result.add(clone( origin, Lists.newArrayList(Accidence.MASCULINE, Accidence.DIRECT), Lists.newArrayList(Accidence.FEMININE, Accidence.OBLIQUE), 1, "ी"));
+        result.add(clone( origin, Lists.newArrayList(Accidence.MASCULINE, Accidence.DIRECT), Lists.newArrayList(Accidence.FEMININE, Accidence.VOCATIVE), 1, "ी"));
+        result.add(clone( origin, Lists.newArrayList(Accidence.MASCULINE, Accidence.SINGULAR), Lists.newArrayList(Accidence.FEMININE, Accidence.PLURAL), 1, "ी"));
+        result.add(clone( origin, Lists.newArrayList(Accidence.MASCULINE, Accidence.SINGULAR, Accidence.DIRECT), Lists.newArrayList(Accidence.FEMININE, Accidence.PLURAL, Accidence.OBLIQUE), 1, "ी"));
+        result.add(clone( origin, Lists.newArrayList(Accidence.MASCULINE, Accidence.SINGULAR, Accidence.DIRECT), Lists.newArrayList(Accidence.FEMININE, Accidence.PLURAL, Accidence.VOCATIVE), 1, "ी"));
+
+        return result;
+    }
+
+
     /**
      * Parses DynameDB.Inflected in search of the minumum possible next index for that inflected word
      * @param inflectedIndex
@@ -396,49 +321,18 @@ public class InflectedService {
         return index + 1;
     }
 
+
+
     private List<Inflected> explodeMasculinesNotInAAorUUorII(Inflected origin){
 
         List<Inflected> result = new ArrayList<>();
         String hindiWord = origin.getInflectedHindi();
 
-        Inflected masculineObliqueSingular = (Inflected) origin.clone();
-        masculineObliqueSingular.setInflectedHindiIndex(1);
-        masculineObliqueSingular.setInflectedHindi(hindiWord);
-        masculineObliqueSingular.getAccidence().remove(Accidence.DIRECT);
-        masculineObliqueSingular.getAccidence().add(Accidence.OBLIQUE);
-        result.add(masculineObliqueSingular);
-
-        Inflected masculineVocativeSingular = (Inflected) origin.clone();
-        masculineVocativeSingular.setInflectedHindiIndex(2);
-        masculineVocativeSingular.setInflectedHindi(hindiWord);
-        masculineVocativeSingular.getAccidence().remove(Accidence.DIRECT);
-        masculineVocativeSingular.getAccidence().add(Accidence.VOCATIVE);
-        result.add(masculineVocativeSingular);
-
-        Inflected masculineDirectPlural = (Inflected) origin.clone();
-        masculineDirectPlural.setInflectedHindiIndex(3);
-        masculineDirectPlural.setInflectedHindi(hindiWord);
-        masculineDirectPlural.getAccidence().remove(Accidence.SINGULAR);
-        masculineDirectPlural.getAccidence().add(Accidence.PLURAL);
-        result.add(masculineDirectPlural);
-
-        Inflected masculineObliquePlural = (Inflected) origin.clone();
-        masculineObliquePlural.setInflectedHindiIndex(4);
-        masculineObliquePlural.setInflectedHindi(hindiWord.concat("ों"));
-        masculineObliquePlural.getAccidence().remove(Accidence.SINGULAR);
-        masculineObliquePlural.getAccidence().add(Accidence.PLURAL);
-        masculineObliquePlural.getAccidence().remove(Accidence.DIRECT);
-        masculineObliquePlural.getAccidence().add(Accidence.OBLIQUE);
-        result.add(masculineObliquePlural);
-
-        Inflected masculineVocativePlural = (Inflected) origin.clone();
-        masculineVocativePlural.setInflectedHindiIndex(5);
-        masculineVocativePlural.setInflectedHindi(hindiWord.concat("ो"));
-        masculineVocativePlural.getAccidence().remove(Accidence.SINGULAR);
-        masculineVocativePlural.getAccidence().add(Accidence.PLURAL);
-        masculineVocativePlural.getAccidence().remove(Accidence.DIRECT);
-        masculineVocativePlural.getAccidence().add(Accidence.VOCATIVE);
-        result.add(masculineVocativePlural);
+        result.add(clone( origin, Lists.newArrayList(Accidence.DIRECT), Lists.newArrayList(Accidence.OBLIQUE), hindiWord));
+        result.add(clone( origin, Lists.newArrayList(Accidence.DIRECT), Lists.newArrayList(Accidence.VOCATIVE), hindiWord));
+        result.add(clone( origin, Lists.newArrayList(Accidence.SINGULAR), Lists.newArrayList(Accidence.PLURAL), hindiWord));
+        result.add(clone( origin, Lists.newArrayList(Accidence.SINGULAR, Accidence.DIRECT), Lists.newArrayList(Accidence.PLURAL, Accidence.OBLIQUE), hindiWord.concat("ों")));
+        result.add(clone( origin, Lists.newArrayList(Accidence.SINGULAR, Accidence.DIRECT), Lists.newArrayList(Accidence.PLURAL, Accidence.OBLIQUE), hindiWord.concat("ो")));
 
         return result;
 
@@ -477,44 +371,12 @@ public class InflectedService {
         String hindiWord = origin.getInflectedHindi();
         int index = origin.getInflectedHindiIndex();
 
-        Inflected masculineObliqueSingular = (Inflected) origin.clone();
-        masculineObliqueSingular.setInflectedHindiIndex(index++);
-        masculineObliqueSingular.setInflectedHindi(hindiWord.substring(0, hindiWord.length()-1).concat("े"));
-        masculineObliqueSingular.getAccidence().remove(Accidence.DIRECT);
-        masculineObliqueSingular.getAccidence().add(Accidence.OBLIQUE);
-        result.add(masculineObliqueSingular);
 
-        Inflected masculineVocativeSingular = (Inflected) origin.clone();
-        masculineVocativeSingular.setInflectedHindiIndex(index++);
-        masculineVocativeSingular.setInflectedHindi(hindiWord.substring(0, hindiWord.length()-1).concat("े"));
-        masculineVocativeSingular.getAccidence().remove(Accidence.DIRECT);
-        masculineVocativeSingular.getAccidence().add(Accidence.VOCATIVE);
-        result.add(masculineVocativeSingular);
-
-        Inflected masculineDirectPlural = (Inflected) origin.clone();
-        masculineDirectPlural.setInflectedHindiIndex(index++);
-        masculineDirectPlural.setInflectedHindi(hindiWord.substring(0, hindiWord.length()-1).concat("े"));
-        masculineDirectPlural.getAccidence().remove(Accidence.SINGULAR);
-        masculineDirectPlural.getAccidence().add(Accidence.PLURAL);
-        result.add(masculineDirectPlural);
-
-        Inflected masculineObliquePlural = (Inflected) origin.clone();
-        masculineObliquePlural.setInflectedHindiIndex(index++);
-        masculineObliquePlural.setInflectedHindi(hindiWord.substring(0, hindiWord.length()-1).concat("ों"));
-        masculineObliquePlural.getAccidence().remove(Accidence.SINGULAR);
-        masculineObliquePlural.getAccidence().add(Accidence.PLURAL);
-        masculineObliquePlural.getAccidence().remove(Accidence.DIRECT);
-        masculineObliquePlural.getAccidence().add(Accidence.OBLIQUE);
-        result.add(masculineObliquePlural);
-
-        Inflected masculineVocativePlural = (Inflected) origin.clone();
-        masculineVocativePlural.setInflectedHindiIndex(index++);
-        masculineVocativePlural.setInflectedHindi(hindiWord.substring(0, hindiWord.length()-1).concat("ो"));
-        masculineVocativePlural.getAccidence().remove(Accidence.SINGULAR);
-        masculineVocativePlural.getAccidence().add(Accidence.PLURAL);
-        masculineVocativePlural.getAccidence().remove(Accidence.DIRECT);
-        masculineVocativePlural.getAccidence().add(Accidence.VOCATIVE);
-        result.add(masculineVocativePlural);
+        result.add(clone( origin, Lists.newArrayList(Accidence.DIRECT), Lists.newArrayList(Accidence.OBLIQUE), 1, "े"));
+        result.add(clone( origin, Lists.newArrayList(Accidence.DIRECT), Lists.newArrayList(Accidence.VOCATIVE), 1, "े"));
+        result.add(clone( origin, Lists.newArrayList(Accidence.SINGULAR), Lists.newArrayList(Accidence.PLURAL), 1, "े"));
+        result.add(clone( origin, Lists.newArrayList(Accidence.SINGULAR, Accidence.DIRECT), Lists.newArrayList(Accidence.PLURAL, Accidence.OBLIQUE), 1, "ों"));
+        result.add(clone( origin, Lists.newArrayList(Accidence.SINGULAR, Accidence.DIRECT), Lists.newArrayList(Accidence.PLURAL, Accidence.VOCATIVE), 1, "ो"));
 
         return result;
 
@@ -525,44 +387,11 @@ public class InflectedService {
         List<Inflected> result = new ArrayList<>();
         String hindiWord = origin.getInflectedHindi();
 
-        Inflected masculineObliqueSingular = (Inflected) origin.clone();
-        masculineObliqueSingular.setInflectedHindiIndex(1);
-        masculineObliqueSingular.setInflectedHindi(hindiWord);
-        masculineObliqueSingular.getAccidence().remove(Accidence.DIRECT);
-        masculineObliqueSingular.getAccidence().add(Accidence.OBLIQUE);
-        result.add(masculineObliqueSingular);
-
-        Inflected masculineVocativeSingular = (Inflected) origin.clone();
-        masculineVocativeSingular.setInflectedHindiIndex(2);
-        masculineVocativeSingular.setInflectedHindi(hindiWord);
-        masculineVocativeSingular.getAccidence().remove(Accidence.DIRECT);
-        masculineVocativeSingular.getAccidence().add(Accidence.VOCATIVE);
-        result.add(masculineVocativeSingular);
-
-        Inflected masculineDirectPlural = (Inflected) origin.clone();
-        masculineDirectPlural.setInflectedHindiIndex(3);
-        masculineDirectPlural.setInflectedHindi(hindiWord);
-        masculineDirectPlural.getAccidence().remove(Accidence.SINGULAR);
-        masculineDirectPlural.getAccidence().add(Accidence.PLURAL);
-        result.add(masculineDirectPlural);
-
-        Inflected masculineObliquePlural = (Inflected) origin.clone();
-        masculineObliquePlural.setInflectedHindiIndex(4);
-        masculineObliquePlural.setInflectedHindi(hindiWord.substring(0, hindiWord.length()-1).concat("ियों"));
-        masculineObliquePlural.getAccidence().remove(Accidence.SINGULAR);
-        masculineObliquePlural.getAccidence().add(Accidence.PLURAL);
-        masculineObliquePlural.getAccidence().remove(Accidence.DIRECT);
-        masculineObliquePlural.getAccidence().add(Accidence.OBLIQUE);
-        result.add(masculineObliquePlural);
-
-        Inflected masculineVocativePlural = (Inflected) origin.clone();
-        masculineVocativePlural.setInflectedHindiIndex(5);
-        masculineVocativePlural.setInflectedHindi(hindiWord.substring(0, hindiWord.length()-1).concat("ियो"));
-        masculineVocativePlural.getAccidence().remove(Accidence.SINGULAR);
-        masculineVocativePlural.getAccidence().add(Accidence.PLURAL);
-        masculineVocativePlural.getAccidence().remove(Accidence.DIRECT);
-        masculineVocativePlural.getAccidence().add(Accidence.VOCATIVE);
-        result.add(masculineVocativePlural);
+        result.add(clone( origin, Lists.newArrayList(Accidence.DIRECT), Lists.newArrayList(Accidence.OBLIQUE), hindiWord));
+        result.add(clone( origin, Lists.newArrayList(Accidence.DIRECT), Lists.newArrayList(Accidence.VOCATIVE), hindiWord));
+        result.add(clone( origin, Lists.newArrayList(Accidence.SINGULAR), Lists.newArrayList(Accidence.PLURAL), hindiWord));
+        result.add(clone( origin, Lists.newArrayList(Accidence.SINGULAR, Accidence.DIRECT), Lists.newArrayList(Accidence.PLURAL, Accidence.OBLIQUE), 1, "ियों"));
+        result.add(clone( origin, Lists.newArrayList(Accidence.SINGULAR, Accidence.DIRECT), Lists.newArrayList(Accidence.PLURAL, Accidence.VOCATIVE), 1, "ियो"));
 
         return result;
 
@@ -573,44 +402,11 @@ public class InflectedService {
         List<Inflected> result = new ArrayList<>();
         String hindiWord = origin.getInflectedHindi();
 
-        Inflected masculineObliqueSingular = (Inflected) origin.clone();
-        masculineObliqueSingular.setInflectedHindiIndex(1);
-        masculineObliqueSingular.setInflectedHindi(hindiWord);
-        masculineObliqueSingular.getAccidence().remove(Accidence.DIRECT);
-        masculineObliqueSingular.getAccidence().add(Accidence.OBLIQUE);
-        result.add(masculineObliqueSingular);
-
-        Inflected masculineVocativeSingular = (Inflected) origin.clone();
-        masculineVocativeSingular.setInflectedHindiIndex(2);
-        masculineVocativeSingular.setInflectedHindi(hindiWord);
-        masculineVocativeSingular.getAccidence().remove(Accidence.DIRECT);
-        masculineVocativeSingular.getAccidence().add(Accidence.VOCATIVE);
-        result.add(masculineVocativeSingular);
-
-        Inflected masculineDirectPlural = (Inflected) origin.clone();
-        masculineDirectPlural.setInflectedHindiIndex(3);
-        masculineDirectPlural.setInflectedHindi(hindiWord);
-        masculineDirectPlural.getAccidence().remove(Accidence.SINGULAR);
-        masculineDirectPlural.getAccidence().add(Accidence.PLURAL);
-        result.add(masculineDirectPlural);
-
-        Inflected masculineObliquePlural = (Inflected) origin.clone();
-        masculineObliquePlural.setInflectedHindiIndex(4);
-        masculineObliquePlural.setInflectedHindi(hindiWord.substring(0, hindiWord.length()-1).concat("ुओं"));
-        masculineObliquePlural.getAccidence().remove(Accidence.SINGULAR);
-        masculineObliquePlural.getAccidence().add(Accidence.PLURAL);
-        masculineObliquePlural.getAccidence().remove(Accidence.DIRECT);
-        masculineObliquePlural.getAccidence().add(Accidence.OBLIQUE);
-        result.add(masculineObliquePlural);
-
-        Inflected masculineVocativePlural = (Inflected) origin.clone();
-        masculineVocativePlural.setInflectedHindiIndex(5);
-        masculineVocativePlural.setInflectedHindi(hindiWord.substring(0, hindiWord.length()-1).concat("ुओ"));
-        masculineVocativePlural.getAccidence().remove(Accidence.SINGULAR);
-        masculineVocativePlural.getAccidence().add(Accidence.PLURAL);
-        masculineVocativePlural.getAccidence().remove(Accidence.DIRECT);
-        masculineVocativePlural.getAccidence().add(Accidence.VOCATIVE);
-        result.add(masculineVocativePlural);
+        result.add(clone( origin, Lists.newArrayList(Accidence.DIRECT), Lists.newArrayList(Accidence.OBLIQUE), hindiWord));
+        result.add(clone( origin, Lists.newArrayList(Accidence.DIRECT), Lists.newArrayList(Accidence.VOCATIVE), hindiWord));
+        result.add(clone( origin, Lists.newArrayList(Accidence.SINGULAR), Lists.newArrayList(Accidence.PLURAL), hindiWord));
+        result.add(clone( origin, Lists.newArrayList(Accidence.SINGULAR, Accidence.DIRECT), Lists.newArrayList(Accidence.PLURAL, Accidence.OBLIQUE), 1, "ुओं"));
+        result.add(clone( origin, Lists.newArrayList(Accidence.SINGULAR, Accidence.DIRECT), Lists.newArrayList(Accidence.PLURAL, Accidence.VOCATIVE), 1, "ुओ"));
 
         return result;
 
@@ -621,54 +417,11 @@ public class InflectedService {
         List<Inflected> result = new ArrayList<>();
         String hindiWord = origin.getInflectedHindi();
 
-        Inflected feminineObliqueSingular = (Inflected) origin.clone();
-        feminineObliqueSingular.setInflectedHindiIndex(7);
-        feminineObliqueSingular.setInflectedHindi(hindiWord);
-        feminineObliqueSingular.getAccidence().remove(Accidence.MASCULINE);
-        feminineObliqueSingular.getAccidence().add(Accidence.FEMININE);
-        feminineObliqueSingular.getAccidence().remove(Accidence.DIRECT);
-        feminineObliqueSingular.getAccidence().add(Accidence.OBLIQUE);
-        result.add(feminineObliqueSingular);
-
-        Inflected feminineVocativeSingular = (Inflected) origin.clone();
-        feminineVocativeSingular.setInflectedHindiIndex(8);
-        feminineVocativeSingular.setInflectedHindi(hindiWord);
-        feminineVocativeSingular.getAccidence().remove(Accidence.MASCULINE);
-        feminineVocativeSingular.getAccidence().add(Accidence.FEMININE);
-        feminineVocativeSingular.getAccidence().remove(Accidence.DIRECT);
-        feminineVocativeSingular.getAccidence().add(Accidence.VOCATIVE);
-        result.add(feminineVocativeSingular);
-
-        Inflected feminineDirectPLural = (Inflected) origin.clone();
-        feminineDirectPLural.setInflectedHindiIndex(9);
-        feminineDirectPLural.setInflectedHindi(hindiWord.concat("ें"));
-        feminineDirectPLural.getAccidence().remove(Accidence.MASCULINE);
-        feminineDirectPLural.getAccidence().add(Accidence.FEMININE);
-        feminineDirectPLural.getAccidence().remove(Accidence.SINGULAR);
-        feminineDirectPLural.getAccidence().add(Accidence.PLURAL);
-        result.add(feminineDirectPLural);
-
-        Inflected feminineObliquePLural = (Inflected) origin.clone();
-        feminineObliquePLural.setInflectedHindiIndex(10);
-        feminineObliquePLural.setInflectedHindi(hindiWord.concat("ों"));
-        feminineObliquePLural.getAccidence().remove(Accidence.MASCULINE);
-        feminineObliquePLural.getAccidence().add(Accidence.FEMININE);
-        feminineObliquePLural.getAccidence().remove(Accidence.SINGULAR);
-        feminineObliquePLural.getAccidence().add(Accidence.PLURAL);
-        feminineObliquePLural.getAccidence().remove(Accidence.DIRECT);
-        feminineObliquePLural.getAccidence().add(Accidence.OBLIQUE);
-        result.add(feminineObliquePLural);
-
-        Inflected feminineVocativePLural = (Inflected) origin.clone();
-        feminineVocativePLural.setInflectedHindiIndex(11);
-        feminineVocativePLural.setInflectedHindi(hindiWord.concat("ो"));
-        feminineVocativePLural.getAccidence().remove(Accidence.MASCULINE);
-        feminineVocativePLural.getAccidence().add(Accidence.FEMININE);
-        feminineVocativePLural.getAccidence().remove(Accidence.SINGULAR);
-        feminineVocativePLural.getAccidence().add(Accidence.PLURAL);
-        feminineVocativePLural.getAccidence().remove(Accidence.DIRECT);
-        feminineVocativePLural.getAccidence().add(Accidence.VOCATIVE);
-        result.add(feminineVocativePLural);
+        result.add(clone( origin, Lists.newArrayList(Accidence.DIRECT), Lists.newArrayList(Accidence.OBLIQUE), hindiWord));
+        result.add(clone( origin, Lists.newArrayList(Accidence.DIRECT), Lists.newArrayList(Accidence.VOCATIVE), hindiWord));
+        result.add(clone( origin, Lists.newArrayList(Accidence.SINGULAR), Lists.newArrayList(Accidence.PLURAL), hindiWord));
+        result.add(clone( origin, Lists.newArrayList(Accidence.SINGULAR, Accidence.DIRECT), Lists.newArrayList(Accidence.PLURAL, Accidence.OBLIQUE), hindiWord.concat("ों")));
+        result.add(clone( origin, Lists.newArrayList(Accidence.SINGULAR, Accidence.DIRECT), Lists.newArrayList(Accidence.PLURAL, Accidence.VOCATIVE), hindiWord.concat("ो")));
 
         return result;
 
@@ -679,54 +432,11 @@ public class InflectedService {
         List<Inflected> result = new ArrayList<>();
         String hindiWord = origin.getInflectedHindi();
 
-        Inflected feminineObliqueSingular = (Inflected) origin.clone();
-        feminineObliqueSingular.setInflectedHindiIndex(7);
-        feminineObliqueSingular.setInflectedHindi(hindiWord);
-        feminineObliqueSingular.getAccidence().remove(Accidence.MASCULINE);
-        feminineObliqueSingular.getAccidence().add(Accidence.FEMININE);
-        feminineObliqueSingular.getAccidence().remove(Accidence.DIRECT);
-        feminineObliqueSingular.getAccidence().add(Accidence.OBLIQUE);
-        result.add(feminineObliqueSingular);
-
-        Inflected feminineVocativeSingular = (Inflected) origin.clone();
-        feminineVocativeSingular.setInflectedHindiIndex(8);
-        feminineVocativeSingular.setInflectedHindi(hindiWord);
-        feminineVocativeSingular.getAccidence().remove(Accidence.MASCULINE);
-        feminineVocativeSingular.getAccidence().add(Accidence.FEMININE);
-        feminineVocativeSingular.getAccidence().remove(Accidence.DIRECT);
-        feminineVocativeSingular.getAccidence().add(Accidence.VOCATIVE);
-        result.add(feminineVocativeSingular);
-
-        Inflected feminineDirectPLural = (Inflected) origin.clone();
-        feminineDirectPLural.setInflectedHindiIndex(9);
-        feminineDirectPLural.setInflectedHindi(hindiWord.substring(0, hindiWord.length()-1).concat("ियाँ"));
-        feminineDirectPLural.getAccidence().remove(Accidence.MASCULINE);
-        feminineDirectPLural.getAccidence().add(Accidence.FEMININE);
-        feminineDirectPLural.getAccidence().remove(Accidence.SINGULAR);
-        feminineDirectPLural.getAccidence().add(Accidence.PLURAL);
-        result.add(feminineDirectPLural);
-
-        Inflected feminineObliquePLural = (Inflected) origin.clone();
-        feminineObliquePLural.setInflectedHindiIndex(10);
-        feminineObliquePLural.setInflectedHindi(hindiWord.substring(0, hindiWord.length()-1).concat("ियों"));
-        feminineObliquePLural.getAccidence().remove(Accidence.MASCULINE);
-        feminineObliquePLural.getAccidence().add(Accidence.FEMININE);
-        feminineObliquePLural.getAccidence().remove(Accidence.SINGULAR);
-        feminineObliquePLural.getAccidence().add(Accidence.PLURAL);
-        feminineObliquePLural.getAccidence().remove(Accidence.DIRECT);
-        feminineObliquePLural.getAccidence().add(Accidence.OBLIQUE);
-        result.add(feminineObliquePLural);
-
-        Inflected feminineVocativePLural = (Inflected) origin.clone();
-        feminineVocativePLural.setInflectedHindiIndex(11);
-        feminineVocativePLural.setInflectedHindi(hindiWord.substring(0, hindiWord.length()-1).concat("ियो"));
-        feminineVocativePLural.getAccidence().remove(Accidence.MASCULINE);
-        feminineVocativePLural.getAccidence().add(Accidence.FEMININE);
-        feminineVocativePLural.getAccidence().remove(Accidence.SINGULAR);
-        feminineVocativePLural.getAccidence().add(Accidence.PLURAL);
-        feminineVocativePLural.getAccidence().remove(Accidence.DIRECT);
-        feminineVocativePLural.getAccidence().add(Accidence.VOCATIVE);
-        result.add(feminineVocativePLural);
+        result.add(clone( origin, Lists.newArrayList(Accidence.DIRECT), Lists.newArrayList(Accidence.OBLIQUE), hindiWord));
+        result.add(clone( origin, Lists.newArrayList(Accidence.DIRECT), Lists.newArrayList(Accidence.VOCATIVE), hindiWord));
+        result.add(clone( origin, Lists.newArrayList(Accidence.SINGULAR), Lists.newArrayList(Accidence.PLURAL), 1, "ियाँ"));
+        result.add(clone( origin, Lists.newArrayList(Accidence.SINGULAR, Accidence.DIRECT), Lists.newArrayList(Accidence.PLURAL, Accidence.OBLIQUE), 1, "ियों"));
+        result.add(clone( origin, Lists.newArrayList(Accidence.SINGULAR, Accidence.DIRECT), Lists.newArrayList(Accidence.PLURAL, Accidence.VOCATIVE), 1, "ियो"));
 
         return result;
 
@@ -737,54 +447,11 @@ public class InflectedService {
         List<Inflected> result = new ArrayList<>();
         String hindiWord = origin.getInflectedHindi();
 
-        Inflected feminineObliqueSingular = (Inflected) origin.clone();
-        feminineObliqueSingular.setInflectedHindiIndex(7);
-        feminineObliqueSingular.setInflectedHindi(hindiWord);
-        feminineObliqueSingular.getAccidence().remove(Accidence.MASCULINE);
-        feminineObliqueSingular.getAccidence().add(Accidence.FEMININE);
-        feminineObliqueSingular.getAccidence().remove(Accidence.DIRECT);
-        feminineObliqueSingular.getAccidence().add(Accidence.OBLIQUE);
-        result.add(feminineObliqueSingular);
-
-        Inflected feminineVocativeSingular = (Inflected) origin.clone();
-        feminineVocativeSingular.setInflectedHindiIndex(8);
-        feminineVocativeSingular.setInflectedHindi(hindiWord);
-        feminineVocativeSingular.getAccidence().remove(Accidence.MASCULINE);
-        feminineVocativeSingular.getAccidence().add(Accidence.FEMININE);
-        feminineVocativeSingular.getAccidence().remove(Accidence.DIRECT);
-        feminineVocativeSingular.getAccidence().add(Accidence.VOCATIVE);
-        result.add(feminineVocativeSingular);
-
-        Inflected feminineDirectPLural = (Inflected) origin.clone();
-        feminineDirectPLural.setInflectedHindiIndex(9);
-        feminineDirectPLural.setInflectedHindi(hindiWord.substring(0, hindiWord.length()-1).concat("इयाँ"));
-        feminineDirectPLural.getAccidence().remove(Accidence.MASCULINE);
-        feminineDirectPLural.getAccidence().add(Accidence.FEMININE);
-        feminineDirectPLural.getAccidence().remove(Accidence.SINGULAR);
-        feminineDirectPLural.getAccidence().add(Accidence.PLURAL);
-        result.add(feminineDirectPLural);
-
-        Inflected feminineObliquePLural = (Inflected) origin.clone();
-        feminineObliquePLural.setInflectedHindiIndex(10);
-        feminineObliquePLural.setInflectedHindi(hindiWord.substring(0, hindiWord.length()-1).concat("इयों"));
-        feminineObliquePLural.getAccidence().remove(Accidence.MASCULINE);
-        feminineObliquePLural.getAccidence().add(Accidence.FEMININE);
-        feminineObliquePLural.getAccidence().remove(Accidence.SINGULAR);
-        feminineObliquePLural.getAccidence().add(Accidence.PLURAL);
-        feminineObliquePLural.getAccidence().remove(Accidence.DIRECT);
-        feminineObliquePLural.getAccidence().add(Accidence.OBLIQUE);
-        result.add(feminineObliquePLural);
-
-        Inflected feminineVocativePLural = (Inflected) origin.clone();
-        feminineVocativePLural.setInflectedHindiIndex(11);
-        feminineVocativePLural.setInflectedHindi(hindiWord.substring(0, hindiWord.length()-1).concat("इयो"));
-        feminineVocativePLural.getAccidence().remove(Accidence.MASCULINE);
-        feminineVocativePLural.getAccidence().add(Accidence.FEMININE);
-        feminineVocativePLural.getAccidence().remove(Accidence.SINGULAR);
-        feminineVocativePLural.getAccidence().add(Accidence.PLURAL);
-        feminineVocativePLural.getAccidence().remove(Accidence.DIRECT);
-        feminineVocativePLural.getAccidence().add(Accidence.VOCATIVE);
-        result.add(feminineVocativePLural);
+        result.add(clone( origin, Lists.newArrayList(Accidence.DIRECT), Lists.newArrayList(Accidence.OBLIQUE), hindiWord));
+        result.add(clone( origin, Lists.newArrayList(Accidence.DIRECT), Lists.newArrayList(Accidence.VOCATIVE), hindiWord));
+        result.add(clone( origin, Lists.newArrayList(Accidence.SINGULAR), Lists.newArrayList(Accidence.PLURAL), 1, "इयाँ"));
+        result.add(clone( origin, Lists.newArrayList(Accidence.SINGULAR, Accidence.DIRECT), Lists.newArrayList(Accidence.PLURAL, Accidence.OBLIQUE), 1, "इयों"));
+        result.add(clone( origin, Lists.newArrayList(Accidence.SINGULAR, Accidence.DIRECT), Lists.newArrayList(Accidence.PLURAL, Accidence.VOCATIVE), 1, "इयो"));
 
         return result;
 
@@ -967,10 +634,10 @@ public class InflectedService {
                 case MURSHID:
                     Optional<MurshidEntry> gonzaloEntry = murshidService.findOne(dk);
                     if (!gonzaloEntry.isPresent()){
-                        LOGGER.info("the GONZALO canonical entry canonicalWord={} canonicalIndex={} indicated in Master does not exist", master.getInflectedHindi(), master.getInflectedHindiIndex());
+                        LOGGER.info("the MURSHID canonical entry canonicalWord={} canonicalIndex={} indicated in Master does not exist", master.getInflectedHindi(), master.getInflectedHindiIndex());
                         return false;
                     }else if (!isDerivatePOS(gonzaloEntry.get().getPartOfSpeech(), master.getPartOfSpeech())){
-                        LOGGER.info("the POS indicated in Master ({}) is not a derivate of the entry in GONZALO ({})", master.getPartOfSpeech(), gonzaloEntry.get().getPartOfSpeech());
+                        LOGGER.info("the POS indicated in Master ({}) is not a derivate of the entry in MURSHID ({})", master.getPartOfSpeech(), gonzaloEntry.get().getPartOfSpeech());
                         return false;
                     }
                     break;

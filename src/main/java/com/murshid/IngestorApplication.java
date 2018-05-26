@@ -4,6 +4,7 @@ package com.murshid;
 import com.amazonaws.services.dynamodbv2.document.Index;
 import com.amazonaws.services.dynamodbv2.document.Table;
 import com.amazonaws.services.dynamodbv2.model.*;
+import com.murshid.dynamo.domain.Inflected;
 import com.murshid.dynamo.domain.Song;
 import com.murshid.dynamo.repo.SongRepository;
 import com.murshid.models.converters.DynamoAccessor;
@@ -16,6 +17,7 @@ import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.ConfigurableApplicationContext;
 
+import java.util.List;
 import java.util.Set;
 
 @SpringBootApplication
@@ -29,7 +31,7 @@ public class IngestorApplication {
 	public static void main(String[] args) throws Exception{
 		context = SpringApplication.run(IngestorApplication.class, args);
 
-        //generateHtml();
+       getAll();
 
 
 	}
@@ -40,6 +42,13 @@ public class IngestorApplication {
         LOGGER.info("finished generating spans");
     }
 
+
+    private static void getAll() throws InterruptedException{
+        InflectedService inflectedService = context.getBean(InflectedService.class);
+        List<Inflected> allInflected = inflectedService.getAll();
+        allInflected.forEach(in -> inflectedService.save(in));
+        LOGGER.info("finished saving");
+    }
 
     private static void validateAll() throws InterruptedException{
         InflectedService masterService = context.getBean(InflectedService.class);

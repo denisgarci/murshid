@@ -145,8 +145,6 @@ public class InflectedConverter {
 
         item = item.with("part_of_speech", master.getPartOfSpeech().name());
 
-        item = item.with("part_of_speech_label", master.getPartOfSpeechLabel());
-
         item = item.withList("canonical_keys", master.getCanonicalKeys().stream()
                 .map(CanonicalKey::toMap).collect(Collectors.toList()));
 

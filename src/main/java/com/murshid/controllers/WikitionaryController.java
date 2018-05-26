@@ -25,8 +25,8 @@ public class WikitionaryController {
         return "processing ...";
     }
 
-    @GetMapping("/processWord/{hindiWord}")
-    public String processWord(@PathVariable(name="hindiWord", required=true) String hindiWord) {
+    @GetMapping("/processWord")
+    public String processWord(@RequestParam(name = "hindiWord") String hindiWord) {
         WikitionaryCaller wikitionaryCaller = new WikitionaryCaller();
         wikitionaryWordProcessor.processWord(wikitionaryCaller, hindiWord);
         LOGGER.info("received canonicalWord " + hindiWord);

@@ -22,6 +22,10 @@ public class WikitionaryDBWriterByLetter implements Callable {
 
     public String initial;
 
+    public static void main(String[] args) throws Exception{
+        new WikitionaryDBWriterByLetter("श").call();
+    }
+
     public WikitionaryDBWriterByLetter(String initial) {
         this.initial = initial;
     }
@@ -33,7 +37,7 @@ public class WikitionaryDBWriterByLetter implements Callable {
         Connection con = null;
         ResultSet rs;
 
-        String dbUrl = "jdbc:mysql://localhost:3306/pratts";
+        String dbUrl = "jdbc:mysql://localhost:3306/murshid";
         String user = "root";
         String password = "";
 
@@ -50,7 +54,7 @@ public class WikitionaryDBWriterByLetter implements Callable {
 
 
             PreparedStatement attemptsPs = con.prepareStatement(
-                    "INSERT INTO attempts (entry, language, source, attempted_at, successful) values (?, hindiWord, 'wikitionary', current_timestamp, ?)");
+                    "INSERT INTO attempts (entry, language, source, attempted_at, successful) values (?, 'HINDI', 'WIKITIONARY', current_timestamp, ?)");
 
 
             PreparedStatement ps = con.prepareStatement(
@@ -58,19 +62,19 @@ public class WikitionaryDBWriterByLetter implements Callable {
 
 
             Statement select = con.createStatement();
-            rs = select.executeQuery("SELECT word from hindi_words where initial = '" + initial +
-                                     "' and word not in (select entry from attempts where source='wikitionary') ");
+            rs = select.executeQuery("SELECT hindi_word from spell_check where initial = '" + initial + " and hindi_word='शोला' '" +
+                                     "' and hindi_word not in (select entry from attempts where source='wikitionary' ) ");
 
             Statement count = con.createStatement();
-            ResultSet rsCount = count.executeQuery("SELECT count(*) from hindi_words where initial = '" + initial +
-                                                   "' and word not in (select entry from attempts where source='wikitionary' ) ");
+            ResultSet rsCount = count.executeQuery("SELECT count(*) from spell_check where initial = '" + initial + " and hindi_word='शोला' '" +
+                    "' and hindi_word not in (select entry from attempts where source='wikitionary'  ) ");
             rsCount.next();
             LOGGER.info("{} records remain to be processed for initial {} ", rsCount.getInt(1), initial);
 
 
             int transactionIndex = 0;
             while (rs.next()) {
-                String word = rs.getString("canonicalWord");
+                String word = rs.getString("hindi_word");
                 currentWord = word;
 
                 String retryMsg = "Crawling failed for canonicalWord " + word + " retrying [{}x]";
@@ -143,17 +147,6 @@ public class WikitionaryDBWriterByLetter implements Callable {
         return success;
     }
 
-    private String ensureUTF8(String original){
-        try {
-            byte[] utf8Bytes = original.getBytes("UTF8");
-            byte[] defaultBytes = original.getBytes();
-
-            return new String(utf8Bytes, "UTF8");
-        }catch (UnsupportedEncodingException ex){
-            LOGGER.error(ex.getMessage(), ex);
-            return original;
-        }
-    }
 
 
 }

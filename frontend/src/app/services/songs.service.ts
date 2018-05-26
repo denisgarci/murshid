@@ -7,6 +7,7 @@ import {WordListMaster} from "../models/WordListMaster";
 import {InflectedKey} from "../models/InflectedKey";
 import {IInflectedEntries} from "../models/IInflectedEntries";
 import {IDictionaryEntries} from "../models/IDictionaryEntries";
+import {Globals} from "../globals";
 
 @Injectable()
 export class SongsService {
@@ -26,7 +27,7 @@ export class SongsService {
 
 
 
-  constructor(private http: HttpClient) { }
+  constructor(private http: HttpClient, private globals: Globals) { }
 
   changeSelectedSong(message: string) {
     this.retrieveSong(message);
@@ -61,6 +62,12 @@ export class SongsService {
 
     this.dictionaryEntries = JSON.parse(song.dictionary_entries);
     this.inflectedEntries = JSON.parse(song.inflected_entries);
+    //complement part of speech labels
+    for (let key in this.inflectedEntries) {
+      let value = this.inflectedEntries[key];
+      value.part_of_speech_label = this.globals.partsOfSpeech[value.part_of_speech];
+    }
+
   }
 
   private static buildMasterKey(mk: InflectedKey){

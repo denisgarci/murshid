@@ -2,6 +2,7 @@ import {Component, ElementRef, Input, OnInit, Renderer2, SimpleChanges} from '@a
 import {SongsService} from "../../services/songs.service";
 import {DictionaryEntry} from "../../models/DictionaryEntry";
 import {DictionariesContent} from "../../models/DictionariesContent";
+import {Globals} from "../../globals";
 
 @Component({
   selector: 'app-dictionariescontainer',
@@ -12,7 +13,7 @@ export class DictionariescontainerComponent implements OnInit {
 
   content: DictionariesContent;
 
-  constructor(private songsService: SongsService) {}
+  constructor(private songsService: SongsService, private globals: Globals) {}
 
   ngOnInit() {
     this.songsService.itemHoverChangeObservable.subscribe(message => {
@@ -32,7 +33,10 @@ export class DictionariescontainerComponent implements OnInit {
       dec.canonical_hindi = inflectedEntry.canonical_hindi;
       dec.inflected_hindi = inflectedEntry.inflected_hindi;
       dec.accidence = inflectedEntry.accidence;
-      dec.accidence_labels = inflectedEntry.accidence_labels;
+      dec.accidence_labels = [];
+      if (inflectedEntry.accidence != null) {
+        inflectedEntry.accidence.forEach(a => dec.accidence_labels.push(this.globals.accidenceTypes[a]));
+      }
       dec.inflected_part_of_speech_label = inflectedEntry.part_of_speech_label;
       dec.dictionary_entries = [];
 

@@ -28,19 +28,41 @@ public class DictionariesController {
      * presents the JS object that will be written in the corresponding Song.
      * It contains all dictionary entries necessary for the words in the song.
      *
-     * It uses as a starting point the song's masterEntries
+     * It uses as a starting point the song's not-inflected entries
      *
      * As a side-effect, it recreates this Json object as a string in the song.
      *
      * @param songLatinName         e.g. "Alvida"
      * @return                      a Map of "key" -> DictionaryEntry apt to be transformed into Json
      */
-    @GetMapping("/createDictionaryEntries")
+    @GetMapping("/createDictionaryEntriesForNotInflected")
     public @ResponseBody
-    Map<String, DictionaryEntry> createDictionaryEntries(@RequestParam(name = "songLatinName") String songLatinName) {
+    Map<String, DictionaryEntry> createDictionaryEntriesForNotInflected(@RequestParam(name = "songLatinName") String songLatinName) {
         Optional<Song> song = songsService.findByLatinTitle(songLatinName);
         if (song.isPresent()) {
-            return dictionaryService.createDictionaryEntries(song.get());
+            return dictionaryService.createDictionaryEntriesForNotInflected(song.get());
+        }else{
+            return null;
+        }
+    }
+
+    /**
+     * presents the JS object that will be written in the corresponding Song.
+     * It contains all dictionary entries necessary for the words in the song.
+     *
+     * It uses as a starting point the song's inflected entries
+     *
+     * As a side-effect, it recreates this Json object as a string in the song.
+     *
+     * @param songLatinName         e.g. "Alvida"
+     * @return                      a Map of "key" -> DictionaryEntry apt to be transformed into Json
+     */
+    @GetMapping("/createDictionaryEntriesForInflected")
+    public @ResponseBody
+    Map<String, DictionaryEntry> createDictionaryEntriesForInflected(@RequestParam(name = "songLatinName") String songLatinName) {
+        Optional<Song> song = songsService.findByLatinTitle(songLatinName);
+        if (song.isPresent()) {
+            return dictionaryService.createDictionaryEntriesForInflected(song.get());
         }else{
             return null;
         }

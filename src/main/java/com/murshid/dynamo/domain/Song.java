@@ -2,6 +2,7 @@ package com.murshid.dynamo.domain;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.murshid.persistence.domain.views.SongWordsToInflectedTable;
+import com.murshid.persistence.domain.views.SongWordsToNotInflectedTable;
 
 import javax.persistence.Column;
 import java.util.List;
@@ -41,20 +42,46 @@ public class Song {
     @Column(name = "word_list_master")
     private List<SongWordsToInflectedTable> wordListMaster;
 
+    @JsonProperty("word_list_not_inflected")
+    @Column(name = "word_list_not_inflected")
+    private List<SongWordsToNotInflectedTable> wordListNotInflected;
+
+
     @JsonProperty("html")
     @Column(name = "html")
     private String html;
 
-    @JsonProperty("dictionary_entries")
-    @Column(name = "dictionary_entries")
-    private String dictionaryEntries;
+    @JsonProperty("dictionary_entries_inflected")
+    @Column(name = "dictionary_entries_inflected")
+    private String dictionaryEntriesInflected;
 
-
+    @JsonProperty("dictionary_entries_not_inflected")
+    @Column(name = "dictionary_entries_not_inflected")
+    private String dictionaryEntriesNotInflected;
 
     @JsonProperty("inflected_entries")
     @Column(name = "inflected_entries")
     private String inflectedEntries;
 
+    @JsonProperty("not_inflected_entries")
+    @Column(name = "not_inflected_entries")
+    private String notInflectedEntries;
+
+    public String getNotInflectedEntries() {
+        return notInflectedEntries;
+    }
+
+    public void setNotInflectedEntries(String notInflectedEntries) {
+        this.notInflectedEntries = notInflectedEntries;
+    }
+
+    public String getDictionaryEntriesNotInflected() {
+        return dictionaryEntriesNotInflected;
+    }
+
+    public void setDictionaryEntriesNotInflected(String dictionaryEntriesNotInflected) {
+        this.dictionaryEntriesNotInflected = dictionaryEntriesNotInflected;
+    }
 
     public String getInflectedEntries() {
         return inflectedEntries;
@@ -129,12 +156,12 @@ public class Song {
         return this;
     }
 
-    public String getDictionaryEntries() {
-        return dictionaryEntries;
+    public String getDictionaryEntriesInflected() {
+        return dictionaryEntriesInflected;
     }
 
-    public Song setDictionaryEntries(String dictionaryEntries) {
-        this.dictionaryEntries = dictionaryEntries;
+    public Song setDictionaryEntriesInflected(String dictionaryEntriesInflected) {
+        this.dictionaryEntriesInflected = dictionaryEntriesInflected;
         return this;
     }
 
@@ -154,6 +181,14 @@ public class Song {
     public Song setEnglishTranslationHtml(String englishTranslationHtml) {
         this.englishTranslationHtml = englishTranslationHtml;
         return this;
+    }
+
+    public List<SongWordsToNotInflectedTable> getWordListNotInflected() {
+        return wordListNotInflected;
+    }
+
+    public void setWordListNotInflected(List<SongWordsToNotInflectedTable> wordListNotInflected) {
+        this.wordListNotInflected = wordListNotInflected;
     }
 
 }

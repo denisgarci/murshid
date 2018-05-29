@@ -22,16 +22,16 @@ import java.util.Set;
 
 @SpringBootApplication
 
-public class IngestorApplication {
+public class MurshidApplication {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(WikitionaryLetterIngestor.class);
 
     private static ConfigurableApplicationContext context;
 
 	public static void main(String[] args) throws Exception{
-		context = SpringApplication.run(IngestorApplication.class, args);
+		context = SpringApplication.run(MurshidApplication.class, args);
 
-       getAll();
+       //getAll();
 
 
 	}
@@ -41,7 +41,6 @@ public class IngestorApplication {
         songsService.generateSpans("Alvida");
         LOGGER.info("finished generating spans");
     }
-
 
     private static void getAll() throws InterruptedException{
         InflectedService inflectedService = context.getBean(InflectedService.class);
@@ -81,7 +80,6 @@ public class IngestorApplication {
         Song newWords = processor.findOne("Alvida");
         System.out.println(newWords);
     }
-
 
     private static void newWordsInSong(){
         SongsService processor = context.getBean(SongsService.class);

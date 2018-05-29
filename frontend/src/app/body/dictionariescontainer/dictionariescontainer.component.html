@@ -12,11 +12,24 @@
     </div>
 
     <br/>
-    <div *ngFor="let dicEntry of content.dictionary_entries">
+    <div *ngFor="let dicEntry of content.dictionary_entries_inflected">
       <span class="dictionary_name">{{dicEntry.dictionary_source}}</span>
       <p class="dictionary_entry_content">
         {{dicEntry.meaning}}
       </p>
+    </div>
+
+    <br/>
+    <div *ngIf="content.dictionary_entries_not_inflected">
+      <div class="dictionary_global_header">
+        <span>{{content.not_inflected_hindi}}</span> &nbsp;-&nbsp; <span class="part_of_speech">{{content.not_inflected_part_of_speech_label}}</span>
+      </div>
+      <div *ngFor="let dicEntry of content.dictionary_entries_not_inflected">
+        <span class="dictionary_name_not_inflected">{{dicEntry.dictionary_source}}</span>
+        <p class="dictionary_entry_content">
+          {{dicEntry.meaning}}
+        </p>
+      </div>
     </div>
   </div>
 </div>

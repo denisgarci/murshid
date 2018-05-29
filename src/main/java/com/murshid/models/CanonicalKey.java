@@ -3,6 +3,7 @@ package com.murshid.models;
 
 import com.amazonaws.services.dynamodbv2.model.AttributeValue;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableMap;
 import com.murshid.models.enums.DictionarySource;
 import org.apache.commons.lang3.builder.EqualsBuilder;
@@ -104,6 +105,9 @@ public class CanonicalKey implements Serializable{
     }
 
     public String toKey(){
+        Preconditions.checkNotNull(this.dictionarySource, "dictionary source cannot be null");
+        Preconditions.checkNotNull(this.getCanonicalWord(), "canonical word cannot be null");
+
         return this.dictionarySource.name().concat("_")
                 .concat(this.getCanonicalWord()).concat("_")
                 .concat(Integer.toString(this.canonicalIndex));

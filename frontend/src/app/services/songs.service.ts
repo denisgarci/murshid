@@ -3,11 +3,16 @@ import {BehaviorSubject} from "rxjs/BehaviorSubject";
 import {HttpClient} from "@angular/common/http";
 import { SongModel } from '../models/SongModel';
 import { IGeo } from '../models/IGeo';
-import {WordListMaster} from "../models/WordListMaster";
+import {WordListInflected} from "../models/WordListInflected";
 import {InflectedKey} from "../models/InflectedKey";
 import {IInflectedEntries} from "../models/IInflectedEntries";
-import {IDictionaryEntries} from "../models/IDictionaryEntries";
+import {IDictionaryEntriesInflected} from "../models/IDictionaryEntriesInflected";
 import {Globals} from "../globals";
+import {IDictionaryEntriesNotInflected} from "../models/IDictionaryEntriesNotInflected";
+import {INotInflectedEntries} from "../models/INotInflectedEntries";
+import {NotInflectedEntry} from "../models/NotInflectedEntry";
+import {NotInflectedKey} from "../models/NotInflectedKey";
+import {WordListNotInflected} from "../models/WordListNotInflected";
 
 @Injectable()
 export class SongsService {
@@ -17,9 +22,12 @@ export class SongsService {
   public songSelectionChangeObservable = this.songSelectionChange.asObservable();
 
   public currentSong: SongModel;
-  public geo: IGeo = {};
+  public inflectedGeo: IGeo = {};
+  public notInflectedGeo: IGeo = {};
   public inflectedEntries: IInflectedEntries = {};
-  public dictionaryEntries: IDictionaryEntries = {};
+  public notInflectedEntries: INotInflectedEntries = {};
+  public dictionaryEntriesInflected: IDictionaryEntriesInflected = {};
+  public dictionaryEntriesNotInflected: IDictionaryEntriesNotInflected = {};
 
   //item-related
   public itemHoverChange = new BehaviorSubject<string>(null);
@@ -38,7 +46,8 @@ export class SongsService {
       .subscribe(data => {
         if ( data!= null ) {
           this.currentSong = data;
-          this.populateGeo(data);
+          this.populateInflectedGeo(data);
+          this.populateNotInflectedGeo(data);
           this.songSelectionChange.next(data.title_latin);
         }else{
           alert("Song not found");
@@ -46,32 +55,67 @@ export class SongsService {
     });
   }
 
-  populateGeo(song: SongModel) {
-    this.geo = {};
+  populateInflectedGeo(song: SongModel) {
+    this.inflectedGeo = {};
     this.inflectedEntries = {};
 
     song.word_list_master.forEach(entry => {
-      let wlm = entry as WordListMaster;
+      let wlm = entry as WordListInflected;
       if (wlm.song_word_indices == null){
         alert(wlm + " has no song_word_indexes")
       }
       wlm.song_word_indices.forEach(id => {
-        this.geo[String(id)] = SongsService.buildMasterKey(wlm.inflected_key);
+        this.inflectedGeo[String(id)] = SongsService.buildInflectedKey(wlm.inflected_key);
       })
     });
 
-    this.dictionaryEntries = JSON.parse(song.dictionary_entries);
+    this.dictionaryEntriesInflected = JSON.parse(song.dictionary_entries_inflected);
     this.inflectedEntries = JSON.parse(song.inflected_entries);
+    this.notInflectedEntries = JSON.parse(song.not_inflected_entries);
+
     //complement part of speech labels
     for (let key in this.inflectedEntries) {
       let value = this.inflectedEntries[key];
       value.part_of_speech_label = this.globals.partsOfSpeech[value.part_of_speech];
     }
+  }
+
+  populateNotInflectedGeo(song: SongModel) {
+    this.notInflectedGeo = {};
+    this.notInflectedEntries = {};
+    if (song.word_list_not_inflected == null) {
+      return;
+    }
+
+    song.word_list_not_inflected.forEach(entry => {
+      let wlm = entry as WordListNotInflected;
+      if (wlm.song_word_indices == null){
+        alert(wlm + " has no song_word_indexes")
+      }
+      wlm.song_word_indices.forEach(id => {
+        this.notInflectedGeo[String(id)] = SongsService.buildNotInflectedKey(wlm.not_inflected_key);
+      })
+    });
+
+    this.dictionaryEntriesNotInflected = JSON.parse(song.dictionary_entries_not_inflected);
+    this.notInflectedEntries = JSON.parse(song.not_inflected_entries);
+
+    //complement part of speech labels
+    for (let key in this.notInflectedEntries) {
+      let value = this.notInflectedEntries[key];
+      value.part_of_speech_label = this.globals.partsOfSpeech[value.part_of_speech];
+    }
 
   }
 
-  private static buildMasterKey(mk: InflectedKey){
+
+  private static buildInflectedKey(mk: InflectedKey){
     return mk.inflected_hindi + "_" + mk.inflected_hindi_index;
   }
+
+  private static buildNotInflectedKey(mk: NotInflectedKey){
+    return mk.hindi + "_" + mk.hindi_index;
+  }
+
 
 }

@@ -1,6 +1,6 @@
 import {InflectedKey} from "./InflectedKey";
 
-export class WordListMaster{
+export class WordListInflected{
   song_word_indices: string[];
   inflected_key: InflectedKey;
 }

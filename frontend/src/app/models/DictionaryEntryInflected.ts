@@ -1,4 +1,4 @@
-export class DictionaryEntry{
+export class DictionaryEntryInflected{
   dictionary_source: string;
   part_of_speech_label: string;
   meaning: string;

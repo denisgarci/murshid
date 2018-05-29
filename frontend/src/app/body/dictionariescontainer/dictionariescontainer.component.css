@@ -17,6 +17,15 @@
   padding-right: 10px;
 }
 
+.dictionary_name_not_inflected {
+  border-radius: 3px;
+  height: 20px;
+  border: 1px solid cornflowerblue;
+  color: cornflowerblue;
+  padding-left: 10px;
+  padding-right: 10px;
+}
+
 .dictionary_global_header{
   padding: 5px;
 }

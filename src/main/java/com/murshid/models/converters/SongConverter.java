@@ -4,6 +4,7 @@ import com.amazonaws.services.dynamodbv2.document.Item;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.murshid.dynamo.domain.Song;
 import com.murshid.persistence.domain.views.SongWordsToInflectedTable;
+import com.murshid.persistence.domain.views.SongWordsToNotInflectedTable;
 import jersey.repackaged.com.google.common.collect.Lists;
 
 import java.io.IOException;
@@ -47,7 +48,6 @@ public class SongConverter {
         }
 
         if (item.isPresent("word_list_master")) {
-            List<SongWordsToInflectedTable> wordListMasterEntries = Lists.newArrayList();
             List<Map<String, Object>> itemList = item.getList("word_list_master");
             List<SongWordsToInflectedTable> wlmEntries = itemList.stream()
                     .map(a -> WordListMasterEntryConverter.fromMap(a))
@@ -55,6 +55,16 @@ public class SongConverter {
 
             song.setWordListMaster(wlmEntries);
         }
+
+        if (item.isPresent("word_list_not_inflected")) {
+            List<Map<String, Object>> itemList = item.getList("word_list_not_inflected");
+            List<SongWordsToNotInflectedTable> wlmEntries = itemList.stream()
+                    .map(a -> WordListNotInflectedEntryConverter.fromMap(a))
+                    .collect(Collectors.toList());
+
+            song.setWordListNotInflected(wlmEntries);
+        }
+
 
         if (item.isPresent("html")){
             song.setHtml(item.getString("html"));
@@ -64,9 +74,19 @@ public class SongConverter {
             song.setInflectedEntries((String)item.get("inflected_entries"));
         }
 
-        if (item.isPresent("dictionary_entries")){
-            song.setDictionaryEntries((String)item.get("dictionary_entries"));
+        if (item.isPresent("not_inflected_entries")){
+            song.setNotInflectedEntries((String)item.get("not_inflected_entries"));
         }
+
+
+        if (item.isPresent("dictionary_entries")){
+            song.setDictionaryEntriesInflected((String)item.get("dictionary_entries"));
+        }
+
+        if (item.isPresent("dictionary_entries_not_inflected")){
+            song.setDictionaryEntriesNotInflected((String)item.get("dictionary_entries_not_inflected"));
+        }
+
 
         return song;
     }
@@ -98,21 +118,33 @@ public class SongConverter {
         item = item.withList("media", song.getMedia());
 
         List<SongWordsToInflectedTable> wordListMasterEntries = song.getWordListMaster();
-        List<Map> items = WordListMasterEntryConverter.toMaps(wordListMasterEntries);
+        List<Map> inflectedItems = WordListMasterEntryConverter.toMaps(wordListMasterEntries);
+        item = item.withList("word_list_master", inflectedItems);
 
         if (song.getHtml() != null) {
             item = item.withString("html", song.getHtml());
         }
 
-        item = item.withList("word_list_master", items);
+        List<SongWordsToNotInflectedTable> songWordsToNotInflectedTables = song.getWordListNotInflected();
+        List<Map> notInflectedItems = WordListNotInflectedEntryConverter.toMaps(songWordsToNotInflectedTables);
+        item = item.withList("word_list_not_inflected", notInflectedItems);
 
         if (song.getInflectedEntries() != null ) {
             item = item.withString("inflected_entries", song.getInflectedEntries());
         }
 
-        if (song.getDictionaryEntries() != null) {
-            item = item.withString("dictionary_entries", song.getDictionaryEntries());
+        if (song.getNotInflectedEntries() != null ) {
+            item = item.withString("not_inflected_entries", song.getNotInflectedEntries());
         }
+
+        if (song.getDictionaryEntriesInflected() != null) {
+            item = item.withString("dictionary_entries", song.getDictionaryEntriesInflected());
+        }
+
+        if (song.getDictionaryEntriesNotInflected() != null) {
+            item = item.withString("dictionary_entries_not_inflected", song.getDictionaryEntriesNotInflected());
+        }
+
 
         return item;
     }

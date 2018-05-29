@@ -29,6 +29,27 @@ public class SpellCheckService {
         }
     }
 
+    public boolean wordsExist(String hindiWord){
+        String[] tokens = hindiWord.split(" ");
+        for (String hindi: tokens){
+            if (!spellCheckRepository.exists(hindi)){
+                return false;
+            }
+        }
+        return true;
+    }
+
+    public String passMultipleWordsToUrdu(String hindiWords){
+        String[] tokens = hindiWords.split(" ");
+        StringBuilder sb = new StringBuilder();
+        for (String hindi : tokens){
+            sb.append(getUrduSpelling(hindi)).append(" ");
+        }
+        sb.delete(sb.length()-1, sb.length());
+        return sb.toString();
+    }
+
+
     public String getUrduSpelling(String hindiWord){
         SpellCheckEntry spellCheckEntry = spellCheckRepository.findByHindiWord(hindiWord);
         if (spellCheckEntry!= null){

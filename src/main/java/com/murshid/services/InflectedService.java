@@ -236,53 +236,73 @@ public class InflectedService {
         result.add(origin);
         String hindiWord = origin.getInflectedHindi();
 
-        if (origin.getPartOfSpeech() == PartOfSpeech.NOUN && origin.getAccidence().contains(Accidence.MASCULINE) && origin.getAccidence().contains(Accidence.SINGULAR) &&  hindiWord.endsWith("ा")){
+        if (origin.getPartOfSpeech() == PartOfSpeech.NOUN && isMasculineSingularDirect(origin) &&  hindiWord.endsWith("ा")){
 
             result.addAll(explodeMasculinesInAA(origin));
 
         } else if (
-                (origin.getPartOfSpeech() == PartOfSpeech.PARTICIPLE || origin.getPartOfSpeech() == PartOfSpeech.INFINITIVE ) && hindiWord.endsWith("ा")){
+                (origin.getPartOfSpeech() == PartOfSpeech.PARTICIPLE || origin.getPartOfSpeech() == PartOfSpeech.INFINITIVE ) && hindiWord.endsWith("ा")
+                && isMasculineSingularDirect(origin)){
 
             result.addAll(participlesAndInfinitivesInAA(origin));
 
         }else if (
-                (origin.getPartOfSpeech() == PartOfSpeech.ADJECTIVE || origin.getPartOfSpeech() == PartOfSpeech.POSSESSIVE_PRONOUN || origin.getPartOfSpeech() == PartOfSpeech.ADVERB) && hindiWord.endsWith("ा")){
+                (origin.getPartOfSpeech() == PartOfSpeech.ADJECTIVE || origin.getPartOfSpeech() == PartOfSpeech.POSSESSIVE_PRONOUN || origin.getPartOfSpeech() == PartOfSpeech.ADVERB) && hindiWord.endsWith("ा")
+                && isMasculineSingularDirect(origin)){
 
             result.addAll(genericExplode(origin));
 
-        } else if (origin.getPartOfSpeech() == PartOfSpeech.NOUN  && origin.getAccidence().contains(Accidence.MASCULINE) && !hindiWord.endsWith("ा") && !hindiWord.endsWith("ू") && !hindiWord.endsWith("ी") ){
+        } else if (origin.getPartOfSpeech() == PartOfSpeech.NOUN  && isMasculineSingularDirect(origin) && !hindiWord.endsWith("ा") && !hindiWord.endsWith("ू") && !hindiWord.endsWith("ी")
+                && isMasculineSingularDirect(origin)){
 
                     result.addAll(explodeMasculinesNotInAAorUUorII(origin));
 
-        } else if (origin.getPartOfSpeech() == PartOfSpeech.NOUN  && origin.getAccidence().contains(Accidence.MASCULINE) && hindiWord.endsWith("ू") ){
+        } else if (origin.getPartOfSpeech() == PartOfSpeech.NOUN  && isMasculineSingularDirect(origin) && hindiWord.endsWith("ू") ){
 
             result.addAll(explodeMasculinesInUU(origin));
 
-        } else if (origin.getPartOfSpeech() == PartOfSpeech.NOUN  && origin.getAccidence().contains(Accidence.MASCULINE) && hindiWord.endsWith("ी") ){
+        } else if (origin.getPartOfSpeech() == PartOfSpeech.NOUN  && isMasculineSingularDirect(origin) && hindiWord.endsWith("ी") ){
 
             result.addAll(explodeMasculinesInII(origin));
 
-        } else if (origin.getPartOfSpeech() == PartOfSpeech.NOUN  && origin.getAccidence().contains(Accidence.FEMININE) && hindiWord.endsWith("ई") ){
+        } else if (origin.getPartOfSpeech() == PartOfSpeech.NOUN  && isFeminineSingularDirect(origin)  && hindiWord.endsWith("ई") ){
 
             result.addAll(explodeFemininesInIIIsolated(origin));
 
-        } else if (origin.getPartOfSpeech() == PartOfSpeech.NOUN  && origin.getAccidence().contains(Accidence.FEMININE) && (!hindiWord.endsWith("ी") ) ){
+        } else if (origin.getPartOfSpeech() == PartOfSpeech.NOUN  && isFeminineSingularDirect(origin) && (!hindiWord.endsWith("ी") ) ){
 
             result.addAll(explodeFemininesNotInII(origin));
 
-        } else if (origin.getPartOfSpeech() == PartOfSpeech.NOUN  && origin.getAccidence().contains(Accidence.FEMININE) && (hindiWord.endsWith("ी")) ){
+        } else if (origin.getPartOfSpeech() == PartOfSpeech.NOUN  && isFeminineSingularDirect(origin) && (hindiWord.endsWith("ी")) ){
 
             result.addAll(explodeFemininesInII(origin));
 
         } else if (origin.getPartOfSpeech() == PartOfSpeech.VERB  && origin.getAccidence().containsAll(Lists.newArrayList(Accidence._1ST, Accidence.SINGULAR, Accidence.SUBJUNCTIVE)) && (hindiWord.endsWith("ूँ")) ){
             result.addAll(explodeSubjunctive(origin));
-        } else if (origin.getPartOfSpeech() == PartOfSpeech.ADJECTIVE && origin.getAccidence().containsAll(Lists.newArrayList(Accidence.MASCULINE, Accidence.SINGULAR, Accidence.DIRECT)) &&
-                   !origin.getInflectedHindi().endsWith("ा")){
-            result.addAll(explodeInvariableAdjectives(origin));
+        } else if (origin.getPartOfSpeech() == PartOfSpeech.ADJECTIVE && isMasculineSingularDirect(origin) && !origin.getInflectedHindi().endsWith("ा")){
+            result.addAll(explodeAsInvariableMascFem(origin));
+        }else if (origin.getPartOfSpeech() == PartOfSpeech.POSTPOSITION && isMasculineSingularDirect(origin)){
+            result.addAll(explodeAsInvariableMascFem(origin));
         }
 
 
         return result;
+    }
+
+    private boolean isMasculineSingularDirect(Inflected inflected){
+        if (inflected.getAccidence() == null){
+            return false;
+        }else {
+          return inflected.getAccidence().containsAll(Lists.newArrayList(Accidence.MASCULINE, Accidence.SINGULAR, Accidence.DIRECT));
+        }
+    }
+
+    private boolean isFeminineSingularDirect(Inflected inflected){
+        if (inflected.getAccidence() == null){
+            return false;
+        }else {
+            return inflected.getAccidence().containsAll(Lists.newArrayList(Accidence.FEMININE, Accidence.SINGULAR, Accidence.DIRECT));
+        }
     }
 
 
@@ -343,7 +363,7 @@ public class InflectedService {
      * @param origin
      * @return
      */
-    private List<Inflected> explodeInvariableAdjectives(Inflected origin){
+    private List<Inflected> explodeAsInvariableMascFem(Inflected origin){
         List<Inflected> result = new ArrayList<>();
         String hindiWord = origin.getInflectedHindi();
         int index = origin.getInflectedHindiIndex();
@@ -419,7 +439,7 @@ public class InflectedService {
 
         result.add(clone( origin, Lists.newArrayList(Accidence.DIRECT), Lists.newArrayList(Accidence.OBLIQUE), hindiWord));
         result.add(clone( origin, Lists.newArrayList(Accidence.DIRECT), Lists.newArrayList(Accidence.VOCATIVE), hindiWord));
-        result.add(clone( origin, Lists.newArrayList(Accidence.SINGULAR), Lists.newArrayList(Accidence.PLURAL), hindiWord));
+        result.add(clone( origin, Lists.newArrayList(Accidence.SINGULAR), Lists.newArrayList(Accidence.PLURAL), hindiWord.concat("ें")));
         result.add(clone( origin, Lists.newArrayList(Accidence.SINGULAR, Accidence.DIRECT), Lists.newArrayList(Accidence.PLURAL, Accidence.OBLIQUE), hindiWord.concat("ों")));
         result.add(clone( origin, Lists.newArrayList(Accidence.SINGULAR, Accidence.DIRECT), Lists.newArrayList(Accidence.PLURAL, Accidence.VOCATIVE), hindiWord.concat("ो")));
 

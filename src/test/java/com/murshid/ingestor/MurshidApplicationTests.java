@@ -7,7 +7,7 @@ import org.springframework.test.context.junit4.SpringRunner;
 import static org.springframework.test.util.AssertionErrors.assertTrue;
 
 @RunWith(SpringRunner.class)
-public class IngestorApplicationTests {
+public class MurshidApplicationTests {
 
 	@Test
 	public void contextLoads() {

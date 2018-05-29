@@ -1,6 +1,5 @@
 import {Component, ElementRef, Input, OnInit, Renderer2, SimpleChanges} from '@angular/core';
 import {SongsService} from "../../services/songs.service";
-import {DictionaryEntry} from "../../models/DictionaryEntry";
 import {DictionariesContent} from "../../models/DictionariesContent";
 import {Globals} from "../../globals";
 
@@ -22,13 +21,13 @@ export class DictionariescontainerComponent implements OnInit {
 
       var dec = new DictionariesContent();
 
-      let masterKey = this.songsService.geo[message];
-      if (masterKey == null){
-        console.log("no master key found for span=" + message );
+      let inflectedKey = this.songsService.inflectedGeo[message];
+      if (inflectedKey == null) {
+        console.log("no inflected key found for span=" + message);
         return;
       }
 
-      let inflectedEntry = this.songsService.inflectedEntries[masterKey];
+      let inflectedEntry = this.songsService.inflectedEntries[inflectedKey];
 
       dec.canonical_hindi = inflectedEntry.canonical_hindi;
       dec.inflected_hindi = inflectedEntry.inflected_hindi;
@@ -38,13 +37,28 @@ export class DictionariescontainerComponent implements OnInit {
         inflectedEntry.accidence.forEach(a => dec.accidence_labels.push(this.globals.accidenceTypes[a]));
       }
       dec.inflected_part_of_speech_label = inflectedEntry.part_of_speech_label;
-      dec.dictionary_entries = [];
+      dec.dictionary_entries_inflected = [];
 
-      let dictionaryEntries = this.songsService.dictionaryEntries;
-
-      inflectedEntry.canonical_keys.forEach(ck =>{
-         dec.dictionary_entries.push(dictionaryEntries[ck]);
+      let dictionaryEntriesInflected = this.songsService.dictionaryEntriesInflected;
+      inflectedEntry.canonical_keys.forEach(ck => {
+        dec.dictionary_entries_inflected.push(dictionaryEntriesInflected[ck]);
       });
+
+
+      let notInflectedKey = this.songsService.notInflectedGeo[message];
+      let notInflectedEntry = this.songsService.notInflectedEntries[notInflectedKey];
+
+
+      if (notInflectedEntry != null) {
+        dec.not_inflected_hindi = notInflectedEntry.hindi;
+        dec.not_inflected_part_of_speech_label = notInflectedEntry.part_of_speech_label;
+        dec.dictionary_entries_not_inflected = [];
+
+        let dictionaryEntriesNotInflected = this.songsService.dictionaryEntriesNotInflected;
+        notInflectedEntry.canonical_keys.forEach(ck => {
+          dec.dictionary_entries_not_inflected.push(dictionaryEntriesNotInflected[ck]);
+        });
+      }
 
       this.content = dec;
 

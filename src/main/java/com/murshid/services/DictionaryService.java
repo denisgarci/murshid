@@ -1,5 +1,6 @@
 package com.murshid.services;
 
+import com.google.common.collect.Lists;
 import com.google.gson.Gson;
 import com.murshid.dynamo.domain.Song;
 import com.murshid.dynamo.repo.SongRepository;
@@ -31,7 +32,7 @@ public class DictionaryService {
      *
      * @return a Map, transformable into a JSon object
      */
-    public Map<String, DictionaryEntry> createDictionaryEntriesForInflected(Song song) {
+    public Map<String, List<DictionaryEntry>> createDictionaryEntriesForInflected(Song song) {
 
         //Inflected entries
         Map<String, Object> inflectedEntries =  gson.fromJson(song.getInflectedEntries(), Map.class);
@@ -39,7 +40,7 @@ public class DictionaryService {
                 .map(me -> (Map) me.getValue()).map(valMap -> (List<String>) valMap.get("canonical_keys"))
                 .flatMap(l -> l.stream()).collect(Collectors.toSet());
 
-        Map<String, DictionaryEntry> dictionaryEntriesForInflected = createDictionaryEntriesMap(canonicalKeysFromInflected);
+        Map<String, List<DictionaryEntry>> dictionaryEntriesForInflected = createDictionaryEntriesMap(canonicalKeysFromInflected);
         song.setDictionaryEntriesInflected(gson.toJson(dictionaryEntriesForInflected));
 
         songRepository.save(song);
@@ -47,14 +48,14 @@ public class DictionaryService {
         return dictionaryEntriesForInflected;
     }
 
-    public Map<String, DictionaryEntry> createDictionaryEntriesForNotInflected(Song song) {
+    public Map<String, List<DictionaryEntry>> createDictionaryEntriesForNotInflected(Song song) {
 
         Map<String, Object> notInflectedEntries =  gson.fromJson(song.getNotInflectedEntries(), Map.class);
         Set<String> canonicalKeysFromNotInflected = notInflectedEntries.entrySet().stream()
                 .map(me -> (Map) me.getValue()).map(valMap -> (List<String>) valMap.get("canonical_keys"))
                 .flatMap(l -> l.stream()).collect(Collectors.toSet());
 
-        Map<String, DictionaryEntry> dictionaryEntriesForNotInflected = createDictionaryEntriesMap(canonicalKeysFromNotInflected);
+        Map<String, List<DictionaryEntry>> dictionaryEntriesForNotInflected = createDictionaryEntriesMap(canonicalKeysFromNotInflected);
         song.setDictionaryEntriesNotInflected(gson.toJson(dictionaryEntriesForNotInflected));
 
         songRepository.save(song);
@@ -63,8 +64,8 @@ public class DictionaryService {
     }
 
 
-    private Map<String, DictionaryEntry> createDictionaryEntriesMap(Set<String> canonicalKeys){
-        Map<String, DictionaryEntry> dictionaryEntries = new HashMap<>();
+    private Map<String, List<DictionaryEntry>> createDictionaryEntriesMap(Set<String> canonicalKeys){
+        Map<String, List<DictionaryEntry>> dictionaryEntries = new HashMap<>();
         canonicalKeys.forEach(cks -> {
 
             String[] keyTokens = cks.split("_");
@@ -80,12 +81,12 @@ public class DictionaryService {
                     if (wikitionaryEntry.isPresent()) {
                         WikitionaryEntry entry = wikitionaryEntry.get();
 
-                        dictionaryEntries.put(entry.getStringKey(), new DictionaryEntry()
+                        dictionaryEntries.put(entry.getStringKey(), Lists.newArrayList(new DictionaryEntry()
                                 .setDictionarySource(DictionarySource.WIKITIONARY)
                                 .setHindiWord(entry.getHindiWord())
                                 .setMeaning(entry.getMeaning())
                                 .setPartOfSpeech(entry.getPartOfSpeech())
-                                .setWordIndex(entry.getWordIndex()));
+                                .setWordIndex(entry.getWordIndex())));
                     }
                 }
                 break;
@@ -95,12 +96,12 @@ public class DictionaryService {
                     Optional<PlattsEntry> prattsEntry = plattsService.findOne(word, wordIndex);
                     if (prattsEntry.isPresent()) {
                         PlattsEntry entry = prattsEntry.get();
-                        dictionaryEntries.put(entry.getStringKey(), new DictionaryEntry()
+                        dictionaryEntries.put(entry.getStringKey(), Lists.newArrayList(new DictionaryEntry()
                                 .setDictionarySource(DictionarySource.PLATTS)
                                 .setHindiWord(entry.getHindiWord())
                                 .setMeaning(entry.getMeaning())
                                 .setPartOfSpeech(entry.getPartOfSpeech())
-                                .setWordIndex(entry.getWordIndex()));
+                                .setWordIndex(entry.getWordIndex())));
                     }
                 }
                 break;
@@ -111,12 +112,12 @@ public class DictionaryService {
                     Optional<RekhtaEntry> prattsEntry = rekhtaService.findOne(word, wordIndex);
                     if (prattsEntry.isPresent()) {
                         RekhtaEntry entry = prattsEntry.get();
-                        dictionaryEntries.put(entry.getStringKey(), new DictionaryEntry()
+                        dictionaryEntries.put(entry.getStringKey(), Lists.newArrayList(new DictionaryEntry()
                                 .setDictionarySource(DictionarySource.REKHTA)
                                 .setHindiWord(entry.getHindiWord())
                                 .setMeaning(entry.getMeaning())
                                 .setPartOfSpeech(entry.getPartOfSpeech())
-                                .setWordIndex(entry.getWordIndex()));
+                                .setWordIndex(entry.getWordIndex())));
                     }
                 }
                 break;
@@ -127,12 +128,12 @@ public class DictionaryService {
                     if (gonzaloEntry.isPresent()) {
                         MurshidEntry entry = gonzaloEntry.get();
 
-                        dictionaryEntries.put(entry.getStringKey(), new DictionaryEntry()
+                        dictionaryEntries.put(entry.getStringKey(), Lists.newArrayList(new DictionaryEntry()
                                 .setDictionarySource(DictionarySource.MURSHID)
                                 .setHindiWord(entry.getHindiWord())
                                 .setMeaning(entry.getMeaning())
                                 .setPartOfSpeech(entry.getPartOfSpeech())
-                                .setWordIndex(entry.getWordIndex()));
+                                .setWordIndex(entry.getWordIndex())));
                     }
 
                 }

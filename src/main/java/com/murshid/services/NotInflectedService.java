@@ -89,16 +89,21 @@ public class NotInflectedService {
      */
     public List<NotInflected> allEntriesForSong(Song song){
 
-        //collect all master keys, without repetition
-        Set<NotInflectedKey> mks = song.getWordListNotInflected()
-                .stream().map(wlm -> wlm.getNotInflectedKey())
-                .collect(Collectors.toSet());
+        if (song.getDictionaryEntriesNotInflected() != null) {
 
-        return mks.stream().map(mk ->
-            notInflectedRepository.findOne(mk.getHindi(), mk.getHindiIndex()))
-                .filter(Optional::isPresent)
-                .map(Optional::get)
-                .collect(Collectors.toList());
+            //collect all master keys, without repetition
+            Set<NotInflectedKey> mks = song.getWordListNotInflected()
+                    .stream().map(wlm -> wlm.getNotInflectedKey())
+                    .collect(Collectors.toSet());
+
+            return mks.stream().map(mk ->
+                    notInflectedRepository.findOne(mk.getHindi(), mk.getHindiIndex()))
+                    .filter(Optional::isPresent)
+                    .map(Optional::get)
+                    .collect(Collectors.toList());
+        }else{
+            return Collections.EMPTY_LIST;
+        }
     }
 
     public void validateAll(){

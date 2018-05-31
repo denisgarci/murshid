@@ -33,11 +33,11 @@ public class DictionariesController {
      * As a side-effect, it recreates this Json object as a string in the song.
      *
      * @param songLatinName         e.g. "Alvida"
-     * @return                      a Map of "key" -> DictionaryEntry apt to be transformed into Json
+     * @return                      a Map of "key" -> List<DictionaryEntry> apt to be transformed into Json
      */
     @GetMapping("/createDictionaryEntriesForNotInflected")
     public @ResponseBody
-    Map<String, DictionaryEntry> createDictionaryEntriesForNotInflected(@RequestParam(name = "songLatinName") String songLatinName) {
+    Map<String, List<DictionaryEntry>> createDictionaryEntriesForNotInflected(@RequestParam(name = "songLatinName") String songLatinName) {
         Optional<Song> song = songsService.findByLatinTitle(songLatinName);
         if (song.isPresent()) {
             return dictionaryService.createDictionaryEntriesForNotInflected(song.get());
@@ -55,11 +55,11 @@ public class DictionariesController {
      * As a side-effect, it recreates this Json object as a string in the song.
      *
      * @param songLatinName         e.g. "Alvida"
-     * @return                      a Map of "key" -> DictionaryEntry apt to be transformed into Json
+     * @return                      a Map of "key" -> List<DictionaryEntry> apt to be transformed into Json
      */
     @GetMapping("/createDictionaryEntriesForInflected")
     public @ResponseBody
-    Map<String, DictionaryEntry> createDictionaryEntriesForInflected(@RequestParam(name = "songLatinName") String songLatinName) {
+    Map<String, List<DictionaryEntry>> createDictionaryEntriesForInflected(@RequestParam(name = "songLatinName") String songLatinName) {
         Optional<Song> song = songsService.findByLatinTitle(songLatinName);
         if (song.isPresent()) {
             return dictionaryService.createDictionaryEntriesForInflected(song.get());

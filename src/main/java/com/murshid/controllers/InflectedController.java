@@ -43,7 +43,7 @@ public class InflectedController {
 
     @GetMapping("/findByCanonicalWord")
     public @ResponseBody
-    List findInByCanonicalWord(@RequestParam(name = "canonicalWord") String canonicalWord) {
+    List findInByCanonicalWord(@RequestParam(name = "hindiWordIndex") String canonicalWord) {
         List result = inflectedService.findByCanonicalWord(canonicalWord);
         return result;
     }

@@ -41,11 +41,25 @@ public class DictionaryService {
                 .flatMap(l -> l.stream()).collect(Collectors.toSet());
 
         Map<String, List<DictionaryEntry>> dictionaryEntriesForInflected = createDictionaryEntriesMap(canonicalKeysFromInflected);
+        addDictionaryRelations(dictionaryEntriesForInflected);
         song.setDictionaryEntriesInflected(gson.toJson(dictionaryEntriesForInflected));
 
         songRepository.save(song);
 
         return dictionaryEntriesForInflected;
+    }
+
+    /**
+     * increases each list on the value side of the incoming map
+     * with related dictionary elements, if any available in dicitonary_relations.
+     * @param dictionaryEntries
+     */
+    public void addDictionaryRelations(Map<String, List<DictionaryEntry>> dictionaryEntries){
+        dictionaryEntries.values().forEach(va -> {
+            DictionaryEntry origin = va.get(0);
+            List<DictionaryEntry> additional = dictionaryRelationsService.find(origin);
+            va.addAll(additional);
+        });
     }
 
     public Map<String, List<DictionaryEntry>> createDictionaryEntriesForNotInflected(Song song) {
@@ -56,6 +70,7 @@ public class DictionaryService {
                 .flatMap(l -> l.stream()).collect(Collectors.toSet());
 
         Map<String, List<DictionaryEntry>> dictionaryEntriesForNotInflected = createDictionaryEntriesMap(canonicalKeysFromNotInflected);
+        addDictionaryRelations(dictionaryEntriesForNotInflected);
         song.setDictionaryEntriesNotInflected(gson.toJson(dictionaryEntriesForNotInflected));
 
         songRepository.save(song);
@@ -64,6 +79,11 @@ public class DictionaryService {
     }
 
 
+    /**
+     * Creates the base map of key => dictionary entries (list values are unary, without the references)
+     * @param canonicalKeys
+     * @return
+     */
     private Map<String, List<DictionaryEntry>> createDictionaryEntriesMap(Set<String> canonicalKeys){
         Map<String, List<DictionaryEntry>> dictionaryEntries = new HashMap<>();
         canonicalKeys.forEach(cks -> {
@@ -154,6 +174,10 @@ public class DictionaryService {
 
         return result;
     }
+
+    @Inject
+    private DictionaryRelationsService dictionaryRelationsService;
+
 
     @Inject
     private WikitionaryService wikitionaryService;

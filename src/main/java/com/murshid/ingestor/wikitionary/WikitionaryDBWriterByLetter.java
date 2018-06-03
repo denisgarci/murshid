@@ -77,8 +77,8 @@ public class WikitionaryDBWriterByLetter implements Callable {
                 String word = rs.getString("hindi_word");
                 currentWord = word;
 
-                String retryMsg = "Crawling failed for canonicalWord " + word + " retrying [{}x]";
-                String failureMsg = "Could not properly crawl canonicalWord " + word;
+                String retryMsg = "Crawling failed for hindiWordIndex " + word + " retrying [{}x]";
+                String failureMsg = "Could not properly crawl hindiWordIndex " + word;
                 org.jsoup.nodes.Document document = FunctionUtil.retryFn(() -> WikitionaryCaller.documentForWord(caller, word),
                                             e -> e instanceof SocketTimeoutException || e instanceof javax.ws.rs.ProcessingException ,
                                             Duration.ofSeconds(1).toMillis(), retryMsg, failureMsg);

@@ -5,7 +5,7 @@ import com.murshid.ingestor.wikitionary.WikiUtils;
 import com.murshid.ingestor.wikitionary.WikitionaryCaller;
 import com.murshid.ingestor.wikitionary.models.WikiEntry;
 import com.murshid.models.enums.DictionarySource;
-import com.murshid.persistence.domain.HindiWord;
+import com.murshid.persistence.domain.SpellCheckEntry;
 import com.murshid.persistence.repo.SpellCheckRepository;
 import org.jsoup.nodes.Document;
 import org.slf4j.Logger;
@@ -27,7 +27,7 @@ public class WikitionaryLetterIngestor implements Runnable{
     private boolean retryFailed;
 
     /**
-     * Reads words from the hindi_words list, and tries to ingest that canonicalWord from the Wikidictionary website
+     * Reads words from the hindi_words list, and tries to ingest that hindiWordIndex from the Wikidictionary website
      * @param letter            the initial of the hindi_words we select
      * @param retryFailed       true if we should leave out only words that were successfully ingested in the past, false
      *                          if we should leave out all words that were tried before, independently of success.
@@ -40,7 +40,7 @@ public class WikitionaryLetterIngestor implements Runnable{
     @Override
     public void run(){
 
-        List<HindiWord> targetHindiWords;
+        List<SpellCheckEntry> targetHindiWords;
 
          if (retryFailed){
              targetHindiWords = spellCheckRepository.selectByInitialExceptSuccessful(letter, DictionarySource.WIKITIONARY.name());
@@ -52,8 +52,8 @@ public class WikitionaryLetterIngestor implements Runnable{
         WikitionaryCaller caller = new WikitionaryCaller();
         String currentWord = null;
 
-        for (HindiWord hindiWord: targetHindiWords){
-            wikitionaryWordProcessor.processWord(caller, hindiWord.getWord());
+        for (SpellCheckEntry hindiWord: targetHindiWords){
+            wikitionaryWordProcessor.processWord(caller, hindiWord.getHindiWord());
         }
 
         LOGGER.info("finished processing letter {}", letter);

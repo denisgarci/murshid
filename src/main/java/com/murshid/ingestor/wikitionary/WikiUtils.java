@@ -177,7 +177,7 @@ public class WikiUtils {
 
     /**
      * Attempts to populate those entries where Etymilogy(es) are the main entry instead of the POS
-     * @param entry             the Hindi canonicalWord
+     * @param entry             the Hindi hindiWordIndex
      * @param document          the whole JSoup document
      * @return                  a list with 0 or more WikiEntries
      */
@@ -211,7 +211,7 @@ public class WikiUtils {
             }
 
         }catch (RuntimeException ex){
-            FILE_LOGGER.error("error processing canonicalWord={} in the Etymologies manner", entry, ex.getMessage());
+            FILE_LOGGER.error("error processing hindiWordIndex={} in the Etymologies manner", entry, ex.getMessage());
         }
         return wikiEntries;
     }
@@ -246,7 +246,7 @@ public class WikiUtils {
                 return Optional.empty();
             }
         }catch (RuntimeException ex){
-            FILE_LOGGER.error("error processing canonicalWord={}", entry, ex);
+            FILE_LOGGER.error("error processing hindiWordIndex={}", entry, ex);
             return Optional.empty();
         }
         return Optional.of(wikiEntry);

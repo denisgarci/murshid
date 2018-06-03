@@ -55,7 +55,7 @@ public class RekhtaDBWriterByLetter implements Callable{
 
             int index = 0;
             while(rs.next()){
-                String word = rs.getString("canonicalWord");
+                String word = rs.getString("hindiWordIndex");
                 Optional<List<RekhtaWebEntry>> result =  caller.fromStringEntry(word);
                 if (result.isPresent()){
                     List<RekhtaWebEntry> entries = result.get();

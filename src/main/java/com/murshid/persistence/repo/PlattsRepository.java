@@ -8,11 +8,13 @@ import java.util.List;
 
 public interface PlattsRepository extends CrudRepository<PlattsEntry, Integer> {
 
-    List<PlattsEntry> findByMeaningLikeOrKeystringLike(String username, String aa);
+    List<PlattsEntry> findByMeaningLikeOrKeystringLikeOrExtraMeaningLike(String word1, String word2, String word3);
 
     List<PlattsEntry> findByDictionaryKeyHindiWordOrUrduWord(String hindiWord, String urduWord);
 
     List<PlattsEntry> findByDictionaryKeyHindiWord(String hindiWord);
+
+    List<PlattsEntry> findByDictionaryKeyHindiWordLike(String hindiWord);
 
     List<PlattsEntry> findByDictionaryKey(DictionaryKey dictionaryKey);
 

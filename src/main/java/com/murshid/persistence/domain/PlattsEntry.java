@@ -3,12 +3,12 @@ package com.murshid.persistence.domain;
 import com.murshid.models.DictionaryKey;
 import com.murshid.models.enums.DictionarySource;
 import com.murshid.models.enums.PartOfSpeech;
-import com.murshid.services.HasDictionaryKey;
+import com.murshid.services.IDictionaryEntry;
 
 import javax.persistence.*;
 
 @Entity(name = "platts")
-public class PlattsEntry implements HasDictionaryKey {
+public class PlattsEntry implements IDictionaryEntry {
 
     @EmbeddedId
     private DictionaryKey dictionaryKey;
@@ -144,6 +144,11 @@ public class PlattsEntry implements HasDictionaryKey {
     public PlattsEntry setExtraMeaning(String extraMeaning) {
         this.extraMeaning = extraMeaning;
         return this;
+    }
+
+    @Override
+    public DictionarySource getDictionarySource() {
+        return DictionarySource.PLATTS;
     }
 
     @Override

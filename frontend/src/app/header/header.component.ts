@@ -10,7 +10,7 @@ export class HeaderComponent implements OnInit {
 
 
 
-  customers = ["Alvida", "Tere Mast Mast Do Nain"];
+  customers = ["Alvida", "Tere Mast Mast Do Nain", "Dard Dilom Ke"];
 
   constructor(private songsService: SongsService) {
 

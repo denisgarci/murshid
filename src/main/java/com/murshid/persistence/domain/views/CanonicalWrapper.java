@@ -1,13 +1,13 @@
 package com.murshid.persistence.domain.views;
 
 import com.murshid.models.enums.DictionarySource;
-import com.murshid.services.HasDictionaryKey;
+import com.murshid.services.IDictionaryEntry;
 
 public class CanonicalWrapper {
     private DictionarySource dictionarySource;
-    private HasDictionaryKey entry;
+    private IDictionaryEntry entry;
 
-    public CanonicalWrapper(DictionarySource dictionarySource, HasDictionaryKey entry){
+    public CanonicalWrapper(DictionarySource dictionarySource, IDictionaryEntry entry){
         this.dictionarySource = dictionarySource;
         this.entry = entry;
     }
@@ -21,11 +21,11 @@ public class CanonicalWrapper {
         return this;
     }
 
-    public HasDictionaryKey getEntry() {
+    public IDictionaryEntry getEntry() {
         return entry;
     }
 
-    public CanonicalWrapper setEntry(HasDictionaryKey entry) {
+    public CanonicalWrapper setEntry(IDictionaryEntry entry) {
         this.entry = entry;
         return this;
     }

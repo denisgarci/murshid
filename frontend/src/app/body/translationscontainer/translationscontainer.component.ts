@@ -40,7 +40,6 @@ export class TranslationscontainerComponent implements OnInit {
   ngAfterViewChecked(){
     $(".songcontainer-main, .translations_container").on("scroll", function() {
       $(".songcontainer-main, .translations_container").scrollTop($(this).scrollTop());
-      console.log("reacting to scroll")
     });
 
   }

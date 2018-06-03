@@ -5,13 +5,13 @@ import com.murshid.models.enums.Accidence;
 import com.murshid.models.enums.DictionarySource;
 import com.murshid.models.enums.PartOfSpeech;
 import com.murshid.persistence.AccidenceColumnConverter;
-import com.murshid.services.HasDictionaryKey;
+import com.murshid.services.IDictionaryEntry;
 
 import javax.persistence.*;
 import java.util.List;
 
 @Entity(name = "wikitionary")
-public class WikitionaryEntry implements HasDictionaryKey{
+public class WikitionaryEntry implements IDictionaryEntry {
 
     @EmbeddedId
     private DictionaryKey dictionaryKey;
@@ -115,5 +115,10 @@ public class WikitionaryEntry implements HasDictionaryKey{
     @Override
     public String getHindiWord() {
         return dictionaryKey.hindiWord;
+    }
+
+    @Override
+    public DictionarySource getDictionarySource() {
+        return DictionarySource.WIKITIONARY;
     }
 }

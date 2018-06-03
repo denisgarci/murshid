@@ -72,7 +72,7 @@ public class FirstHindi2LastUrdusSplitHead {
                 ps.setInt(4, id);
                 ps.execute();
                 LOGGER.info("head={}", head);
-                LOGGER.info("canonicalWord={}, urdu={}, latin={}", hindi, urdu, latin);
+                LOGGER.info("hindiWordIndex={}, urdu={}, latin={}", hindi, urdu, latin);
 
                 i++;
 

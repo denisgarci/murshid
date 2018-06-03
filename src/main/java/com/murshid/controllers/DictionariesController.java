@@ -79,7 +79,7 @@ public class DictionariesController {
             Map<String, Map<String, String>> partial = canonicalWrappers.stream()
                     .collect(Collectors.toMap(CanonicalWrapper::getKey, a ->{
                         Map<String, String> body = new HashMap<>();
-                        body.put("dictionarySource", a.getDictionarySource().name());
+                        body.put("dictionarySourceTo", a.getDictionarySource().name());
                         body.put("meaning", a.getEntry().getMeaning());
                         //result.put("partOfSpeech", a.getEntry().getPartOfSpeech().name());
                         body.put("hindiWord", a.getEntry().getHindiWord());

@@ -44,7 +44,7 @@ public class WriteUrduWordsFromFile {
                     i++;
 
                     if (i % 20 == 0) {
-                        LOGGER.info("Writing canonicalWord={}", word);
+                        LOGGER.info("Writing hindiWordIndex={}", word);
                         con.commit();
                     }
 

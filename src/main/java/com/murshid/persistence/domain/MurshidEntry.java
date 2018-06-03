@@ -6,13 +6,13 @@ import com.murshid.models.enums.Accidence;
 import com.murshid.models.enums.DictionarySource;
 import com.murshid.models.enums.PartOfSpeech;
 import com.murshid.persistence.AccidenceColumnConverter;
-import com.murshid.services.HasDictionaryKey;
+import com.murshid.services.IDictionaryEntry;
 
 import javax.persistence.*;
 import java.util.List;
 
 @Entity(name = "murshid")
-public class MurshidEntry implements HasDictionaryKey{
+public class MurshidEntry implements IDictionaryEntry {
 
     @EmbeddedId
     private DictionaryKey dictionaryKey;
@@ -105,4 +105,8 @@ public class MurshidEntry implements HasDictionaryKey{
         return this.dictionaryKey.wordIndex;
     }
 
+    @Override
+    public DictionarySource getDictionarySource() {
+        return DictionarySource.MURSHID;
+    }
 }

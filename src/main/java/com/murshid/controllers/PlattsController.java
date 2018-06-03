@@ -11,6 +11,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
 import javax.inject.Inject;
+import java.util.Iterator;
 import java.util.List;
 
 @Controller
@@ -22,9 +23,31 @@ public class PlattsController {
 
     @GetMapping("/findAnywhere")
     public @ResponseBody
-    List<PlattsEntry> findInKeyAndBody(@RequestParam(name = "word") String word) {
+    List<PlattsEntry> findAnywhere(@RequestParam(name = "word") String word) {
         List list = Lists.newArrayList(plattsService.findAnywhere(word));
         return list;
+    }
+
+    //@GetMapping("/allSpaces")
+    public @ResponseBody
+    void allSpaces() {
+        Iterable<PlattsEntry> iterable = plattsService.findAll();
+        Iterator<PlattsEntry> iterator = iterable.iterator();
+        while(iterator.hasNext()){
+            PlattsEntry pe = iterator.next();
+            pe.setMeaning(pe.getMeaning().replace("\n", " ").replace("\r", " "));
+            if (pe.getExtraMeaning() != null) {
+                pe.setExtraMeaning(pe.getExtraMeaning().replace("\n", " ").replace("\r", " "));
+            }
+            plattsService.save(pe);
+        }
+    }
+
+
+    @GetMapping("/replaceNukta")
+    public @ResponseBody
+    List<PlattsEntry> replaceNukta() {
+        return plattsService.replaceNuktas();
     }
 
     @PostMapping
@@ -48,7 +71,7 @@ public class PlattsController {
             return false;
         } else {
             if (plattsEntry.getDictionaryKey().hindiWord == null) {
-                LOGGER.info("hindi canonicalWord cannot be null");
+                LOGGER.info("hindi hindiWordIndex cannot be null");
                 return false;
             }
         }

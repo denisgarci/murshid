@@ -59,15 +59,21 @@ export class SongsService {
     this.inflectedGeo = {};
     this.inflectedEntries = {};
 
-    song.word_list_master.forEach(entry => {
-      let wlm = entry as WordListInflected;
-      if (wlm.song_word_indices == null){
-        alert(wlm + " has no song_word_indexes")
-      }
-      wlm.song_word_indices.forEach(id => {
-        this.inflectedGeo[String(id)] = SongsService.buildInflectedKey(wlm.inflected_key);
-      })
-    });
+    if (song.word_list_master != null) {
+
+      song.word_list_master.forEach(entry => {
+        let wlm = entry as WordListInflected;
+        if (wlm.song_word_indices == null) {
+          alert(wlm + " has no song_word_indexes")
+        }
+        wlm.song_word_indices.forEach(id => {
+          this.inflectedGeo[String(id)] = SongsService.buildInflectedKey(wlm.inflected_key);
+        })
+      });
+
+    }else{
+      alert("No word_list_master found for song: " + song.title_latin);
+    }
 
     this.dictionaryEntriesInflected = JSON.parse(song.dictionary_entries_inflected);
     this.inflectedEntries = JSON.parse(song.inflected_entries);

@@ -41,7 +41,7 @@ export class DictionariescontainerComponent implements OnInit {
 
       let dictionaryEntriesInflected = this.songsService.dictionaryEntriesInflected;
       inflectedEntry.canonical_keys.forEach(ck => {
-        [].concat(...dictionaryEntriesInflected[ck]).forEach( de => dec.dictionary_entries_inflected.push(de));
+        dec.dictionary_entries_inflected.push(dictionaryEntriesInflected[ck]);
       });
 
 
@@ -56,7 +56,7 @@ export class DictionariescontainerComponent implements OnInit {
 
         let dictionaryEntriesNotInflected = this.songsService.dictionaryEntriesNotInflected;
         notInflectedEntry.canonical_keys.forEach(ck => {
-          [].concat(...dictionaryEntriesInflected[ck]).forEach( de => dec.dictionary_entries_not_inflected.push(de));
+          dec.dictionary_entries_not_inflected.push(dictionaryEntriesNotInflected[ck]);
         });
       }
 

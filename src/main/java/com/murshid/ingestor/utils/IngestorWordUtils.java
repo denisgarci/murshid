@@ -44,7 +44,7 @@ public class IngestorWordUtils {
 
     public static String stripLastWord(String original){
         String[] tokens = original.split(" ");
-        if (tokens.length < 2) throw new IllegalArgumentException("there is only one canonicalWord here");
+        if (tokens.length < 2) throw new IllegalArgumentException("there is only one hindiWordIndex here");
         String[] sansLast = Arrays.copyOfRange(tokens, 0, tokens.length - 1);
         return String.join(" ", sansLast);
     }

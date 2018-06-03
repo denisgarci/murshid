@@ -152,7 +152,7 @@ public class Inflected {
                 .append(getPartOfSpeech(), master.getPartOfSpeech())
                 .append(getAccidence(), master.getAccidence())
                 .append(getCanonicalKeys(), master.getCanonicalKeys())
-                .append(getInflectedHindiIndex(), master.getInflectedHindiIndex())
+                //.append(getInflectedHindiIndex(), master.getInflectedHindiIndex())
                 .isEquals();
     }
 
@@ -164,7 +164,7 @@ public class Inflected {
                 .append(getAccidence())
                 .append(getCanonicalKeys())
                 .append(getCanonicalHindi())
-                .append(getInflectedHindiIndex())
+                //.append(getInflectedHindiIndex())
                 .toHashCode();
     }
 

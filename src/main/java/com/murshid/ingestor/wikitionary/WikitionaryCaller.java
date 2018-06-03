@@ -26,9 +26,9 @@ public class WikitionaryCaller {
         //new PlattsCaller().invokeAll();
         WikitionaryCaller caller = new WikitionaryCaller();
 
-        //String canonicalWord = "हैकल";
+        //String hindiWordIndex = "हैकल";
         String word = "भेदभाव";
-        //String canonicalWord = "को";
+        //String hindiWordIndex = "को";
 
         URL url = caller.createUrlForWord(word);
 
@@ -43,7 +43,7 @@ public class WikitionaryCaller {
 
         String entity = response.readEntity(String.class);
         Document document = Jsoup.parse(entity);
-        //LOGGER.info("Wikitionary for {} is: {}", canonicalWord,  skEntry);
+        //LOGGER.info("Wikitionary for {} is: {}", hindiWordIndex,  skEntry);
     }
 
     public static Document documentForWord(WikitionaryCaller caller, String word) {
@@ -155,7 +155,7 @@ public class WikitionaryCaller {
             builder.setPath(relativePath);
             return builder.build().toURL();
         } catch (URISyntaxException | MalformedURLException e) {
-            String msg = String.format("Error creating URL for Wikitionary canonicalWord search parameter %s . The exception is %s ", word, e.getMessage());
+            String msg = String.format("Error creating URL for Wikitionary hindiWordIndex search parameter %s . The exception is %s ", word, e.getMessage());
             throw new RuntimeException(msg, e);
         }
     }

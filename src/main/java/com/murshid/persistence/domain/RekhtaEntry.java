@@ -3,12 +3,12 @@ package com.murshid.persistence.domain;
 import com.murshid.models.DictionaryKey;
 import com.murshid.models.enums.DictionarySource;
 import com.murshid.models.enums.PartOfSpeech;
-import com.murshid.services.HasDictionaryKey;
+import com.murshid.services.IDictionaryEntry;
 
 import javax.persistence.*;
 
 @Entity(name = "rekhta")
-public class RekhtaEntry implements HasDictionaryKey{
+public class RekhtaEntry implements IDictionaryEntry {
 
     @EmbeddedId
     private DictionaryKey dictionaryKey;
@@ -88,5 +88,10 @@ public class RekhtaEntry implements HasDictionaryKey{
     @Override
     public int getWordIndex() {
         return dictionaryKey.wordIndex;
+    }
+
+    @Override
+    public DictionarySource getDictionarySource() {
+        return DictionarySource.REKHTA;
     }
 }

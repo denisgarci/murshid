@@ -86,7 +86,7 @@ public class AnalysisBodyForHindiUrdu {
                 ps.setString(3, supposedLatin);
                 ps.setInt(4, id);
                 ps.execute();
-                LOGGER.info("canonicalWord={}, urdu={}, latin={}",  supposedHindi, supposedUrdu, supposedLatin);
+                LOGGER.info("hindiWordIndex={}, urdu={}, latin={}",  supposedHindi, supposedUrdu, supposedLatin);
 
                 i++;
 

@@ -28,5 +28,13 @@ public class DictionaryKey implements Serializable{
 
     }
 
+    public String getHindiWord() {
+        return hindiWord;
+    }
+
+    public int getWordIndex() {
+        return wordIndex;
+    }
+
 
 }

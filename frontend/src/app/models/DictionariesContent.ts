@@ -9,6 +9,6 @@ export class DictionariesContent {
   not_inflected_hindi: string;
   not_inflected_part_of_speech_label: string;
   inflected_part_of_speech_label: string;
-  dictionary_entries_inflected: DictionaryEntryInflected[];
-  dictionary_entries_not_inflected: DictionaryEntryNotInflected[];
+  dictionary_entries_inflected: DictionaryEntryInflected[][];
+  dictionary_entries_not_inflected: DictionaryEntryNotInflected[][];
 }

@@ -222,28 +222,28 @@ public class NotInflectedService {
                 case PLATTS:
                     Optional<PlattsEntry> plattsEntry = plattsService.findOne(dk);
                     if (!plattsEntry.isPresent()){
-                        LOGGER.info("the PLATTS canonical entry canonicalWord={} canonicalIndex={} indicated in NotInflected does not exist", master.getHindi(), master.getHindi());
+                        LOGGER.info("the PLATTS canonical entry hindiWordIndex={} hindiWordIndex={} indicated in NotInflected does not exist", master.getHindi(), master.getHindi());
                         return false;
                     }
                     break;
                 case MURSHID:
                     Optional<MurshidEntry> gonzaloEntry = murshidService.findOne(dk);
                     if (!gonzaloEntry.isPresent()){
-                        LOGGER.info("the MURSHID canonical entry canonicalWord={} canonicalIndex={} indicated in NotInflected does not exist", master.getHindi(), master.getHindiIndex());
+                        LOGGER.info("the MURSHID canonical entry hindiWordIndex={} hindiWordIndex={} indicated in NotInflected does not exist", master.getHindi(), master.getHindiIndex());
                         return false;
                     }
                     break;
                 case REKHTA:
                     Optional<RekhtaEntry> rekhtaEntry = rekhtaService.findOne(dk);
                     if (!rekhtaEntry.isPresent()){
-                        LOGGER.info("the REKHTA canonical entry canonicalWord={} canonicalIndex={} indicated in NotInflected does not exist", master.getHindi(), master.getHindiIndex());
+                        LOGGER.info("the REKHTA canonical entry hindiWordIndex={} hindiWordIndex={} indicated in NotInflected does not exist", master.getHindi(), master.getHindiIndex());
                         return false;
                     }
                     break;
                 case WIKITIONARY:
                     Optional<WikitionaryEntry> wikitionaryEntry = wikitionaryService.findOne(dk);
                     if (!wikitionaryEntry.isPresent()){
-                        LOGGER.info("the WIKITIONARY canonical entry canonicalWord={} canonicalIndex={} indicated in NotInflected does not exist", master.getHindi(), master.getHindiIndex());
+                        LOGGER.info("the WIKITIONARY canonical entry hindiWordIndex={} hindiWordIndex={} indicated in NotInflected does not exist", master.getHindi(), master.getHindiIndex());
                         return false;
                     }
                     break;

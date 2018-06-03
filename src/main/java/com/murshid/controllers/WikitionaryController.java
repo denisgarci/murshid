@@ -29,7 +29,7 @@ public class WikitionaryController {
     public String processWord(@RequestParam(name = "hindiWord") String hindiWord) {
         WikitionaryCaller wikitionaryCaller = new WikitionaryCaller();
         wikitionaryWordProcessor.processWord(wikitionaryCaller, hindiWord);
-        LOGGER.info("received canonicalWord " + hindiWord);
+        LOGGER.info("received hindiWordIndex " + hindiWord);
         return "processWord/" + hindiWord;
     }
 

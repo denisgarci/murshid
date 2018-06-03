@@ -33,7 +33,7 @@ public class ExtractAccidenceClasses {
 
 
             Statement select = con.createStatement();
-            //rs = select.executeQuery("SELECT canonicalWord from hindi_words where canonicalWord >= 'उभय' ");
+            //rs = select.executeQuery("SELECT hindiWordIndex from hindi_words where hindiWordIndex >= 'उभय' ");
             rs = select.executeQuery("SELECT word from hindi_words where word >= 'आया' ");
 
             int i = 0;
@@ -41,19 +41,19 @@ public class ExtractAccidenceClasses {
                 String word = null;
                 try {
 
-                     word = rs.getString("canonicalWord");
+                     word = rs.getString("hindiWordIndex");
 
                     if (Arrays.binarySearch(problematic, word) > -1)
                         continue;
 
-                    LOGGER.info("canonicalWord is " + word);
+                    LOGGER.info("hindiWordIndex is " + word);
 
                     WikitionaryCaller caller = new WikitionaryCaller();
                     org.jsoup.nodes.Document document = WikitionaryCaller.documentForWord(caller, word);
 
                     WikiUtils.populateEntry(word, document);
                 }catch (Exception ex){
-                    FILE_LOGGER.error("canonicalWord={} failed ", word,  ex);
+                    FILE_LOGGER.error("hindiWordIndex={} failed ", word,  ex);
                 }
 
             }

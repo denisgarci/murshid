@@ -58,7 +58,7 @@ public class ExtractHindiLemmas {
                     Elements lis = cg.selectFirst("ul").select("li");
                     lis.forEach(li -> {
                         String word = li.selectFirst("a").wholeText();
-                        LOGGER.info("canonicalWord =" + word);
+                        LOGGER.info("hindiWordIndex =" + word);
                         insertIfNotPresent(word, select, insert);
                     });
                 });
@@ -100,7 +100,7 @@ public class ExtractHindiLemmas {
                 insert.setInt(2, 3);
                 insert.setString(3, word.substring(0, 1));
                 insert.execute();
-                LOGGER.info("inserted canonicalWord={}", word);
+                LOGGER.info("inserted hindiWordIndex={}", word);
             }
         }catch (SQLException ex){
             LOGGER.error("error in insertIfNotPresent", ex);

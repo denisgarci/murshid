@@ -10,7 +10,6 @@ public enum Accidence {
     INDICATIVE("indicative"), SUBJUNCTIVE("subjunctive"), CONDITIONAL("conditional"), IMPERATIVE("imperative"), PRESUMPTIVE("presumptive"),
     NON_ASPECTUAL("non aspectual"), HABITUAL("habitual"), CONTINUOUS("continuous"), PERFECTIVE("perfective"), IMPERFECTIVE("imperfective"),
     FACTUAL("factual"), CONTRAFACTUAL("contrafactual"),
-    ABSOLUTIVE("absolutive"),
     LONG_FORM("long form"),
     VERB_ROOT("Verb root");
 

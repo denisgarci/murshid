@@ -157,6 +157,20 @@ public class Inflected {
     }
 
     @Override
+    public String toString() {
+        return "Inflected{" +
+                "inflectedHindi='" + inflectedHindi + '\'' +
+                ", inflectedUrdu='" + inflectedUrdu + '\'' +
+                ", inflectedHindiIndex=" + inflectedHindiIndex +
+                ", partOfSpeech=" + partOfSpeech +
+                ", canonicalHindi='" + canonicalHindi + '\'' +
+                ", canonicalUrdu='" + canonicalUrdu + '\'' +
+                ", accidence=" + accidence +
+                ", canonicalKeys=" + canonicalKeys +
+                '}';
+    }
+
+    @Override
     public int hashCode() {
         return new HashCodeBuilder(17, 37)
                 .append(getInflectedHindi())

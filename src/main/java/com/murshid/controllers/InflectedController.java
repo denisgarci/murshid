@@ -80,6 +80,42 @@ public class InflectedController {
         }
     }
 
+    @PostMapping("/insertAllVerbsWithExplode")
+    public ResponseEntity<String> insertAllverbsWithExplode(@RequestBody Inflected inflected) {
+
+        if (!inflectedService.isInfinitiveMasculineSingularDirect(inflected)){
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
+        }
+
+        complementCanonicalKeys(inflected);
+
+        if (!inflectedService.isValid(inflected)) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
+        }
+
+        List<Inflected> explodedVerbs = inflectedService.explodeAllVerbs(inflected);
+
+        //first validate them all
+        for (Inflected master: explodedVerbs) {
+            if (!inflectedService.isValid(master)) {
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
+            }
+        }
+
+        //then check if any of them is already in inflected
+        boolean someExist = inflectedService.duplicatesInflected(inflected.getCanonicalHindi(), explodedVerbs);
+        if (someExist){
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
+        }
+
+        boolean wroteAll = inflectedService.writeSeveralWithSuggestedIndexes(explodedVerbs);
+        if (!wroteAll) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
+
+        return ResponseEntity.status(HttpStatus.CREATED).build();
+    }
+
     @PostMapping("/insertNewWithExplode")
     public ResponseEntity<String> insertNewWithExplode(@RequestBody Inflected inflected) {
         complementCanonicalKeys(inflected);
@@ -97,12 +133,9 @@ public class InflectedController {
         }
 
         //then write
-        for (Inflected inflectedEntry: exploded) {
-            inflectedEntry.setInflectedHindiIndex(inflectedService.suggestNewIndex(inflectedEntry.getInflectedHindi()));
-            boolean success = inflectedService.save(inflectedEntry);
-            if (!success) {
+        boolean wroteAll = inflectedService.writeSeveralWithSuggestedIndexes(exploded);
+        if (!wroteAll) {
                 return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
-            }
         }
 
         return ResponseEntity.status(HttpStatus.CREATED).build();

@@ -1,9 +1,13 @@
 package com.murshid.utils;
 
+import com.google.common.annotations.VisibleForTesting;
 import com.google.common.collect.Sets;
+import com.google.common.io.CharStreams;
+import org.antlr.v4.runtime.CharStream;
 
 import java.util.Arrays;
 import java.util.Set;
+import java.util.stream.IntStream;
 
 public class WordUtils {
 
@@ -20,6 +24,23 @@ public class WordUtils {
             '\u0950', '\u0953', '\u0954', '\u0955', '\u0940'
     };
 
+    private static char[] vowels = { 'अ','आ', 'ा',  'ई' , 'ी',  'इ', 'ि',   'उ', 'ु', 'ऊ', 'ू',
+            'ऋ', 'ए', 'े', 'ऐ', 'ै',  'ओ', 'ो', 'औ', 'ौ' };
+
+    @VisibleForTesting
+    protected static String removeNasalizationFromRoot(String root){
+        if (root.endsWith("ं") || root.endsWith("ँ")){
+            return root.substring(0, root.length()-1);
+        }else{
+            return root;
+        }
+    }
+
+    public static boolean endsWithVowel(String word){
+        char last = word.charAt(word.length()-1);
+        String allVowels = new String(vowels);
+        return allVowels.indexOf(last) > -1;
+    }
 
     public static String replaceAnusvaara(String original){
         char[] chars = original.toCharArray();

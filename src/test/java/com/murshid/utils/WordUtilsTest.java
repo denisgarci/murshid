@@ -33,8 +33,7 @@ public class WordUtilsTest {
 
     @Test
     public void explodeHehs() throws Exception {
-
-        //iniciales
+        //initials
         String hogaWithHehGoal = "ہوگا";
         String hogaWithHehDoachsmee = "ھوگا";
         Set<String> exploded = WordUtils.explodeHehs(hogaWithHehGoal);
@@ -45,9 +44,33 @@ public class WordUtilsTest {
         String huinWithGeDoChashmee = "هونیں";
         exploded = WordUtils.explodeHehs(huinWithGeDoChashmee);
         assertTrue(exploded.contains(huinWithGoal));
-
-
     }
+
+    @Test
+    public void removeNasalizationFromRoot()  {
+        assertEquals(WordUtils.removeNasalizationFromRoot("बोलूं"), "बोलू");
+        assertEquals(WordUtils.removeNasalizationFromRoot("बोलूँ"), "बोलू");
+
+        assertEquals(WordUtils.removeNasalizationFromRoot("कर"), "कर");
+    }
+
+    @Test
+    public void endsWithVowel()  {
+        //because it is nasalized, it "doesn't " end with vowel (but with nasalization)
+        assertFalse(WordUtils.endsWithVowel("बोलूं"));
+
+        assertFalse(WordUtils.endsWithVowel("कर"));
+        assertFalse(WordUtils.endsWithVowel("बोल"));
+
+
+        assertTrue(WordUtils.endsWithVowel("करना"));
+        assertTrue(WordUtils.endsWithVowel("होने"));
+        assertTrue(WordUtils.endsWithVowel("तू"));
+        assertTrue(WordUtils.endsWithVowel("तू"));
+        assertTrue(WordUtils.endsWithVowel("जो"));
+        assertTrue(WordUtils.endsWithVowel("हिन्दुओ"));
+    }
+
 
 
 

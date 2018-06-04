@@ -8,6 +8,7 @@ import com.murshid.dynamo.domain.Inflected;
 import com.murshid.dynamo.domain.Song;
 import com.murshid.dynamo.repo.SongRepository;
 import com.murshid.models.converters.DynamoAccessor;
+import com.murshid.models.enums.Accidence;
 import com.murshid.services.InflectedService;
 import com.murshid.services.SongsService;
 import com.murshid.services.WikitionaryLetterIngestor;
@@ -31,7 +32,8 @@ public class MurshidApplication {
 	public static void main(String[] args) throws Exception{
 		context = SpringApplication.run(MurshidApplication.class, args);
 
-       //getAll();
+//       List<Inflected> allInflected = getAll();
+
 
 
 	}
@@ -42,11 +44,12 @@ public class MurshidApplication {
         LOGGER.info("finished generating spans");
     }
 
-    private static void getAll() throws InterruptedException{
+    private static List<Inflected> getAll() throws InterruptedException{
         InflectedService inflectedService = context.getBean(InflectedService.class);
         List<Inflected> allInflected = inflectedService.getAll();
-        allInflected.forEach(in -> inflectedService.save(in));
-        LOGGER.info("finished saving");
+        //allInflected.forEach(in -> inflectedService.save(in));
+        //LOGGER.info("finished saving");
+        return allInflected;
     }
 
     private static void validateAll() throws InterruptedException{

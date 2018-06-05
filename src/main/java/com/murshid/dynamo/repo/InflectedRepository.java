@@ -59,4 +59,12 @@ public class InflectedRepository {
         table.putItem(item);
     }
 
+    public void delete(Inflected master){
+        Table table = DynamoAccessor.dynamoDB.getTable("inflected");
+        PrimaryKey primaryKey = new PrimaryKey().addComponent("inflected_hindi", master.getInflectedHindi())
+                .addComponent("inflected_hindi_index", master.getInflectedHindiIndex());
+        table.deleteItem(primaryKey);
+    }
+
+
 }

@@ -59,6 +59,10 @@ public class InflectedService {
         return true;
     }
 
+    public void delete(Inflected inflected){
+        inflectedRepository.delete(inflected);
+    }
+
     /**
      * true if the POS indicated in Master can refer to the POS indicated in the respective disctionarr tables.
      * For example, a participle can refer to a dictionary verb.
@@ -181,7 +185,6 @@ public class InflectedService {
         target.getAccidence().addAll(addAccidences);
         target.setInflectedHindi(inflectedHindi);
         target.setInflectedHindiIndex(suggestNewIndex(inflectedHindi));
-        target.setCanonicalUrdu(spellCheckService.getUrduSpelling(inflectedHindi));
         return target;
     }
 
@@ -288,7 +291,7 @@ public class InflectedService {
 
         //verbal nouns
         {
-            Inflected verbalNoun = clone(infinitive, Lists.newArrayList(), Lists.newArrayList(), 2, "नेवाला");
+            Inflected verbalNoun = clone(infinitive, Lists.newArrayList(), Lists.newArrayList(), 2, "ने वाला");
             verbalNoun.setPartOfSpeech(PartOfSpeech.VERBAL_NOUN);
             result.add(verbalNoun);
             result.addAll(participlesInAA(verbalNoun));
@@ -735,20 +738,10 @@ public class InflectedService {
     }
 
     /**
-     * True if some of the proposed inflected, that I want to write in Dynamos'inflected,
-     * are already in the database
+     * True if there are inflected for that hindi Canonical word
      */
-    public boolean duplicatesInflected(String canonicalWord, List<Inflected> exploded){
-        Set<Inflected> explodedSet = Sets.newHashSet(exploded);
-        Set<Inflected> inflectedSetInRepo = Sets.newHashSet(findByCanonicalWord(canonicalWord));
-
-        Set<Inflected> intersection = Sets.intersection(explodedSet, inflectedSetInRepo);
-        if (!intersection.isEmpty()){
-            LOGGER.info("some of the proposed, exploded Inflected are already in the database ");
-            intersection.forEach(in -> LOGGER.info(in.toString()));
-            return true;
-        }
-        return false;
+    public boolean thereAreInflected(String canonicalWord){
+        return !findByCanonicalWord(canonicalWord).isEmpty();
     }
 
     public List<Inflected> findByCanonicalWord(@Nonnull String canonicalWord) {
@@ -771,8 +764,8 @@ public class InflectedService {
 
     public boolean save(Inflected master){
         try {
-            master.setInflectedUrdu(spellCheckService.getUrduSpelling(master.getInflectedHindi()));
-            master.setCanonicalUrdu(spellCheckService.getUrduSpelling(master.getCanonicalHindi()));
+            master.setInflectedUrdu(spellCheckService.passMultipleWordsToUrdu(master.getInflectedHindi()));
+            master.setCanonicalUrdu(spellCheckService.passMultipleWordsToUrdu(master.getCanonicalHindi()));
 
             inflectedRepository.save(master);
         }catch (RuntimeException ex){
@@ -861,8 +854,8 @@ public class InflectedService {
             return false;
         }
 
-        if (!spellCheckService.exists(inflected.getInflectedHindi())){
-            LOGGER.info("the inflected hindi word {} does not exists in spell_check ", inflected.getInflectedHindi());
+        if (!spellCheckService.wordsExist(inflected.getInflectedHindi())){
+            LOGGER.info("the inflected hindi words {} do not exist in spell_check ", inflected.getInflectedHindi());
             return false;
         }
 

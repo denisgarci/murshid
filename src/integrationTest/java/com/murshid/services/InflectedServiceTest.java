@@ -202,22 +202,22 @@ public class InflectedServiceTest {
 
     private List<Inflected> verbalNouns(){
         return Lists.newArrayList(
-                new Inflected().setCanonicalHindi(bolnã).setCanonicalKeys(canonicalKeysBolnã).setInflectedHindi("बोलनेवाला").setPartOfSpeech(PartOfSpeech.VERBAL_NOUN)
+                new Inflected().setCanonicalHindi(bolnã).setCanonicalKeys(canonicalKeysBolnã).setInflectedHindi("बोलने वाला").setPartOfSpeech(PartOfSpeech.VERBAL_NOUN)
                         .setAccidence(Sets.newHashSet(Accidence.MASCULINE, Accidence.DIRECT, Accidence.SINGULAR)),
-                new Inflected().setCanonicalHindi(bolnã).setCanonicalKeys(canonicalKeysBolnã).setInflectedHindi("बोलनेवाले").setPartOfSpeech(PartOfSpeech.VERBAL_NOUN)
+                new Inflected().setCanonicalHindi(bolnã).setCanonicalKeys(canonicalKeysBolnã).setInflectedHindi("बोलने वाले").setPartOfSpeech(PartOfSpeech.VERBAL_NOUN)
                         .setAccidence(Sets.newHashSet(Accidence.MASCULINE, Accidence.OBLIQUE, Accidence.SINGULAR)),
-                new Inflected().setCanonicalHindi(bolnã).setCanonicalKeys(canonicalKeysBolnã).setInflectedHindi("बोलनेवाले").setPartOfSpeech(PartOfSpeech.VERBAL_NOUN)
+                new Inflected().setCanonicalHindi(bolnã).setCanonicalKeys(canonicalKeysBolnã).setInflectedHindi("बोलने वाले").setPartOfSpeech(PartOfSpeech.VERBAL_NOUN)
                         .setAccidence(Sets.newHashSet(Accidence.MASCULINE, Accidence.DIRECT, Accidence.PLURAL)),
-                new Inflected().setCanonicalHindi(bolnã).setCanonicalKeys(canonicalKeysBolnã).setInflectedHindi("बोलनेवाले").setPartOfSpeech(PartOfSpeech.VERBAL_NOUN)
+                new Inflected().setCanonicalHindi(bolnã).setCanonicalKeys(canonicalKeysBolnã).setInflectedHindi("बोलने वाले").setPartOfSpeech(PartOfSpeech.VERBAL_NOUN)
                         .setAccidence(Sets.newHashSet(Accidence.MASCULINE, Accidence.OBLIQUE, Accidence.PLURAL)),
 
-                new Inflected().setCanonicalHindi(bolnã).setCanonicalKeys(canonicalKeysBolnã).setInflectedHindi("बोलनेवाली").setPartOfSpeech(PartOfSpeech.VERBAL_NOUN)
+                new Inflected().setCanonicalHindi(bolnã).setCanonicalKeys(canonicalKeysBolnã).setInflectedHindi("बोलने वाली").setPartOfSpeech(PartOfSpeech.VERBAL_NOUN)
                         .setAccidence(Sets.newHashSet(Accidence.FEMININE, Accidence.DIRECT, Accidence.SINGULAR)),
-                new Inflected().setCanonicalHindi(bolnã).setCanonicalKeys(canonicalKeysBolnã).setInflectedHindi("बोलनेवालीं").setPartOfSpeech(PartOfSpeech.VERBAL_NOUN)
+                new Inflected().setCanonicalHindi(bolnã).setCanonicalKeys(canonicalKeysBolnã).setInflectedHindi("बोलने वालीं").setPartOfSpeech(PartOfSpeech.VERBAL_NOUN)
                         .setAccidence(Sets.newHashSet(Accidence.FEMININE, Accidence.OBLIQUE, Accidence.SINGULAR)),
-                new Inflected().setCanonicalHindi(bolnã).setCanonicalKeys(canonicalKeysBolnã).setInflectedHindi("बोलनेवालीं").setPartOfSpeech(PartOfSpeech.VERBAL_NOUN)
+                new Inflected().setCanonicalHindi(bolnã).setCanonicalKeys(canonicalKeysBolnã).setInflectedHindi("बोलने वालीं").setPartOfSpeech(PartOfSpeech.VERBAL_NOUN)
                         .setAccidence(Sets.newHashSet(Accidence.FEMININE, Accidence.DIRECT, Accidence.PLURAL)),
-                new Inflected().setCanonicalHindi(bolnã).setCanonicalKeys(canonicalKeysBolnã).setInflectedHindi("बोलनेवालीं").setPartOfSpeech(PartOfSpeech.VERBAL_NOUN)
+                new Inflected().setCanonicalHindi(bolnã).setCanonicalKeys(canonicalKeysBolnã).setInflectedHindi("बोलने वालीं").setPartOfSpeech(PartOfSpeech.VERBAL_NOUN)
                         .setAccidence(Sets.newHashSet(Accidence.FEMININE, Accidence.OBLIQUE, Accidence.PLURAL))
         );
     }

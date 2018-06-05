@@ -81,19 +81,19 @@ public class InflectedController {
     }
 
     @PostMapping("/insertAllVerbsWithExplode")
-    public ResponseEntity<String> insertAllverbsWithExplode(@RequestBody Inflected inflected) {
+    public ResponseEntity<String> insertAllverbsWithExplode(@RequestBody Inflected infinitive) {
 
-        if (!inflectedService.isInfinitiveMasculineSingularDirect(inflected)){
+        if (!inflectedService.isInfinitiveMasculineSingularDirect(infinitive)){
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
         }
 
-        complementCanonicalKeys(inflected);
+        complementCanonicalKeys(infinitive);
 
-        if (!inflectedService.isValid(inflected)) {
+        if (!inflectedService.isValid(infinitive)) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
         }
 
-        List<Inflected> explodedVerbs = inflectedService.explodeAllVerbs(inflected);
+        List<Inflected> explodedVerbs = inflectedService.explodeAllVerbs(infinitive);
 
         //first validate them all
         for (Inflected master: explodedVerbs) {
@@ -103,8 +103,9 @@ public class InflectedController {
         }
 
         //then check if any of them is already in inflected
-        boolean someExist = inflectedService.duplicatesInflected(inflected.getCanonicalHindi(), explodedVerbs);
+        boolean someExist = inflectedService.thereAreInflected(infinitive.getCanonicalHindi());
         if (someExist){
+            LOGGER.info("there are already inflected for the canonical hindi word {}. Nothing will be written", infinitive.getCanonicalHindi());
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
         }
 

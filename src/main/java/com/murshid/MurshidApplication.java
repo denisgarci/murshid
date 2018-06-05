@@ -9,6 +9,7 @@ import com.murshid.dynamo.domain.Song;
 import com.murshid.dynamo.repo.SongRepository;
 import com.murshid.models.converters.DynamoAccessor;
 import com.murshid.models.enums.Accidence;
+import com.murshid.models.enums.PartOfSpeech;
 import com.murshid.services.InflectedService;
 import com.murshid.services.SongsService;
 import com.murshid.services.WikitionaryLetterIngestor;
@@ -18,6 +19,7 @@ import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.ConfigurableApplicationContext;
 
+import javax.persistence.criteria.CriteriaBuilder;
 import java.util.List;
 import java.util.Set;
 
@@ -32,7 +34,7 @@ public class MurshidApplication {
 	public static void main(String[] args) throws Exception{
 		context = SpringApplication.run(MurshidApplication.class, args);
 
-//       List<Inflected> allInflected = getAll();
+       //List<Inflected> allInflected = getAll();
 
 
 
@@ -46,11 +48,37 @@ public class MurshidApplication {
 
     private static List<Inflected> getAll() throws InterruptedException{
         InflectedService inflectedService = context.getBean(InflectedService.class);
-        List<Inflected> allInflected = inflectedService.getAll();
+        try{
+            List<Inflected> allInflected = inflectedService.getAll();
+            for (Inflected inflected : allInflected){
+//                    if (inflected.getAccidence()!= null && inflected.getAccidence().contains(Accidence.ABSOLUTIVE)) {
+//                        inflected.getAccidence().remove(Accidence.ABSOLUTIVE);
+//                        inflected.setPartOfSpeech(PartOfSpeech.VERB);
+//                    }
+//                    inflectedService.save(inflected);
+            }
+        }catch (Exception ex){
+            ex.printStackTrace();
+        }
+
+
         //allInflected.forEach(in -> inflectedService.save(in));
-        //LOGGER.info("finished saving");
-        return allInflected;
+        LOGGER.info("finished deleting");
+        return null;
     }
+
+//    private static List<Inflected> getAll() throws InterruptedException{
+//        InflectedService inflectedService = context.getBean(InflectedService.class);
+//        List<Inflected> allInflected = inflectedService.getAll();
+//        for (Inflected inflected : allInflected){
+//            if (inflected.getCanonicalHindi().equals("चाहना"))
+//            inflectedService.delete(inflected);
+//        }
+//
+//        //allInflected.forEach(in -> inflectedService.save(in));
+//        LOGGER.info("finished deleting");
+//        return allInflected;
+//    }
 
     private static void validateAll() throws InterruptedException{
         InflectedService masterService = context.getBean(InflectedService.class);

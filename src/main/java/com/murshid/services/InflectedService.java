@@ -205,7 +205,7 @@ public class InflectedService {
             result.add(clone(origin, Lists.newArrayList(Accidence._1ST), Lists.newArrayList(Accidence._3RD), 2, "ए"));
             result.add(clone(origin, Lists.newArrayList(Accidence.SINGULAR), Lists.newArrayList(Accidence.PLURAL), 2, "एँ"));
             result.add(clone(origin, Lists.newArrayList(Accidence.SINGULAR, Accidence._1ST), Lists.newArrayList(Accidence.PLURAL, Accidence._3RD), 2, "एँ"));
-            result.add(clone(origin, Lists.newArrayList(Accidence.SINGULAR, Accidence._1ST), Lists.newArrayList(Accidence.PLURAL, Accidence._2ND), 2, "ऒ"));
+            result.add(clone(origin, Lists.newArrayList(Accidence.SINGULAR, Accidence._1ST), Lists.newArrayList(Accidence.PLURAL, Accidence._2ND), 2, "ओ"));
         }else {
             result.add(clone(origin, Lists.newArrayList(Accidence._1ST), Lists.newArrayList(Accidence._2ND), 2, "े"));
             result.add(clone(origin, Lists.newArrayList(Accidence._1ST), Lists.newArrayList(Accidence._3RD), 2, "े"));
@@ -519,8 +519,8 @@ public class InflectedService {
 
             result.addAll(explodeFemininesInII(origin));
 
-        } else if (origin.getPartOfSpeech() == PartOfSpeech.VERB  && origin.getAccidence().containsAll(Lists.newArrayList(Accidence._1ST, Accidence.SINGULAR, Accidence.SUBJUNCTIVE)) && (hindiWord.endsWith("ूँ")) ){
-            result.addAll(explodeSubjunctive(origin));
+        } else if (origin.getPartOfSpeech() == PartOfSpeech.VERB  && origin.getAccidence().containsAll(Lists.newArrayList(Accidence._1ST, Accidence.SINGULAR, Accidence.SUBJUNCTIVE)) && (hindiWord.endsWith("ूँ") || hindiWord.endsWith("ऊँ")) ){
+            result.addAll(  explodeSubjunctive(origin));
         } else if (origin.getPartOfSpeech() == PartOfSpeech.ADJECTIVE && isMasculineSingularDirect(origin) && !origin.getInflectedHindi().endsWith("ा")){
             result.addAll(explodeAsInvariableMascFem(origin));
         }else if (origin.getPartOfSpeech() == PartOfSpeech.POSTPOSITION && isMasculineSingularDirect(origin)){

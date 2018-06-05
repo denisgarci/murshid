@@ -29,6 +29,11 @@ export class DictionariescontainerComponent implements OnInit {
 
       let inflectedEntry = this.songsService.inflectedEntries[inflectedKey];
 
+      if (inflectedEntry == null){
+        alert("no inflected entry found for key " + inflectedKey);
+        return;
+      }
+
       dec.canonical_hindi = inflectedEntry.canonical_hindi;
       dec.inflected_hindi = inflectedEntry.inflected_hindi;
       dec.accidence = inflectedEntry.accidence;

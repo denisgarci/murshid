@@ -1,11 +1,14 @@
 package com.murshid.utils;
 
 import com.google.common.annotations.VisibleForTesting;
+import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 import com.google.common.io.CharStreams;
+import com.murshid.persistence.domain.PlattsEntry;
 import org.antlr.v4.runtime.CharStream;
 
 import java.util.Arrays;
+import java.util.List;
 import java.util.Set;
 import java.util.stream.IntStream;
 
@@ -42,7 +45,15 @@ public class WordUtils {
         return allVowels.indexOf(last) > -1;
     }
 
-    public static String replaceAnusvaara(String original){
+    public static String KA_NUKTA = new String(new char[]{0x915, 0x93C});
+    public static String QA = new String(new char[]{0x958});
+
+    public static String replace2CharsWithNukta(String original) {
+        return original.replace(KA_NUKTA, QA);
+    }
+
+
+        public static String replaceAnusvaara(String original){
         char[] chars = original.toCharArray();
         boolean changed = false;
         for (int i=0; i< chars.length; i++){

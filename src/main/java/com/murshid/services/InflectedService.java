@@ -4,6 +4,7 @@ import com.amazonaws.services.dynamodbv2.document.Item;
 import com.amazonaws.services.dynamodbv2.model.AttributeValue;
 import com.amazonaws.services.dynamodbv2.model.ScanRequest;
 import com.amazonaws.services.dynamodbv2.model.ScanResult;
+import com.google.common.base.Preconditions;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 import com.google.gson.Gson;
@@ -380,6 +381,51 @@ public class InflectedService {
 
     }
 
+    private List<Inflected> futures(Inflected origin){
+        String inflectedHindi = origin.getInflectedHindi();
+        Preconditions.checkArgument(inflectedHindi.endsWith("ूँगा") || inflectedHindi.endsWith("ऊँगा"));
+        List<Inflected> result = Lists.newArrayList();
+
+        boolean rootInVowel = !origin.getInflectedHindi().endsWith("ूँगा");
+        Inflected futureRootMasc = clone(origin, Lists.newArrayList(Accidence.DIRECT, Accidence.SINGULAR, Accidence._1ST), Lists.newArrayList(), 4, "");
+        if (!rootInVowel) {
+            result.add(clone(futureRootMasc, Lists.newArrayList(), Lists.newArrayList(Accidence.SINGULAR, Accidence._1ST), 0, "ूँगा"));
+            result.add(clone(futureRootMasc, Lists.newArrayList(), Lists.newArrayList(Accidence.SINGULAR, Accidence._2ND), 0, "ेगा"));
+            result.add(clone(futureRootMasc, Lists.newArrayList(), Lists.newArrayList(Accidence.SINGULAR, Accidence._3RD), 0, "ेगा"));
+            result.add(clone(futureRootMasc, Lists.newArrayList(), Lists.newArrayList(Accidence.PLURAL, Accidence._1ST), 0, "ेंगे"));
+            result.add(clone(futureRootMasc, Lists.newArrayList(), Lists.newArrayList(Accidence.PLURAL, Accidence._2ND), 0, "ोगे"));
+            result.add(clone(futureRootMasc, Lists.newArrayList(), Lists.newArrayList(Accidence.PLURAL, Accidence._3RD), 0, "ेंगे"));
+        }else{
+            result.add(clone(futureRootMasc, Lists.newArrayList(), Lists.newArrayList(Accidence.SINGULAR, Accidence._1ST), 0, "ऊँगा"));
+            result.add(clone(futureRootMasc, Lists.newArrayList(), Lists.newArrayList(Accidence.SINGULAR, Accidence._2ND), 0, "एगा"));
+            result.add(clone(futureRootMasc, Lists.newArrayList(), Lists.newArrayList(Accidence.SINGULAR, Accidence._3RD), 0, "एगा"));
+            result.add(clone(futureRootMasc, Lists.newArrayList(), Lists.newArrayList(Accidence.PLURAL, Accidence._1ST), 0, "एँगे"));
+            result.add(clone(futureRootMasc, Lists.newArrayList(), Lists.newArrayList(Accidence.PLURAL, Accidence._2ND), 0, "ओगे"));
+            result.add(clone(futureRootMasc, Lists.newArrayList(), Lists.newArrayList(Accidence.PLURAL, Accidence._3RD), 0, "एँगे"));
+        }
+
+        Inflected futureRootFem = clone(origin, Lists.newArrayList(Accidence.DIRECT, Accidence.SINGULAR, Accidence.MASCULINE, Accidence._1ST), Lists.newArrayList(Accidence.FEMININE), 4, "");
+        futureRootFem.setPartOfSpeech(PartOfSpeech.VERB);
+        if (!WordUtils.endsWithVowel(futureRootFem.getInflectedHindi())) {
+            result.add(clone(futureRootFem, Lists.newArrayList(), Lists.newArrayList(Accidence.SINGULAR, Accidence._1ST), 0, "ूँगी"));
+            result.add(clone(futureRootFem, Lists.newArrayList(), Lists.newArrayList(Accidence.SINGULAR, Accidence._2ND), 0, "ेगी"));
+            result.add(clone(futureRootFem, Lists.newArrayList(), Lists.newArrayList(Accidence.SINGULAR, Accidence._3RD), 0, "ेगी"));
+            result.add(clone(futureRootFem, Lists.newArrayList(), Lists.newArrayList(Accidence.PLURAL, Accidence._1ST), 0, "ेंगी"));
+            result.add(clone(futureRootFem, Lists.newArrayList(), Lists.newArrayList(Accidence.PLURAL, Accidence._2ND), 0, "ोगी"));
+            result.add(clone(futureRootFem, Lists.newArrayList(), Lists.newArrayList(Accidence.PLURAL, Accidence._3RD), 0, "ेंगी"));
+        }else{
+            result.add(clone(futureRootFem, Lists.newArrayList(), Lists.newArrayList(Accidence.SINGULAR, Accidence._1ST), 0, "ऊँगी"));
+            result.add(clone(futureRootFem, Lists.newArrayList(), Lists.newArrayList(Accidence.SINGULAR, Accidence._2ND), 0, "एगी"));
+            result.add(clone(futureRootFem, Lists.newArrayList(), Lists.newArrayList(Accidence.SINGULAR, Accidence._3RD), 0, "एगी"));
+            result.add(clone(futureRootFem, Lists.newArrayList(), Lists.newArrayList(Accidence.PLURAL, Accidence._1ST), 0, "एँगी"));
+            result.add(clone(futureRootFem, Lists.newArrayList(), Lists.newArrayList(Accidence.PLURAL, Accidence._2ND), 0, "ओगी"));
+            result.add(clone(futureRootFem, Lists.newArrayList(), Lists.newArrayList(Accidence.PLURAL, Accidence._3RD), 0, "एँगी"));
+        }
+
+        return result;
+
+    }
+
     /**
      * Explodes a masc. sing. direct form into the 11 remaining inflected forms for a participle or infinitive
      * @param origin        the original form
@@ -521,6 +567,8 @@ public class InflectedService {
 
         } else if (origin.getPartOfSpeech() == PartOfSpeech.VERB  && origin.getAccidence().containsAll(Lists.newArrayList(Accidence._1ST, Accidence.SINGULAR, Accidence.SUBJUNCTIVE)) && (hindiWord.endsWith("ूँ") || hindiWord.endsWith("ऊँ")) ){
             result.addAll(  explodeSubjunctive(origin));
+        } else if (origin.getPartOfSpeech() == PartOfSpeech.VERB  && origin.getAccidence().containsAll(Lists.newArrayList(Accidence._1ST, Accidence.SINGULAR, Accidence.FUTURE, Accidence.MASCULINE)) && (hindiWord.endsWith("ूँगा") || hindiWord.endsWith("ऊँगा")) ){
+            result.addAll(  futures(origin));
         } else if (origin.getPartOfSpeech() == PartOfSpeech.ADJECTIVE && isMasculineSingularDirect(origin) && !origin.getInflectedHindi().endsWith("ा")){
             result.addAll(explodeAsInvariableMascFem(origin));
         }else if (origin.getPartOfSpeech() == PartOfSpeech.POSTPOSITION && isMasculineSingularDirect(origin)){
@@ -859,10 +907,6 @@ public class InflectedService {
             return false;
         }
 
-        if (inflected.getPartOfSpeech() == null) {
-            LOGGER.info("part of speech cannot be null");
-            return false;
-        }
 
         if (!validateCanonicalKeys(inflected)){
             LOGGER.info("some of the canonical keys are not present or incorrect");
@@ -898,7 +942,7 @@ public class InflectedService {
                         LOGGER.info("the PRATTS canonical entry hindiWordIndex={} hindiWordIndex={} indicated in Master does not exist", master.getInflectedHindi(), master.getInflectedHindiIndex());
                         return false;
                     }else if (!isDerivatePOS(plattsEntry.get().getPartOfSpeech(), master.getPartOfSpeech())){
-                        LOGGER.info("the POS indicated in Master ({}) is not a derivate of the entry in PRATTS ({})", master.getPartOfSpeech(), plattsEntry.get().getPartOfSpeech());
+                        LOGGER.info("the POS indicated in Master ({}) is not a derivate of the entry in PLATTS ({})", master.getPartOfSpeech(), plattsEntry.get().getPartOfSpeech());
                         return false;
                     }
                     break;

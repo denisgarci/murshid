@@ -10,9 +10,7 @@ import com.murshid.dynamo.repo.SongRepository;
 import com.murshid.models.converters.DynamoAccessor;
 import com.murshid.models.enums.Accidence;
 import com.murshid.models.enums.PartOfSpeech;
-import com.murshid.services.InflectedService;
-import com.murshid.services.SongsService;
-import com.murshid.services.WikitionaryLetterIngestor;
+import com.murshid.services.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.boot.SpringApplication;
@@ -36,9 +34,20 @@ public class MurshidApplication {
 
        //List<Inflected> allInflected = getAll();
 
+        //replaceNuktas();
+
 
 
 	}
+
+    private static void replaceNuktas() throws InterruptedException{
+        WikitionaryService wikitionaryService =  context.getBean(WikitionaryService.class);
+        wikitionaryService.replaceNuktas();
+
+        RekhtaService rekhtaService =  context.getBean(RekhtaService.class);
+        rekhtaService.replaceNuktas();
+        LOGGER.info("finished replacing spans");
+    }
 
     private static void generateHtml() throws InterruptedException{
         SongsService songsService = context.getBean(SongsService.class);

@@ -1,9 +1,12 @@
 package com.murshid.services;
 
+import com.google.common.collect.Lists;
 import com.murshid.models.DictionaryKey;
+import com.murshid.persistence.domain.PlattsEntry;
 import com.murshid.persistence.domain.WikitionaryEntry;
 import com.murshid.persistence.repo.SpellCheckRepository;
 import com.murshid.persistence.repo.WikitionaryRepository;
+import com.murshid.utils.WordUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeansException;
@@ -18,6 +21,8 @@ import java.util.Optional;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ThreadFactory;
+
+import static com.murshid.utils.WordUtils.KA_NUKTA;
 
 @Named
 public class WikitionaryService implements ApplicationContextAware {
@@ -38,6 +43,22 @@ public class WikitionaryService implements ApplicationContextAware {
 
 
         pool.shutdown();
+    }
+
+    public List<WikitionaryEntry> replaceNuktas(){
+        List<WikitionaryEntry> list = Lists.newArrayList(findByHindiWordLike("%".concat(KA_NUKTA).concat("%")));
+
+        for (WikitionaryEntry pe : list){
+            wikitionaryRepository.delete(pe);
+            LOGGER.info("replacing {} with {} ", pe.getDictionaryKey().getHindiWord(), WordUtils.replace2CharsWithNukta(pe.getHindiWord()));
+            pe.getDictionaryKey().setHindiWord(WordUtils.replace2CharsWithNukta(pe.getHindiWord()));
+            save(pe);
+        }
+        return list;
+    }
+
+    private List<WikitionaryEntry> findByHindiWordLike(String hindiWord){
+        return wikitionaryRepository.findByDictionaryKeyHindiWordLike(hindiWord);
     }
 
     public WikitionaryEntry save(WikitionaryEntry rekhtaEntry){

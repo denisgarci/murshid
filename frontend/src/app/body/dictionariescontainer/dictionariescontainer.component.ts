@@ -30,7 +30,7 @@ export class DictionariescontainerComponent implements OnInit {
       let inflectedEntry = this.songsService.inflectedEntries[inflectedKey];
 
       if (inflectedEntry == null){
-        alert("no inflected entry found for key " + inflectedKey);
+        console.log("no inflected entry found for key " + inflectedKey);
         return;
       }
 

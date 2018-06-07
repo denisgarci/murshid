@@ -37,7 +37,7 @@ public class AccidenceColumnConverter implements AttributeConverter<List<Acciden
 
         List<Accidence> result = new ArrayList<>();
         while(m.find()) {
-            result.add(Accidence.valueOf(m.group(1)));
+          result.add(Accidence.valueOf(m.group(1)));
         }
         return result;
     }

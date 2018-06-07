@@ -4,11 +4,14 @@ import com.google.common.collect.Lists;
 import com.murshid.models.DictionaryKey;
 import com.murshid.persistence.domain.PlattsEntry;
 import com.murshid.persistence.repo.PlattsRepository;
+import com.murshid.utils.WordUtils;
 
 import javax.inject.Inject;
 import javax.inject.Named;
 import java.util.List;
 import java.util.Optional;
+
+import static com.murshid.utils.WordUtils.KA_NUKTA;
 
 @Named
 public class PlattsService {
@@ -53,23 +56,11 @@ public class PlattsService {
      * @return   the list of changed and persisted PlattsEntries
      */
     public List<PlattsEntry> replaceNuktas(){
-        char ka = 0x915;
-        char nukta = 0x93C;
-        String kaNukta = new StringBuilder().append(ka).append(nukta).toString();
+        List<PlattsEntry> list = Lists.newArrayList(findByHindiWordLike("%".concat(KA_NUKTA).concat("%")));
 
-        StringBuilder sbLike = new StringBuilder();
-        sbLike.append("%").append(kaNukta).append("%");
-
-        List<PlattsEntry> list = Lists.newArrayList(findByHindiWordLike(sbLike.toString()));
-
-        char qa = 0x958;
-        String qaStr = new String(new char[]{qa});
-
-        for (int i=0; i<list.size(); i++){
-            PlattsEntry pe = list.get(i);
+        for (PlattsEntry pe : list){
             plattsRepository.delete(pe);
-            String newhindiword = pe.getHindiWord().replace(kaNukta, qaStr);
-            pe.getDictionaryKey().setHindiWord(newhindiword);
+            pe.getDictionaryKey().setHindiWord(WordUtils.replace2CharsWithNukta(pe.getHindiWord()));
             save(pe);
         }
         return list;

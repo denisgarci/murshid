@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.common.collect.Sets;
 import com.google.gson.annotations.SerializedName;
 import com.murshid.models.CanonicalKey;
+import com.murshid.models.DictionaryKey;
 import com.murshid.models.enums.Accidence;
 import com.murshid.models.enums.PartOfSpeech;
 import org.apache.commons.lang3.builder.EqualsBuilder;
@@ -15,6 +16,10 @@ import java.util.Set;
 import java.util.TreeSet;
 
 public class Inflected {
+
+    @JsonProperty("master_dictionary_key")
+    @Column(name = "master_dictionary_key")
+    private DictionaryKey masterDictionaryKey;
 
     @JsonProperty("inflected_hindi")
     @Column(name = "inflected_hindi")
@@ -32,19 +37,7 @@ public class Inflected {
     @Column(name = "part_of_speech")
     private PartOfSpeech partOfSpeech;
 
-    @JsonProperty("canonical_hindi")
-    @Column(name = "canonical_hindi")
-    private String canonicalHindi;
-
-    @JsonProperty("canonical_urdu")
-    @Column(name = "canonical_urdu")
-    private String canonicalUrdu;
-
     private TreeSet<Accidence> accidence;
-
-    @JsonProperty("canonical_keys")
-    @Column(name = "canonical_keys")
-    private Set<CanonicalKey> canonicalKeys;
 
     public Set<Accidence> getAccidence() {
         return accidence;
@@ -59,12 +52,12 @@ public class Inflected {
         return this;
     }
 
-    public Set<CanonicalKey> getCanonicalKeys() {
-        return canonicalKeys;
+    public DictionaryKey getMasterDictionaryKey() {
+        return masterDictionaryKey;
     }
 
-    public Inflected setCanonicalKeys(Set<CanonicalKey> canonicalKeys) {
-        this.canonicalKeys = canonicalKeys;
+    public Inflected setMasterDictionaryKey(DictionaryKey masterDictionaryKey) {
+        this.masterDictionaryKey = masterDictionaryKey;
         return this;
     }
 
@@ -104,24 +97,6 @@ public class Inflected {
         return this;
     }
 
-    public String getCanonicalHindi() {
-        return canonicalHindi;
-    }
-
-    public Inflected setCanonicalHindi(String canonicalHindi) {
-        this.canonicalHindi = canonicalHindi;
-        return this;
-    }
-
-    public String getCanonicalUrdu() {
-        return canonicalUrdu;
-    }
-
-    public Inflected setCanonicalUrdu(String canonicalUrdu) {
-        this.canonicalUrdu = canonicalUrdu;
-        return this;
-    }
-
     @Override
     public Object clone() {
           Inflected master = new Inflected();
@@ -129,10 +104,8 @@ public class Inflected {
            .setInflectedHindi(this.inflectedHindi)
            .setInflectedUrdu(this.inflectedUrdu)
            .setAccidence(new HashSet<>(this.accidence))
-           .setCanonicalHindi(this.canonicalHindi)
-           .setCanonicalUrdu(this.canonicalUrdu)
-           .setCanonicalKeys(this.canonicalKeys)
            .setPartOfSpeech(this.getPartOfSpeech())
+           .setMasterDictionaryKey(this.masterDictionaryKey)
            .setInflectedHindiIndex(this.getInflectedHindiIndex()+ 1);
           return master;
 
@@ -147,11 +120,10 @@ public class Inflected {
         Inflected master = (Inflected) o;
 
         return new EqualsBuilder()
+                .append(getMasterDictionaryKey(), master.getMasterDictionaryKey())
                 .append(getInflectedHindi(), master.getInflectedHindi())
-                .append(getCanonicalHindi(), master.getCanonicalHindi())
                 .append(getPartOfSpeech(), master.getPartOfSpeech())
                 .append(getAccidence(), master.getAccidence())
-                .append(getCanonicalKeys(), master.getCanonicalKeys())
                 //.append(getInflectedHindiIndex(), master.getInflectedHindiIndex())
                 .isEquals();
     }
@@ -159,26 +131,22 @@ public class Inflected {
     @Override
     public String toString() {
         return "Inflected{" +
-                "inflectedHindi='" + inflectedHindi + '\'' +
+                "  masterDictonaryKey='" + masterDictionaryKey + '\'' +
+                "  inflectedHindi='" + inflectedHindi + '\'' +
                 ", inflectedUrdu='" + inflectedUrdu + '\'' +
                 ", inflectedHindiIndex=" + inflectedHindiIndex +
                 ", partOfSpeech=" + partOfSpeech +
-                ", canonicalHindi='" + canonicalHindi + '\'' +
-                ", canonicalUrdu='" + canonicalUrdu + '\'' +
                 ", accidence=" + accidence +
-                ", canonicalKeys=" + canonicalKeys +
                 '}';
     }
 
     @Override
     public int hashCode() {
         return new HashCodeBuilder(17, 37)
+                .append(getMasterDictionaryKey())
                 .append(getInflectedHindi())
                 .append(getPartOfSpeech())
                 .append(getAccidence())
-                .append(getCanonicalKeys())
-                .append(getCanonicalHindi())
-                //.append(getInflectedHindiIndex())
                 .toHashCode();
     }
 

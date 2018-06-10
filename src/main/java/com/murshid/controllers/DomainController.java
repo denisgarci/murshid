@@ -1,19 +1,12 @@
 package com.murshid.controllers;
 
-import com.murshid.dynamo.domain.Song;
 import com.murshid.models.enums.Accidence;
 import com.murshid.models.enums.PartOfSpeech;
-import com.murshid.persistence.domain.views.CanonicalWrapper;
-import com.murshid.persistence.domain.views.DictionaryEntry;
-import com.murshid.persistence.domain.views.StringListWrapper;
-import com.murshid.services.DictionaryService;
-import com.murshid.services.SongsService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
-import javax.inject.Inject;
 import java.util.*;
 import java.util.stream.Collectors;
 

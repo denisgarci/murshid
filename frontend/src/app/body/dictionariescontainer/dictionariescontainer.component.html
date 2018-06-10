@@ -12,9 +12,9 @@
     </div>
 
     <br/>
-    <div *ngFor="let dicEntryArr of content.dictionary_entries_inflected; let i = index" class="dictionary_entry_array">
-      <div *ngFor="let   dicEntry of dicEntryArr; let e = index">
-        <span *ngIf="e == 0" class="dictionary_name">{{dicEntry.dictionary_source}}</span>
+    <div *ngFor="let dictionarySource of objectKeys(content.dictionary_entries_inflected); let i = index" class="dictionary_entry_array">
+      <span class="dictionary_name">{{dictionarySource}}</span>
+      <div *ngFor="let   dicEntry of content.dictionary_entries_inflected[dictionarySource]; let e = index">
         <span *ngIf="e != 0" class="secondary_canonical_hindi">{{dicEntry.hindi_word}}</span>
         <p class="dictionary_entry_content">
           {{dicEntry.meaning}}
@@ -23,19 +23,18 @@
     </div>
 
     <br/>
-    <div *ngIf="content.dictionary_entries_not_inflected">
-      <div class="dictionary_global_header">
-        <span>{{content.not_inflected_hindi}}</span> &nbsp;-&nbsp; <span class="part_of_speech">{{content.not_inflected_part_of_speech_label}}</span>
-      </div>
-      <div *ngFor="let dicEntryArr of content.dictionary_entries_not_inflected; let i= index" class="dictionary_entry_array">
-        <div *ngFor="let dicEntry of dicEntryArr; let e = index">
-          <span *ngIf="e == 0" class="dictionary_name_not_inflected">{{dicEntry.dictionary_source}}</span>
+    <span *ngIf="content.dictionary_entries_not_inflected">
+      <div *ngFor="let dictionarySource of objectKeys(content.dictionary_entries_not_inflected); let i = index" class="dictionary_entry_array">
+        <span class="dictionary_name_not_inflected">{{dictionarySource}}</span>
+        <div *ngFor="let   dicEntry of content.dictionary_entries_not_inflected[dictionarySource]; let e = index">
           <span *ngIf="e != 0" class="secondary_canonical_hindi">{{dicEntry.hindi_word}}</span>
           <p class="dictionary_entry_content">
             {{dicEntry.meaning}}
           </p>
         </div>
       </div>
-    </div>
+    </span>
+
+
   </div>
 </div>

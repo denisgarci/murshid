@@ -1,8 +1,9 @@
 package com.murshid.controllers;
 
 import com.murshid.dynamo.domain.Song;
+import com.murshid.models.enums.DictionarySource;
 import com.murshid.persistence.domain.views.CanonicalWrapper;
-import com.murshid.persistence.domain.views.DictionaryEntry;
+import com.murshid.persistence.domain.views.DictionaryEntryView;
 import com.murshid.persistence.domain.views.StringListWrapper;
 import com.murshid.services.DictionaryService;
 import com.murshid.services.SongsService;
@@ -33,11 +34,11 @@ public class DictionariesController {
      * As a side-effect, it recreates this Json object as a string in the song.
      *
      * @param songLatinName         e.g. "Alvida"
-     * @return                      a Map of "key" -> List<DictionaryEntry> apt to be transformed into Json
+     * @return                      a Map of "key" -> List<DictionaryEntryView> apt to be transformed into Json
      */
     @GetMapping("/createDictionaryEntriesForNotInflected")
     public @ResponseBody
-    Map<String, List<DictionaryEntry>> createDictionaryEntriesForNotInflected(@RequestParam(name = "songLatinName") String songLatinName) {
+    Map<String, Map<DictionarySource, List<DictionaryEntryView>>> createDictionaryEntriesForNotInflected(@RequestParam(name = "songLatinName") String songLatinName) {
         Optional<Song> song = songsService.findByLatinTitle(songLatinName);
         if (song.isPresent()) {
             return dictionaryService.createDictionaryEntriesForNotInflected(song.get());
@@ -55,11 +56,11 @@ public class DictionariesController {
      * As a side-effect, it recreates this Json object as a string in the song.
      *
      * @param songLatinName         e.g. "Alvida"
-     * @return                      a Map of "key" -> List<DictionaryEntry> apt to be transformed into Json
+     * @return                      a Map of "key" -> List<DictionaryEntryView> apt to be transformed into Json
      */
     @GetMapping("/createDictionaryEntriesForInflected")
     public @ResponseBody
-    Map<String, List<DictionaryEntry>> createDictionaryEntriesForInflected(@RequestParam(name = "songLatinName") String songLatinName) {
+    Map<String, Map<DictionarySource, List<DictionaryEntryView>>> createDictionaryEntriesForInflected(@RequestParam(name = "songLatinName") String songLatinName) {
         Optional<Song> song = songsService.findByLatinTitle(songLatinName);
         if (song.isPresent()) {
             return dictionaryService.createDictionaryEntriesForInflected(song.get());

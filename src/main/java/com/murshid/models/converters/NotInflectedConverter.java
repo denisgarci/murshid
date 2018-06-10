@@ -5,6 +5,7 @@ import com.amazonaws.services.dynamodbv2.model.AttributeValue;
 import com.murshid.dynamo.domain.Inflected;
 import com.murshid.dynamo.domain.NotInflected;
 import com.murshid.models.CanonicalKey;
+import com.murshid.models.DictionaryKey;
 import com.murshid.models.enums.Accidence;
 import com.murshid.models.enums.PartOfSpeech;
 import org.slf4j.Logger;
@@ -39,54 +40,22 @@ public class NotInflectedConverter {
             inflected.setPartOfSpeech(PartOfSpeech.valueOf(item.getString("part_of_speech")));
         }
 
-        if (item.isPresent("canonical_keys")){
-            List<Object> cksObjList = (List)item.get("canonical_keys");
-            Set<CanonicalKey> cksSet = cksObjList.stream().map(obj -> CanonicalKey.fromMap((Map)obj))
-                    .collect(Collectors.toSet());
-            inflected.setCanonicalKeys(cksSet);
+        if (item.isPresent("master_dictionary_key")){
+            inflected.setMasterDictionaryKey(DictionaryKey.fromMap(item.getMap("master_dictionary_key")));
         }
 
+
         return inflected;
-    }
-
-    public static Map<String, AttributeValue> convertToAvMap(NotInflected master){
-
-        List<AttributeValue> canonicalKeys = master.getCanonicalKeys().stream()
-                .map(ck -> {
-                    AttributeValue attributeValue = new AttributeValue();
-                    attributeValue.setM(CanonicalKey.toAvMap(ck));
-                    return attributeValue;
-                } )
-                .collect(Collectors.toList());
-
-        AttributeValue cksList= new AttributeValue();
-        cksList.setL(canonicalKeys);
-
-        Map<String, AttributeValue> result = new HashMap<>();
-        result.put("hindi", new AttributeValue(master.getHindi()));
-        result.put("inflected_urdu", new AttributeValue(master.getUrdu()));
-        result.put("hindi_index", new AttributeValue(Integer.toString(master.getHindiIndex())));
-        result.put("part_of_speech", new AttributeValue(master.getPartOfSpeech().name()));
-        result.put("canonical_keys", cksList);
-
-        return result;
     }
 
     public static NotInflected fromAvMap(Map<String, AttributeValue> sAvs){
         NotInflected master = new NotInflected();
         master
-                .setHindi(sAvs.get("hindi").getS())
-                .setUrdu(sAvs.get("urdu").getS())
-                .setPartOfSpeech(PartOfSpeech.valueOf(sAvs.get("part_of_speech").getS()))
-                .setHindiIndex(Integer.valueOf(sAvs.get("hindi_index").getN()));
-
-        Set<CanonicalKey> canonicalKeys = sAvs.get("canonical_keys")
-                .getL().stream()
-                .map(av -> CanonicalKey.fromAvMap(av.getM()) )
-                .collect(Collectors.toSet());
-
-        master.setCanonicalKeys(canonicalKeys);
-
+            .setHindi(sAvs.get("hindi").getS())
+            .setUrdu(sAvs.get("urdu").getS())
+            .setPartOfSpeech(PartOfSpeech.valueOf(sAvs.get("part_of_speech").getS()))
+            .setHindiIndex(Integer.valueOf(sAvs.get("hindi_index").getN()))
+            .setMasterDictionaryKey(DictionaryKey.fromAvMap(sAvs.get("master_dictionary_key").getM()));
 
         return master;
     }
@@ -102,8 +71,7 @@ public class NotInflectedConverter {
 
         item = item.with("part_of_speech", master.getPartOfSpeech().name());
 
-        item = item.withList("canonical_keys", master.getCanonicalKeys().stream()
-                .map(CanonicalKey::toMap).collect(Collectors.toList()));
+        item = item.withMap("master_dictionary_key", master.getMasterDictionaryKey().toMap());
 
         return item;
     }

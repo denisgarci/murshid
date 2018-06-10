@@ -43,7 +43,7 @@ public class InflectedController {
 
     @GetMapping("/findByCanonicalWord")
     public @ResponseBody
-    List findInByCanonicalWord(@RequestParam(name = "hindiWordIndex") String canonicalWord) {
+    List findInByCanonicalWord(@RequestParam(name = "canonicalWord") String canonicalWord) {
         List result = inflectedService.findByCanonicalWord(canonicalWord);
         return result;
     }
@@ -62,7 +62,7 @@ public class InflectedController {
 
     @PostMapping("/insertNew")
     public ResponseEntity<String> insertNew(@RequestBody Inflected inflected) {
-        complementCanonicalKeys(inflected);
+        //complementCanonicalKeys(inflected);
         inflected.setInflectedHindiIndex(inflectedService.suggestNewIndex(inflected.getInflectedHindi()));
         if (inflectedService.isValid(inflected)) {
             if (inflectedService.exists(inflected.getInflectedHindi(), inflected.getInflectedHindiIndex())){
@@ -87,7 +87,7 @@ public class InflectedController {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
         }
 
-        complementCanonicalKeys(infinitive);
+        //complementCanonicalKeys(infinitive);
 
         if (!inflectedService.isValid(infinitive)) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
@@ -103,11 +103,11 @@ public class InflectedController {
         }
 
         //then check if any of them is already in inflected
-        boolean someExist = inflectedService.thereAreInflected(infinitive.getCanonicalHindi());
-        if (someExist){
-            LOGGER.info("there are already inflected for the canonical hindi word {}. Nothing will be written", infinitive.getCanonicalHindi());
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
-        }
+//        boolean someExist = inflectedService.thereAreInflected(infinitive.getCanonicalHindi());
+//        if (someExist){
+//            LOGGER.info("there are already inflected for the canonical hindi word {}. Nothing will be written", infinitive.getCanonicalHindi());
+//            return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
+//        }
 
         boolean wroteAll = inflectedService.writeSeveralWithSuggestedIndexes(explodedVerbs);
         if (!wroteAll) {
@@ -119,7 +119,7 @@ public class InflectedController {
 
     @PostMapping("/insertNewWithExplode")
     public ResponseEntity<String> insertNewWithExplode(@RequestBody Inflected inflected) {
-        complementCanonicalKeys(inflected);
+        //complementCanonicalKeys(inflected);
         if (!inflectedService.isValid(inflected)) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
         }
@@ -145,7 +145,7 @@ public class InflectedController {
 
     @PostMapping("/upsert")
     public ResponseEntity<String> upsert(@RequestBody Inflected inflected) {
-        complementCanonicalKeys(inflected);
+        //complementCanonicalKeys(inflected);
         if (inflectedService.isValid(inflected)) {
             boolean success = inflectedService.save(inflected);
             if (success) {
@@ -158,12 +158,12 @@ public class InflectedController {
         }
     }
 
-    private Inflected complementCanonicalKeys(Inflected inflected){
-        for (CanonicalKey ck: inflected.getCanonicalKeys()){
-            ck.setCanonicalWord(inflected.getCanonicalHindi());
-        }
-        return inflected;
-    }
+//    private Inflected complementCanonicalKeys(Inflected inflected){
+//        for (CanonicalKey ck: inflected.getCanonicalKeys()){
+//            ck.setCanonicalWord(inflected.getCanonicalHindi());
+//        }
+//        return inflected;
+//    }
 
     @Inject
     private InflectedService inflectedService;

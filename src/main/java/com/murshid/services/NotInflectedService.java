@@ -68,10 +68,7 @@ public class NotInflectedService {
             value.put("hindi", notInflected.getHindi());
             value.put("urdu", notInflected.getUrdu());
             value.put("part_of_speech", notInflected.getPartOfSpeech());
-            List<String> dictionaryKeys = notInflected.getCanonicalKeys().stream()
-                    .map( CanonicalKey::toKey)
-                    .collect(Collectors.toList());
-            value.put("canonical_keys", dictionaryKeys);
+            value.put("master_dictionary_key", notInflected.getMasterDictionaryKey().toMap());
 
             result.put(notInflected.getKey(), value);
         });
@@ -212,44 +209,6 @@ public class NotInflectedService {
      */
     public boolean validateCanonicalKeys(NotInflected master){
 
-        if (master.getCanonicalKeys() == null){
-            return true;
-        }
-        for (CanonicalKey ck: master.getCanonicalKeys()){
-            DictionaryKey dk = new DictionaryKey().setHindiWord(ck.canonicalWord).setWordIndex(ck.canonicalIndex);
-
-            switch (ck.dictionarySource){
-                case PLATTS:
-                    Optional<PlattsEntry> plattsEntry = plattsService.findOne(dk);
-                    if (!plattsEntry.isPresent()){
-                        LOGGER.info("the PLATTS canonical entry hindiWordIndex={} hindiWordIndex={} indicated in NotInflected does not exist", master.getHindi(), master.getHindi());
-                        return false;
-                    }
-                    break;
-                case MURSHID:
-                    Optional<MurshidEntry> gonzaloEntry = murshidService.findOne(dk);
-                    if (!gonzaloEntry.isPresent()){
-                        LOGGER.info("the MURSHID canonical entry hindiWordIndex={} hindiWordIndex={} indicated in NotInflected does not exist", master.getHindi(), master.getHindiIndex());
-                        return false;
-                    }
-                    break;
-                case REKHTA:
-                    Optional<RekhtaEntry> rekhtaEntry = rekhtaService.findOne(dk);
-                    if (!rekhtaEntry.isPresent()){
-                        LOGGER.info("the REKHTA canonical entry hindiWordIndex={} hindiWordIndex={} indicated in NotInflected does not exist", master.getHindi(), master.getHindiIndex());
-                        return false;
-                    }
-                    break;
-                case WIKITIONARY:
-                    Optional<WikitionaryEntry> wikitionaryEntry = wikitionaryService.findOne(dk);
-                    if (!wikitionaryEntry.isPresent()){
-                        LOGGER.info("the WIKITIONARY canonical entry hindiWordIndex={} hindiWordIndex={} indicated in NotInflected does not exist", master.getHindi(), master.getHindiIndex());
-                        return false;
-                    }
-                    break;
-            }
-
-        };
         return true;
     }
 

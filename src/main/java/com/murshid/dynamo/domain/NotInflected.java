@@ -3,6 +3,7 @@ package com.murshid.dynamo.domain;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.common.collect.Sets;
 import com.murshid.models.CanonicalKey;
+import com.murshid.models.DictionaryKey;
 import com.murshid.models.enums.Accidence;
 import com.murshid.models.enums.PartOfSpeech;
 import org.apache.commons.lang3.builder.EqualsBuilder;
@@ -14,6 +15,10 @@ import java.util.Set;
 import java.util.TreeSet;
 
 public class NotInflected {
+    @JsonProperty("master_dictionary_key")
+    @Column(name = "master_dictionary_key")
+    private DictionaryKey masterDictionaryKey;
+
 
     @JsonProperty("hindi")
     @Column(name = "hindi")
@@ -31,18 +36,6 @@ public class NotInflected {
     @Column(name = "part_of_speech")
     private PartOfSpeech partOfSpeech;
 
-    @JsonProperty("canonical_keys")
-    @Column(name = "canonical_keys")
-    private Set<CanonicalKey> canonicalKeys;
-
-    public Set<CanonicalKey> getCanonicalKeys() {
-        return canonicalKeys;
-    }
-
-    public NotInflected setCanonicalKeys(Set<CanonicalKey> canonicalKeys) {
-        this.canonicalKeys = canonicalKeys;
-        return this;
-    }
 
     public PartOfSpeech getPartOfSpeech() {
         return partOfSpeech;
@@ -80,6 +73,15 @@ public class NotInflected {
         return this;
     }
 
+
+    public DictionaryKey getMasterDictionaryKey() {
+        return masterDictionaryKey;
+    }
+
+    public void setMasterDictionaryKey(DictionaryKey masterDictionaryKey) {
+        this.masterDictionaryKey = masterDictionaryKey;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) { return true; }
@@ -89,9 +91,9 @@ public class NotInflected {
         NotInflected master = (NotInflected) o;
 
         return new EqualsBuilder()
+                .append(getMasterDictionaryKey(), master.getMasterDictionaryKey())
                 .append(getHindi(), master.getHindi())
                 .append(getPartOfSpeech(), master.getPartOfSpeech())
-                .append(getCanonicalKeys(), master.getCanonicalKeys())
                 .append(getHindiIndex(), master.getHindiIndex())
                 .isEquals();
     }
@@ -99,9 +101,9 @@ public class NotInflected {
     @Override
     public int hashCode() {
         return new HashCodeBuilder(17, 37)
+                .append(getMasterDictionaryKey())
                 .append(getHindi())
                 .append(getPartOfSpeech())
-                .append(getCanonicalKeys())
                 .append(getHindiIndex())
                 .toHashCode();
     }

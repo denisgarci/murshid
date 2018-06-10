@@ -43,7 +43,6 @@ public class NotInflectedController {
 
     @PostMapping("/insertNew")
     public ResponseEntity<String> insertNew(@RequestBody NotInflected inflected) {
-        complementCanonicalKeys(inflected);
         inflected.setHindiIndex(notInflectedService.suggestNewIndex(inflected.getHindi()));
         if (notInflectedService.isValid(inflected)) {
             if (notInflectedService.exists(inflected.getHindi(), inflected.getHindiIndex())){
@@ -63,7 +62,6 @@ public class NotInflectedController {
 
     @PostMapping("/upsert")
     public ResponseEntity<String> upsert(@RequestBody NotInflected inflected) {
-        complementCanonicalKeys(inflected);
         if (notInflectedService.isValid(inflected)) {
             boolean success = notInflectedService.save(inflected);
             if (success) {
@@ -76,12 +74,7 @@ public class NotInflectedController {
         }
     }
 
-    private NotInflected complementCanonicalKeys(NotInflected notInflected){
-        for (CanonicalKey ck: notInflected.getCanonicalKeys()){
-            ck.setCanonicalWord(notInflected.getHindi());
-        }
-        return notInflected;
-    }
+
 
     @Inject
     private NotInflectedService notInflectedService;

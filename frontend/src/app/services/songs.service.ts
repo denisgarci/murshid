@@ -6,13 +6,13 @@ import { IGeo } from '../models/IGeo';
 import {WordListInflected} from "../models/WordListInflected";
 import {InflectedKey} from "../models/InflectedKey";
 import {IInflectedEntries} from "../models/IInflectedEntries";
-import {IDictionaryEntriesInflected} from "../models/IDictionaryEntriesInflected";
+import {IDictionaryEntriesMap} from "../models/IDictionaryEntriesMap";
 import {Globals} from "../globals";
-import {IDictionaryEntriesNotInflected} from "../models/IDictionaryEntriesNotInflected";
 import {INotInflectedEntries} from "../models/INotInflectedEntries";
 import {NotInflectedEntry} from "../models/NotInflectedEntry";
 import {NotInflectedKey} from "../models/NotInflectedKey";
 import {WordListNotInflected} from "../models/WordListNotInflected";
+import {IDictionaryEntriesModel} from "../models/IDictionaryEntriesModel";
 
 @Injectable()
 export class SongsService {
@@ -26,8 +26,8 @@ export class SongsService {
   public notInflectedGeo: IGeo = {};
   public inflectedEntries: IInflectedEntries = {};
   public notInflectedEntries: INotInflectedEntries = {};
-  public dictionaryEntriesInflected: IDictionaryEntriesInflected = {};
-  public dictionaryEntriesNotInflected: IDictionaryEntriesNotInflected = {};
+  public dictionaryEntriesInflected: IDictionaryEntriesModel[];
+  public dictionaryEntriesNotInflected: IDictionaryEntriesModel[];
 
   //item-related
   public itemHoverChange = new BehaviorSubject<string>(null);

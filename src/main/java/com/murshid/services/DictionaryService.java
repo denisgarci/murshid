@@ -2,15 +2,16 @@ package com.murshid.services;
 
 import com.google.common.collect.Lists;
 import com.google.gson.Gson;
+import com.google.gson.internal.LinkedTreeMap;
 import com.murshid.dynamo.domain.Song;
 import com.murshid.dynamo.repo.SongRepository;
+import com.murshid.models.DictionaryKey;
 import com.murshid.models.enums.DictionarySource;
-import com.murshid.persistence.domain.MurshidEntry;
-import com.murshid.persistence.domain.PlattsEntry;
-import com.murshid.persistence.domain.RekhtaEntry;
-import com.murshid.persistence.domain.WikitionaryEntry;
+import com.murshid.persistence.domain.*;
 import com.murshid.persistence.domain.views.CanonicalWrapper;
-import com.murshid.persistence.domain.views.DictionaryEntry;
+import com.murshid.persistence.domain.views.DictionaryEntryView;
+import com.murshid.persistence.repo.DictionaryEntryRepository;
+import com.murshid.persistence.repo.MasterDictionaryRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -32,16 +33,20 @@ public class DictionaryService {
      *
      * @return a Map, transformable into a JSon object
      */
-    public Map<String, List<DictionaryEntry>> createDictionaryEntriesForInflected(Song song) {
+    public Map<String, Map<DictionarySource, List<DictionaryEntryView>>> createDictionaryEntriesForInflected(Song song) {
 
         //Inflected entries
-        Map<String, Object> inflectedEntries =  gson.fromJson(song.getInflectedEntries(), Map.class);
-        Set<String> canonicalKeysFromInflected = inflectedEntries.entrySet().stream()
-                .map(me -> (Map) me.getValue()).map(valMap -> (List<String>) valMap.get("canonical_keys"))
-                .flatMap(l -> l.stream()).collect(Collectors.toSet());
+        LinkedTreeMap< String, LinkedTreeMap> inflectedEntries =  gson.fromJson(song.getInflectedEntries(), LinkedTreeMap.class);
 
-        Map<String, List<DictionaryEntry>> dictionaryEntriesForInflected = createDictionaryEntriesMap(canonicalKeysFromInflected);
-        addDictionaryRelations(dictionaryEntriesForInflected);
+        Set<DictionaryKey> masterDictionaryKeys = inflectedEntries.entrySet().stream()
+                .map(me -> {
+                      LinkedTreeMap mdkMap = (LinkedTreeMap)me.getValue().get("master_dictionary_key");
+                      return DictionaryKey.fromMap(mdkMap);
+                    }
+                ).collect(Collectors.toSet());
+
+        Map<String, Map<DictionarySource, List<DictionaryEntryView>>> dictionaryEntriesForInflected = createDictionaryEntriesMap2(masterDictionaryKeys);
+        //addDictionaryRelations(dictionaryEntriesForInflected);
         song.setDictionaryEntriesInflected(gson.toJson(dictionaryEntriesForInflected));
 
         songRepository.save(song);
@@ -49,28 +54,44 @@ public class DictionaryService {
         return dictionaryEntriesForInflected;
     }
 
+    Set<DictionaryKey> masterDictionaryKeys(LinkedTreeMap masterDictionaryKey){
+        String mHindiWord = masterDictionaryKey.get("hindi_word").toString();
+        int mWordIndex = Double.valueOf((Double)masterDictionaryKey.get("word_index")).intValue();
+        MasterDictionary masterDictionary = masterDictionaryRepository.findByHindiWordAndWordIndex(mHindiWord, mWordIndex);
+        List<DictionaryEntry> dictionaryEntries = dictionaryEntryRepository.findByMasterDictionary(masterDictionary);
+        return dictionaryEntries.stream().map(DictionaryEntry::getMasterDictionary).map(md -> {
+            DictionaryKey dk = new DictionaryKey();
+            dk.setWordIndex(md.getWordIndex()).setHindiWord(md.getHindiWord());
+            return dk;
+        }).collect(Collectors.toSet());
+    }
+
     /**
      * increases each list on the value side of the incoming map
-     * with related dictionary elements, if any available in dicitonary_relations.
+     * with related dictionary elements, if any available in dictionary_relations.
      * @param dictionaryEntries
      */
-    public void addDictionaryRelations(Map<String, List<DictionaryEntry>> dictionaryEntries){
+    public void addDictionaryRelations(Map<String, List<DictionaryEntryView>> dictionaryEntries){
         dictionaryEntries.values().forEach(va -> {
-            DictionaryEntry origin = va.get(0);
-            List<DictionaryEntry> additional = dictionaryRelationsService.find(origin);
+            DictionaryEntryView origin = va.get(0);
+            List<DictionaryEntryView> additional = dictionaryRelationsService.find(origin);
             va.addAll(additional);
         });
     }
 
-    public Map<String, List<DictionaryEntry>> createDictionaryEntriesForNotInflected(Song song) {
+    public Map<String, Map<DictionarySource, List<DictionaryEntryView>>> createDictionaryEntriesForNotInflected(Song song) {
 
-        Map<String, Object> notInflectedEntries =  gson.fromJson(song.getNotInflectedEntries(), Map.class);
-        Set<String> canonicalKeysFromNotInflected = notInflectedEntries.entrySet().stream()
-                .map(me -> (Map) me.getValue()).map(valMap -> (List<String>) valMap.get("canonical_keys"))
-                .flatMap(l -> l.stream()).collect(Collectors.toSet());
+        LinkedTreeMap< String, LinkedTreeMap> notInflectedEntries =  gson.fromJson(song.getNotInflectedEntries(), LinkedTreeMap.class);
 
-        Map<String, List<DictionaryEntry>> dictionaryEntriesForNotInflected = createDictionaryEntriesMap(canonicalKeysFromNotInflected);
-        addDictionaryRelations(dictionaryEntriesForNotInflected);
+        Set<DictionaryKey> masterDictionaryKeys = notInflectedEntries.entrySet().stream()
+                .map(me -> {
+                            LinkedTreeMap mdkMap = (LinkedTreeMap)me.getValue().get("master_dictionary_key");
+                            return DictionaryKey.fromMap(mdkMap);
+                        }
+                ).collect(Collectors.toSet());
+
+        Map<String, Map<DictionarySource, List<DictionaryEntryView>>> dictionaryEntriesForNotInflected = createDictionaryEntriesMap2(masterDictionaryKeys);
+        //addDictionaryRelations(dictionaryEntriesForNotInflected);
         song.setDictionaryEntriesNotInflected(gson.toJson(dictionaryEntriesForNotInflected));
 
         songRepository.save(song);
@@ -81,87 +102,115 @@ public class DictionaryService {
 
     /**
      * Creates the base map of key => dictionary entries (list values are unary, without the references)
-     * @param canonicalKeys
+     *
+     * @param masterDictionaryKeys
      * @return
      */
-    private Map<String, List<DictionaryEntry>> createDictionaryEntriesMap(Set<String> canonicalKeys){
-        Map<String, List<DictionaryEntry>> dictionaryEntries = new HashMap<>();
-        canonicalKeys.forEach(cks -> {
+    private Map<String, Map<DictionarySource, List<DictionaryEntryView>>> createDictionaryEntriesMap2(Set<DictionaryKey> masterDictionaryKeys) {
+        Map<String, Map<DictionarySource, List<DictionaryEntryView>>> result = new HashMap<>();
+        masterDictionaryKeys.forEach(cks -> {
 
-            String[] keyTokens = cks.split("_");
-            DictionarySource dictionarySource = DictionarySource.valueOf(keyTokens[0]);
-            int wordIndex = Integer.valueOf(keyTokens[keyTokens.length - 1]);
-            String[] wordArrays = Arrays.copyOfRange(keyTokens, 1, keyTokens.length - 1);
-            String word = String.join(" ", wordArrays);
+            String mapKey = cks.hindiWord.concat("_").concat(Integer.toString(cks.wordIndex));
 
-            switch (dictionarySource) {
-                case WIKITIONARY: {
+            MasterDictionary masterDictionary = masterDictionaryRepository.findByHindiWordAndWordIndex(cks.hindiWord, cks.wordIndex);
+            List<DictionaryEntry> dictionaryEntries1 = dictionaryEntryRepository.findByMasterDictionary(masterDictionary);
 
-                    Optional<WikitionaryEntry> wikitionaryEntry = wikitionaryService.findOne(word, wordIndex);
-                    if (wikitionaryEntry.isPresent()) {
-                        WikitionaryEntry entry = wikitionaryEntry.get();
+            dictionaryEntries1.forEach(de -> {
+                switch (de.getDictionarySource()) {
+                    case WIKITIONARY: {
+                        Optional<WikitionaryEntry> wikitionaryEntry = wikitionaryService.findOne(de.masterDictionary.getHindiWord(), de.getWordIndex());
+                        if (wikitionaryEntry.isPresent()) {
+                            WikitionaryEntry entry = wikitionaryEntry.get();
 
-                        dictionaryEntries.put(entry.getStringKey(), Lists.newArrayList(new DictionaryEntry()
-                                .setDictionarySource(DictionarySource.WIKITIONARY)
-                                .setHindiWord(entry.getHindiWord())
-                                .setMeaning(entry.getMeaning())
-                                .setPartOfSpeech(entry.getPartOfSpeech())
-                                .setWordIndex(entry.getWordIndex())));
+                            DictionaryEntryView dew = new DictionaryEntryView()
+                                    .setDictionarySource(DictionarySource.WIKITIONARY)
+                                    .setHindiWord(entry.getHindiWord())
+                                    .setMeaning(entry.getMeaning())
+                                    .setPartOfSpeech(entry.getPartOfSpeech())
+                                    .setWordIndex(entry.getWordIndex());
+
+                            if(result.get(mapKey) == null){
+                                result.put(mapKey, new HashMap<>());
+                            }
+
+                            result.get(mapKey).put(DictionarySource.WIKITIONARY, Lists.newArrayList(dew));
+
+                        }
                     }
-                }
-                break;
+                    break;
+                    case PLATTS: {
 
-                case PLATTS: {
+                        Optional<PlattsEntry> prattsEntry = plattsService.findOne(de.masterDictionary.getHindiWord(), de.getWordIndex());
+                        if (prattsEntry.isPresent()) {
+                            PlattsEntry entry = prattsEntry.get();
 
-                    Optional<PlattsEntry> prattsEntry = plattsService.findOne(word, wordIndex);
-                    if (prattsEntry.isPresent()) {
-                        PlattsEntry entry = prattsEntry.get();
-                        dictionaryEntries.put(entry.getStringKey(), Lists.newArrayList(new DictionaryEntry()
-                                .setDictionarySource(DictionarySource.PLATTS)
-                                .setHindiWord(entry.getHindiWord())
-                                .setMeaning(entry.getMeaning())
-                                .setPartOfSpeech(entry.getPartOfSpeech())
-                                .setWordIndex(entry.getWordIndex())));
+                            DictionaryEntryView dew = new DictionaryEntryView()
+                                    .setDictionarySource(DictionarySource.PLATTS)
+                                    .setHindiWord(entry.getHindiWord())
+                                    .setMeaning(entry.getMeaning())
+                                    .setPartOfSpeech(entry.getPartOfSpeech())
+                                    .setWordIndex(entry.getWordIndex());
+
+                            if(result.get(mapKey) == null){
+                                result.put(mapKey, new HashMap<>());
+                            }
+
+                            result.get(mapKey).put(DictionarySource.PLATTS, Lists.newArrayList(dew));
+
+                        }
                     }
-                }
-                break;
+                    break;
 
+                    case REKHTA: {
 
-                case REKHTA: {
+                        Optional<RekhtaEntry> prattsEntry = rekhtaService.findOne(de.masterDictionary.getHindiWord(), de.getWordIndex());
+                        if (prattsEntry.isPresent()) {
+                            RekhtaEntry entry = prattsEntry.get();
 
-                    Optional<RekhtaEntry> prattsEntry = rekhtaService.findOne(word, wordIndex);
-                    if (prattsEntry.isPresent()) {
-                        RekhtaEntry entry = prattsEntry.get();
-                        dictionaryEntries.put(entry.getStringKey(), Lists.newArrayList(new DictionaryEntry()
-                                .setDictionarySource(DictionarySource.REKHTA)
-                                .setHindiWord(entry.getHindiWord())
-                                .setMeaning(entry.getMeaning())
-                                .setPartOfSpeech(entry.getPartOfSpeech())
-                                .setWordIndex(entry.getWordIndex())));
+                            DictionaryEntryView dew = new DictionaryEntryView()
+                                    .setDictionarySource(DictionarySource.REKHTA)
+                                    .setHindiWord(entry.getHindiWord())
+                                    .setMeaning(entry.getMeaning())
+                                    .setPartOfSpeech(entry.getPartOfSpeech())
+                                    .setWordIndex(entry.getWordIndex());
+
+                            if(result.get(mapKey) == null){
+                                result.put(mapKey, new HashMap<>());
+                            }
+
+                            result.get(mapKey).put(DictionarySource.REKHTA, Lists.newArrayList(dew));
+
+                        }
                     }
-                }
-                break;
+                    break;
 
-                case MURSHID: {
+                    case MURSHID: {
 
-                    Optional<MurshidEntry> gonzaloEntry = murshidService.findOne(word, wordIndex);
-                    if (gonzaloEntry.isPresent()) {
-                        MurshidEntry entry = gonzaloEntry.get();
+                        Optional<MurshidEntry> gonzaloEntry = murshidService.findOne(de.masterDictionary.getHindiWord(), de.getWordIndex());
+                        if (gonzaloEntry.isPresent()) {
+                            MurshidEntry entry = gonzaloEntry.get();
 
-                        dictionaryEntries.put(entry.getStringKey(), Lists.newArrayList(new DictionaryEntry()
-                                .setDictionarySource(DictionarySource.MURSHID)
-                                .setHindiWord(entry.getHindiWord())
-                                .setMeaning(entry.getMeaning())
-                                .setPartOfSpeech(entry.getPartOfSpeech())
-                                .setWordIndex(entry.getWordIndex())));
+                            DictionaryEntryView dew = new DictionaryEntryView()
+                                    .setDictionarySource(DictionarySource.MURSHID)
+                                    .setHindiWord(entry.getHindiWord())
+                                    .setMeaning(entry.getMeaning())
+                                    .setPartOfSpeech(entry.getPartOfSpeech())
+                                    .setWordIndex(entry.getWordIndex());
+
+                            if(result.get(mapKey) == null){
+                                result.put(mapKey, new HashMap<>());
+                            }
+
+                            result.get(mapKey).put(DictionarySource.MURSHID, Lists.newArrayList(dew));
+
+                        }
+
                     }
-
+                    break;
                 }
-                break;
-            }
+            });
         });
-
-        return dictionaryEntries;
+        return result;
     }
 
     public List<CanonicalWrapper> findDictionaryEntries(@Nonnull String hindiWord){
@@ -177,6 +226,12 @@ public class DictionaryService {
 
     @Inject
     private DictionaryRelationsService dictionaryRelationsService;
+
+    @Inject
+    private MasterDictionaryRepository masterDictionaryRepository;
+
+    @Inject
+    private DictionaryEntryRepository dictionaryEntryRepository;
 
 
     @Inject

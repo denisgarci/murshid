@@ -8,7 +8,7 @@ import com.murshid.models.enums.PartOfSpeech;
 /**
  * A dictionary entry in a format easily displayable as part of a Json/ Javascript object
  */
-public class DictionaryEntry {
+public class DictionaryEntryView {
 
     @SerializedName("dictionary_source")
     private DictionarySource dictionarySource;
@@ -29,7 +29,7 @@ public class DictionaryEntry {
     }
 
     @JsonProperty("dictionary_source")
-    public DictionaryEntry setDictionarySource(DictionarySource dictionarySource) {
+    public DictionaryEntryView setDictionarySource(DictionarySource dictionarySource) {
         this.dictionarySource = dictionarySource;
         return this;
     }
@@ -39,7 +39,7 @@ public class DictionaryEntry {
         return partOfSpeech;
     }
 
-    public DictionaryEntry setPartOfSpeech(PartOfSpeech partOfSpeech) {
+    public DictionaryEntryView setPartOfSpeech(PartOfSpeech partOfSpeech) {
         this.partOfSpeech = partOfSpeech;
         return this;
     }
@@ -60,17 +60,17 @@ public class DictionaryEntry {
         return wordIndex;
     }
 
-    public DictionaryEntry setMeaning(String meaning) {
+    public DictionaryEntryView setMeaning(String meaning) {
         this.meaning = meaning;
         return this;
     }
 
-    public DictionaryEntry setHindiWord(String hindiWord) {
+    public DictionaryEntryView setHindiWord(String hindiWord) {
         this.hindiWord = hindiWord;
         return this;
     }
 
-    public DictionaryEntry setWordIndex(int wordIndex) {
+    public DictionaryEntryView setWordIndex(int wordIndex) {
         this.wordIndex = wordIndex;
         return this;
     }

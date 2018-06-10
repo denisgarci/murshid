@@ -12,27 +12,19 @@ import com.murshid.dynamo.domain.Inflected;
 import com.murshid.dynamo.domain.Song;
 import com.murshid.dynamo.repo.InflectedRepository;
 import com.murshid.dynamo.repo.SongRepository;
-import com.murshid.models.CanonicalKey;
-import com.murshid.models.DictionaryKey;
 import com.murshid.models.converters.DynamoAccessor;
 import com.murshid.models.converters.InflectedConverter;
 import com.murshid.models.enums.Accidence;
 import com.murshid.models.enums.PartOfSpeech;
-import com.murshid.persistence.domain.MurshidEntry;
-import com.murshid.persistence.domain.PlattsEntry;
-import com.murshid.persistence.domain.RekhtaEntry;
-import com.murshid.persistence.domain.WikitionaryEntry;
 import com.murshid.persistence.domain.views.InflectedKey;
+import com.murshid.persistence.repo.MasterDictionaryRepository;
 import com.murshid.utils.WordUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 
 import javax.annotation.Nonnull;
 import javax.inject.Inject;
 import javax.inject.Named;
-import javax.persistence.criteria.CriteriaBuilder;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -115,12 +107,7 @@ public class InflectedService {
             value.put("inflected_urdu", inflected.getInflectedUrdu());
             value.put("accidence", inflected.getAccidence());
             value.put("part_of_speech", inflected.getPartOfSpeech());
-            value.put("canonical_hindi", inflected.getCanonicalHindi());
-            value.put("canonical_urdu", inflected.getCanonicalUrdu());
-            List<String> dictionaryKeys = inflected.getCanonicalKeys().stream()
-                    .map( CanonicalKey::toKey)
-                    .collect(Collectors.toList());
-            value.put("canonical_keys", dictionaryKeys);
+            value.put("master_dictionary_key", inflected.getMasterDictionaryKey().toMap());
 
             result.put(inflected.getKey(), value);
         });
@@ -813,7 +800,6 @@ public class InflectedService {
     public boolean save(Inflected master){
         try {
             master.setInflectedUrdu(spellCheckService.passMultipleWordsToUrdu(master.getInflectedHindi()));
-            master.setCanonicalUrdu(spellCheckService.passMultipleWordsToUrdu(master.getCanonicalHindi()));
 
             inflectedRepository.save(master);
         }catch (RuntimeException ex){
@@ -908,8 +894,8 @@ public class InflectedService {
         }
 
 
-        if (!validateCanonicalKeys(inflected)){
-            LOGGER.info("some of the canonical keys are not present or incorrect");
+        if (!keyExistsInMasterDictionary(inflected)){
+            LOGGER.info("no master_dictionary key {}-{} exists, as suggested by {}", inflected.getMasterDictionaryKey().getHindiWord(), inflected.getMasterDictionaryKey().getWordIndex(), inflected.getInflectedHindi());
             return false;
         }
 
@@ -927,59 +913,8 @@ public class InflectedService {
      * @param master    the Master record
      * @return          true if all canonical keys exist, false otherwise
      */
-    public boolean validateCanonicalKeys(Inflected master){
-
-        if (master.getCanonicalKeys() == null){
-            return true;
-        }
-        for (CanonicalKey ck: master.getCanonicalKeys()){
-            DictionaryKey dk = new DictionaryKey().setHindiWord(ck.canonicalWord).setWordIndex(ck.canonicalIndex);
-
-            switch (ck.dictionarySource){
-                case PLATTS:
-                    Optional<PlattsEntry> plattsEntry = plattsService.findOne(dk);
-                    if (!plattsEntry.isPresent()){
-                        LOGGER.info("the PRATTS canonical entry hindiWordIndex={} hindiWordIndex={} indicated in Master does not exist", master.getInflectedHindi(), master.getInflectedHindiIndex());
-                        return false;
-                    }else if (!isDerivatePOS(plattsEntry.get().getPartOfSpeech(), master.getPartOfSpeech())){
-                        LOGGER.info("the POS indicated in Master ({}) is not a derivate of the entry in PLATTS ({})", master.getPartOfSpeech(), plattsEntry.get().getPartOfSpeech());
-                        return false;
-                    }
-                    break;
-                case MURSHID:
-                    Optional<MurshidEntry> gonzaloEntry = murshidService.findOne(dk);
-                    if (!gonzaloEntry.isPresent()){
-                        LOGGER.info("the MURSHID canonical entry hindiWordIndex={} hindiWordIndex={} indicated in Master does not exist", master.getInflectedHindi(), master.getInflectedHindiIndex());
-                        return false;
-                    }else if (!isDerivatePOS(gonzaloEntry.get().getPartOfSpeech(), master.getPartOfSpeech())){
-                        LOGGER.info("the POS indicated in Master ({}) is not a derivate of the entry in MURSHID ({})", master.getPartOfSpeech(), gonzaloEntry.get().getPartOfSpeech());
-                        return false;
-                    }
-                    break;
-                case REKHTA:
-                    Optional<RekhtaEntry> rekhtaEntry = rekhtaService.findOne(dk);
-                    if (!rekhtaEntry.isPresent()){
-                        LOGGER.info("the REKHTA canonical entry hindiWordIndex={} hindiWordIndex={} indicated in Master does not exist", master.getInflectedHindi(), master.getInflectedHindiIndex());
-                        return false;
-                    }else if (!isDerivatePOS(rekhtaEntry.get().getPartOfSpeech(), master.getPartOfSpeech())){
-                        LOGGER.info("the POS indicated in Master ({}) is not a derivate of the entry in REKHTA ({})", master.getPartOfSpeech(), rekhtaEntry.get().getPartOfSpeech());
-                        return false;
-                    }
-                    break;
-                case WIKITIONARY:
-                    Optional<WikitionaryEntry> wikitionaryEntry = wikitionaryService.findOne(dk);
-                    if (!wikitionaryEntry.isPresent()){
-                        LOGGER.info("the WIKITIONARY canonical entry hindiWordIndex={} hindiWordIndex={} indicated in Master does not exist", master.getInflectedHindi(), master.getInflectedHindiIndex());
-                        return false;
-                    }else if (!isDerivatePOS(wikitionaryEntry.get().getPartOfSpeech(), master.getPartOfSpeech())){
-                        LOGGER.info("the POS indicated in Master ({}) is not a derivate of the entry in WIKITIONARY ({})", master.getPartOfSpeech(), wikitionaryEntry.get().getPartOfSpeech());
-                        return false;
-                    }
-                    break;
-            }
-
-        };
-        return true;
+    public boolean keyExistsInMasterDictionary(Inflected master) {
+        return masterDictionaryService.findByHindiWordAndWordIndex(master.getMasterDictionaryKey().hindiWord, master.getMasterDictionaryKey().wordIndex).isPresent();
     }
 
     @Inject
@@ -990,16 +925,7 @@ public class InflectedService {
 
 
     @Inject
-    private WikitionaryService wikitionaryService;
-
-    @Inject
-    private PlattsService plattsService;
-
-    @Inject
-    private MurshidService murshidService;
-
-    @Inject
-    private RekhtaService rekhtaService;
+    private MasterDictionaryService masterDictionaryService;
 
     @Inject
     private SpellCheckService spellCheckService;

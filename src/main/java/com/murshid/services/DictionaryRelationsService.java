@@ -3,7 +3,7 @@ package com.murshid.services;
 import com.murshid.models.DictionaryRelationKey;
 import com.murshid.models.enums.DictionarySource;
 import com.murshid.persistence.domain.*;
-import com.murshid.persistence.domain.views.DictionaryEntry;
+import com.murshid.persistence.domain.views.DictionaryEntryView;
 import com.murshid.persistence.repo.DictionaryRelationsRepository;
 
 import javax.inject.Inject;
@@ -22,8 +22,8 @@ public class DictionaryRelationsService {
         return dictionaryRelationsRepository.findByDictionaryRelationKey(dictionaryRelationKey);
     }
 
-    private <T extends IDictionaryEntry> DictionaryEntry convert(T origin){
-        return new DictionaryEntry()
+    private <T extends IDictionaryEntry> DictionaryEntryView convert(T origin){
+        return new DictionaryEntryView()
                 .setDictionarySource(origin.getDictionarySource())
                 .setHindiWord(origin.getHindiWord())
                 .setMeaning(origin.getMeaning())
@@ -31,10 +31,10 @@ public class DictionaryRelationsService {
                 .setWordIndex(origin.getWordIndex());
     }
 
-    public  List<DictionaryEntry> find(DictionaryEntry sourceDictionaryEntry){
+    public  List<DictionaryEntryView> find(DictionaryEntryView sourceDictionaryEntryView){
 
-        List<DictionaryRelations> dirs = find(sourceDictionaryEntry.getHindiWord(), sourceDictionaryEntry.getWordIndex(), sourceDictionaryEntry.getDictionarySource());
-        List<DictionaryEntry> result = new ArrayList<>();
+        List<DictionaryRelations> dirs = find(sourceDictionaryEntryView.getHindiWord(), sourceDictionaryEntryView.getWordIndex(), sourceDictionaryEntryView.getDictionarySource());
+        List<DictionaryEntryView> result = new ArrayList<>();
 
         dirs.forEach(de -> {
             switch (de.dictionarySourceTo){

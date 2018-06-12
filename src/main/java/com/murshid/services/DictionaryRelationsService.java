@@ -37,7 +37,7 @@ public class DictionaryRelationsService {
         List<DictionaryEntryView> result = new ArrayList<>();
 
         dirs.forEach(de -> {
-            switch (de.dictionarySourceTo){
+            switch (de.getDictionaryRelationKey().dictionarySource){
                 case PLATTS:
                     Optional<PlattsEntry> plattsEntry = plattsService.findOne(de.getHindiWordTo(), de.getHindiWordIndexTo());
                     if (plattsEntry.isPresent()){
@@ -63,7 +63,7 @@ public class DictionaryRelationsService {
                     }
                     break;
                 default:
-                    throw new UnsupportedOperationException("dictionary source value " + de.dictionarySourceTo + " not supported");
+                    throw new UnsupportedOperationException("dictionary source value " + de.getDictionaryRelationKey().dictionarySource + " not supported");
             }
 
         });

@@ -14,7 +14,6 @@ import javax.persistence.Embeddable;
 import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
 import java.io.Serializable;
-import java.math.BigDecimal;
 import java.util.Map;
 
 @Embeddable
@@ -22,11 +21,11 @@ public class CanonicalKey implements Serializable{
 
     @JsonProperty("canonical_word")
     @Column(name ="canonical_word")
-    public String canonicalWord;
+    private String canonicalWord;
 
     @JsonProperty("canonical_index")
     @Column(name ="canonical_index")
-    public int canonicalIndex;
+    private int canonicalIndex;
 
     @JsonProperty("dictionary_source")
     @Column(name ="dictionary_source")
@@ -48,11 +47,11 @@ public class CanonicalKey implements Serializable{
         return this;
     }
 
-    public String getCanonicalWord() {
+    private String getCanonicalWord() {
         return canonicalWord;
     }
 
-    public int getCanonicalIndex() {
+    private int getCanonicalIndex() {
         return canonicalIndex;
     }
 
@@ -84,8 +83,7 @@ public class CanonicalKey implements Serializable{
     public static CanonicalKey  fromMap(Map<String, Object> avMap){
         CanonicalKey canonicalKey = new CanonicalKey();
         canonicalKey.setCanonicalWord((String)avMap.get("canonical_word"));
-        BigDecimal bdCi = (BigDecimal) avMap.get("canonical_index");
-        canonicalKey.setCanonicalIndex(bdCi.intValue());
+        canonicalKey.setCanonicalIndex(Integer.valueOf((String)avMap.get("canonical_index")));
         canonicalKey.setDictionarySource(DictionarySource.valueOf((String)avMap.get("dictionary_source")));
         return canonicalKey;
     }

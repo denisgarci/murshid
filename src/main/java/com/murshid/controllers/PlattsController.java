@@ -51,7 +51,7 @@ public class PlattsController {
     }
 
     @PostMapping
-    public ResponseEntity<String> persistPratts(@RequestBody PlattsEntry plattsEntry) {
+    public ResponseEntity<String> persistPlatts(@RequestBody PlattsEntry plattsEntry) {
         if (isValid(plattsEntry)) {
             plattsService.save(plattsEntry);
             return ResponseEntity.status(HttpStatus.CREATED).build();

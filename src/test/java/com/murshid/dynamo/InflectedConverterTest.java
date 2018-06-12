@@ -5,6 +5,7 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 import com.murshid.dynamo.domain.Inflected;
 import com.murshid.models.CanonicalKey;
+import com.murshid.models.DictionaryKey;
 import com.murshid.models.converters.InflectedConverter;
 import com.murshid.models.enums.Accidence;
 import com.murshid.models.enums.DictionarySource;
@@ -28,16 +29,15 @@ public class InflectedConverterTest {
     public void convertToAvMap() throws Exception {
 
         Set<Accidence> accidenceList = Sets.newHashSet(Accidence.FEMININE, Accidence.SINGULAR);
-        Set<CanonicalKey> canonicalKeysList = Sets.newHashSet(
-                new CanonicalKey().setCanonicalIndex(0).setDictionarySource(DictionarySource.MURSHID).setCanonicalWord("भी"),
-                new CanonicalKey().setCanonicalIndex(0).setDictionarySource(DictionarySource.PLATTS).setCanonicalWord("भी"));
-
 
         Inflected inflected = new Inflected()
                 .setInflectedHindiIndex(0)
                 .setInflectedHindi("भी")
                 .setPartOfSpeech(PartOfSpeech.ADVERB)
-                .setAccidence(accidenceList);
+                .setAccidence(accidenceList)
+                .setMasterDictionaryKey(new DictionaryKey().setHindiWord("भी").setWordIndex(0));
+
+
                 //.setCanonicalKeys(canonicalKeysList);
 
         Map<String, AttributeValue> avMap = InflectedConverter.convertToAvMap(inflected);
@@ -48,9 +48,6 @@ public class InflectedConverterTest {
                 Collectors.toSet());
         assertEquals(accAvs, accidenceList);
 
-//        Set<CanonicalKey> cksAvs = avMap.get("canonical_keys").getL().stream().map(av -> CanonicalKey.fromAvMap(av.getM())).collect(
-//                Collectors.toSet());
-//        assertEquals(cksAvs, canonicalKeysList);
     }
 
     @Test
@@ -67,20 +64,10 @@ public class InflectedConverterTest {
 
 
         //create Dictionary Sources
-        Map<String, AttributeValue> ckMap1 = new HashMap<>();
-        ckMap1.put("dictionary_source", new AttributeValue().withS(DictionarySource.MURSHID.name()));
-        ckMap1.put("canonical_word", new AttributeValue("भी"));
-        ckMap1.put("canonical_index", new AttributeValue().withN(Integer.toString(0)));
-        AttributeValue ck1Av = new AttributeValue().withM(ckMap1);
-
-        Map<String, AttributeValue> ckMap2 = new HashMap<>();
-        ckMap2.put("dictionary_source", new AttributeValue().withS(DictionarySource.PLATTS.name()));
-        ckMap2.put("canonical_word", new AttributeValue("भी"));
-        ckMap2.put("canonical_index", new AttributeValue().withN(Integer.toString(0)));
-        AttributeValue ck2Av = new AttributeValue().withM(ckMap2);
-
-        AttributeValue cksAv = new AttributeValue();
-        cksAv.setL(Lists.newArrayList(ck1Av, ck2Av));
+        Map<String, AttributeValue> masterDictionaryKey = new HashMap<>();
+        masterDictionaryKey.put("hindi_word", new AttributeValue().withS("भी"));
+        masterDictionaryKey.put("word_index", new AttributeValue().withN("0"));
+        avMap.put("master_dictionary_key", new AttributeValue().withM(masterDictionaryKey));
 
         //create Accidences
         AttributeValue avAcc1 = new AttributeValue(Accidence.FEMININE.name());
@@ -88,7 +75,6 @@ public class InflectedConverterTest {
         AttributeValue avAccs = new AttributeValue();
         avAccs.setL(Sets.newHashSet(avAcc1, avAcc2));
 
-//        avMap.put("canonical_keys", cksAv);
         avMap.put("accidence", avAccs);
 
         Inflected master = InflectedConverter.fromAvMap(avMap);
@@ -98,10 +84,7 @@ public class InflectedConverterTest {
         assertEquals(master.getAccidence(), Sets.newHashSet(Accidence.FEMININE, Accidence.SINGULAR));
         assertEquals(master.getInflectedHindiIndex(), 3);
 
-        Set<CanonicalKey> canonicalKeysList = Sets.newHashSet(
-                new CanonicalKey().setCanonicalIndex(0).setDictionarySource(DictionarySource.MURSHID).setCanonicalWord("भी"),
-                new CanonicalKey().setCanonicalIndex(0).setDictionarySource(DictionarySource.PLATTS).setCanonicalWord("भी"));
-        //assertEquals(master.getCanonicalKeys(), canonicalKeysList);
+        assertEquals(master.getMasterDictionaryKey().hindiWord, "भी");
     }
 
 

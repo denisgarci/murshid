@@ -29,19 +29,6 @@ public class MasterDictionary  {
     @Column(name ="part_of_speech", nullable = true)
     private PartOfSpeech partOfSpeech;
 
-    @Column(name ="wikitionary_index")
-    private Integer wikitionaryIndex;
-
-    @Column(name ="rekhta_index")
-    private Integer rekhtaIndex;
-
-    @Column(name ="platts_index")
-    private Integer plattsIndex;
-
-    @Column(name ="murshid_index")
-    private Integer murhsidIndex;
-
-
     public PartOfSpeech getPartOfSpeech() {
         return partOfSpeech;
     }
@@ -74,37 +61,4 @@ public class MasterDictionary  {
     public void setWordIndex(int wordIndex) {
         this.wordIndex = wordIndex;
     }
-
-    public Integer getWikitionaryIndex() {
-        return wikitionaryIndex;
-    }
-
-    public void setWikitionaryIndex(int wikitionaryIndex) {
-        this.wikitionaryIndex = wikitionaryIndex;
-    }
-
-    public Integer getRekhtaIndex() {
-        return rekhtaIndex;
-    }
-
-    public void setRekhtaIndex(int rekhtaIndex) {
-        this.rekhtaIndex = rekhtaIndex;
-    }
-
-    public Integer getPlattsIndex() {
-        return plattsIndex;
-    }
-
-    public void setPlattsIndex(int plattsIndex) {
-        this.plattsIndex = plattsIndex;
-    }
-
-    public Integer getMurhsidIndex() {
-        return murhsidIndex;
-    }
-
-    public void setMurhsidIndex(int murhsidIndex) {
-        this.murhsidIndex = murhsidIndex;
-    }
-
 }

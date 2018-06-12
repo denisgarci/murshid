@@ -3,7 +3,7 @@ import {IDictionaryEntriesMap} from "./IDictionaryEntriesMap";
 
 export class DictionariesContent {
   accidence: string[];
-  accidence_labels: string[];
+  accidence_labels: string[] = [];
   canonical_hindi: string;
   inflected_hindi: string;
   not_inflected_hindi: string;

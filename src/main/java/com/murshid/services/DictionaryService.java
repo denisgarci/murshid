@@ -46,7 +46,7 @@ public class DictionaryService {
                 ).collect(Collectors.toSet());
 
         Map<String, Map<DictionarySource, List<DictionaryEntryView>>> dictionaryEntriesForInflected = createDictionaryEntriesMap2(masterDictionaryKeys);
-        //addDictionaryRelations(dictionaryEntriesForInflected);
+        addDictionaryRelations(dictionaryEntriesForInflected);
         song.setDictionaryEntriesInflected(gson.toJson(dictionaryEntriesForInflected));
 
         songRepository.save(song);
@@ -71,12 +71,15 @@ public class DictionaryService {
      * with related dictionary elements, if any available in dictionary_relations.
      * @param dictionaryEntries
      */
-    public void addDictionaryRelations(Map<String, List<DictionaryEntryView>> dictionaryEntries){
+    public void addDictionaryRelations(Map<String, Map<DictionarySource, List<DictionaryEntryView>>> dictionaryEntries){
         dictionaryEntries.values().forEach(va -> {
-            DictionaryEntryView origin = va.get(0);
-            List<DictionaryEntryView> additional = dictionaryRelationsService.find(origin);
-            va.addAll(additional);
-        });
+            va.values().forEach( va2 -> {
+                DictionaryEntryView origin = va2.get(0);
+                List<DictionaryEntryView> additional = dictionaryRelationsService.find(origin);
+                va2.addAll(additional);
+            });
+          }
+        );
     }
 
     public Map<String, Map<DictionarySource, List<DictionaryEntryView>>> createDictionaryEntriesForNotInflected(Song song) {
@@ -91,7 +94,7 @@ public class DictionaryService {
                 ).collect(Collectors.toSet());
 
         Map<String, Map<DictionarySource, List<DictionaryEntryView>>> dictionaryEntriesForNotInflected = createDictionaryEntriesMap2(masterDictionaryKeys);
-        //addDictionaryRelations(dictionaryEntriesForNotInflected);
+        addDictionaryRelations(dictionaryEntriesForNotInflected);
         song.setDictionaryEntriesNotInflected(gson.toJson(dictionaryEntriesForNotInflected));
 
         songRepository.save(song);

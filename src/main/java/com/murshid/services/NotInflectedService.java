@@ -86,7 +86,7 @@ public class NotInflectedService {
      */
     public List<NotInflected> allEntriesForSong(Song song){
 
-        if (song.getDictionaryEntriesNotInflected() != null) {
+        if (song.getWordListNotInflected() != null) {
 
             //collect all master keys, without repetition
             Set<NotInflectedKey> mks = song.getWordListNotInflected()

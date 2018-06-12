@@ -2,9 +2,7 @@ package com.murshid.models;
 
 import com.amazonaws.services.dynamodbv2.model.AttributeValue;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.databind.annotation.JsonPOJOBuilder;
 import com.google.common.collect.ImmutableMap;
-import com.murshid.models.enums.DictionarySource;
 
 import javax.persistence.Column;
 import javax.persistence.Embeddable;
@@ -48,13 +46,24 @@ public class DictionaryKey implements Serializable{
     public static DictionaryKey  fromMap(Map<String, Object> map){
         DictionaryKey canonicalKey = new DictionaryKey();
         canonicalKey.setHindiWord(map.get("hindi_word").toString());
-        canonicalKey.setWordIndex(((Double)(map.get("word_index"))).intValue());
+        canonicalKey.setWordIndex(safeIntFromMap(map, "word_index"));
         return canonicalKey;
+    }
+
+    private static int safeIntFromMap(Map map, String fieldName){
+        Object value = map.get(fieldName);
+        if (value instanceof Number) {
+            return ((Number) value).intValue();
+        }else  if (value instanceof String){
+            return Integer.valueOf((String)value).intValue();
+        }else{
+            throw new IllegalArgumentException("Field name " + fieldName + " has a value " + value + " whose format is not supported");
+        }
     }
 
     public Map<String, Object>  toMap(){
         return ImmutableMap.of("hindi_word", hindiWord,
-                "word_index", wordIndex);
+                "word_index", Integer.toString(wordIndex));
     }
 
     public static Map<String, AttributeValue>  toAvMap(DictionaryKey dictionaryKey ){

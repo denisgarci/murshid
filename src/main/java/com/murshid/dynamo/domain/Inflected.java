@@ -2,8 +2,6 @@ package com.murshid.dynamo.domain;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.common.collect.Sets;
-import com.google.gson.annotations.SerializedName;
-import com.murshid.models.CanonicalKey;
 import com.murshid.models.DictionaryKey;
 import com.murshid.models.enums.Accidence;
 import com.murshid.models.enums.PartOfSpeech;
@@ -115,15 +113,19 @@ public class Inflected {
 
     @Override
     public Object clone() {
-          Inflected master = new Inflected();
-          master
-           .setInflectedHindi(this.inflectedHindi)
-           .setInflectedUrdu(this.inflectedUrdu)
-           .setAccidence(new HashSet<>(this.accidence))
-           .setPartOfSpeech(this.getPartOfSpeech())
-           .setMasterDictionaryKey(this.masterDictionaryKey)
-           .setInflectedHindiIndex(this.getInflectedHindiIndex()+ 1);
-          return master;
+        try {
+            Inflected master = (Inflected) super.clone();
+            master
+                    .setInflectedHindi(this.inflectedHindi)
+                    .setInflectedUrdu(this.inflectedUrdu)
+                    .setAccidence(new HashSet<>(this.accidence))
+                    .setPartOfSpeech(this.getPartOfSpeech())
+                    .setMasterDictionaryKey(this.masterDictionaryKey)
+                    .setInflectedHindiIndex(this.getInflectedHindiIndex() + 1);
+            return master;
+        }catch (CloneNotSupportedException ex){
+            return null;
+        }
 
     }
 

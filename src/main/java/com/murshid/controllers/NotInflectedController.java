@@ -1,9 +1,7 @@
 package com.murshid.controllers;
 
-import com.murshid.dynamo.domain.Inflected;
 import com.murshid.dynamo.domain.NotInflected;
 import com.murshid.dynamo.domain.Song;
-import com.murshid.models.CanonicalKey;
 import com.murshid.services.NotInflectedService;
 import com.murshid.services.SongsService;
 import org.slf4j.Logger;
@@ -20,13 +18,15 @@ import java.util.*;
 @RequestMapping("notinflected")
 public class NotInflectedController {
 
+    private NotInflectedService notInflectedService;
+    private SongsService songsService;
+
     private static final Logger LOGGER = LoggerFactory.getLogger(NotInflectedController.class);
 
     @GetMapping("/findWord")
     public @ResponseBody
     List<NotInflected> findInKeyAndBody(@RequestParam(name = "hindiWord") String word) {
-        List<NotInflected> result = notInflectedService.getByHindi(word);
-        return result;
+        return notInflectedService.getByHindi(word);
     }
 
     @GetMapping("/generateNotInflectedEntriesInSong")
@@ -74,12 +74,15 @@ public class NotInflectedController {
         }
     }
 
-
+    @Inject
+    public void setNotInflectedService(NotInflectedService notInflectedService) {
+        this.notInflectedService = notInflectedService;
+    }
 
     @Inject
-    private NotInflectedService notInflectedService;
+    public void setSongsService(SongsService songsService) {
+        this.songsService = songsService;
+    }
 
-    @Inject
-    private SongsService songsService;
 
 }

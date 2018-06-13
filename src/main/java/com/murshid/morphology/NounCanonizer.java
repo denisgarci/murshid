@@ -7,7 +7,7 @@ import com.murshid.models.enums.PartOfSpeech;
 import java.util.HashSet;
 import java.util.Set;
 
-public class NounCanonizer {
+class NounCanonizer {
 
     /**
      * Given an inflected form, offers all possible canonical forms it can come from 
@@ -17,14 +17,13 @@ public class NounCanonizer {
      *                          We are not including gender in the accidence, so that the discovories are useful for both genders. This implies that gemder can't be part of the 
      *                          comparison when selecting forms in the dictionary databases.
      */
-    public static Set<CanonicalResult> process(String inflectedForm){
+     static Set<CanonicalResult> process(String inflectedForm){
         Set<CanonicalResult> results = new HashSet<>();
 
         //masculine in -A
         if (inflectedForm.endsWith("ा")){
-            String canonicalForm = inflectedForm;
             results.add(new CanonicalResult().setPossiblePOS(PartOfSpeech.NOUN)
-                                .setCanonicalForm(canonicalForm).setAccidence(Sets.newHashSet(Accidence.SINGULAR, Accidence.DIRECT)));
+                                .setCanonicalForm(inflectedForm).setAccidence(Sets.newHashSet(Accidence.SINGULAR, Accidence.DIRECT)));
         }
 
         if (inflectedForm.endsWith("े")){
@@ -51,9 +50,8 @@ public class NounCanonizer {
 
         //masculines in -UU shortened it to -UÕ
         if (inflectedForm.endsWith("ू")){
-            String canonicalForm = inflectedForm;
             results.add(new CanonicalResult().setPossiblePOS(PartOfSpeech.NOUN)
-                                .setCanonicalForm(canonicalForm).setAccidence(Sets.newHashSet(Accidence.SINGULAR, Accidence.DIRECT)));
+                                .setCanonicalForm(inflectedForm).setAccidence(Sets.newHashSet(Accidence.SINGULAR, Accidence.DIRECT)));
         }
         if (inflectedForm.endsWith("ुओं")){
             String canonicalForm = inflectedForm.substring(0, inflectedForm.length()-3).concat("ू");
@@ -63,13 +61,12 @@ public class NounCanonizer {
 
         //feminines in -I
         if (inflectedForm.endsWith("ी")){
-            String canonicalForm = inflectedForm;
             results.add(new CanonicalResult().setPossiblePOS(PartOfSpeech.NOUN)
-                                .setCanonicalForm(canonicalForm).setAccidence(Sets.newHashSet( Accidence.SINGULAR, Accidence.DIRECT)));
+                                .setCanonicalForm(inflectedForm).setAccidence(Sets.newHashSet( Accidence.SINGULAR, Accidence.DIRECT)));
             results.add(new CanonicalResult().setPossiblePOS(PartOfSpeech.NOUN)
-                                .setCanonicalForm(canonicalForm).setAccidence(Sets.newHashSet( Accidence.SINGULAR, Accidence.OBLIQUE)));
+                                .setCanonicalForm(inflectedForm).setAccidence(Sets.newHashSet( Accidence.SINGULAR, Accidence.OBLIQUE)));
             results.add(new CanonicalResult().setPossiblePOS(PartOfSpeech.NOUN)
-                                .setCanonicalForm(canonicalForm).setAccidence(Sets.newHashSet( Accidence.SINGULAR, Accidence.VOCATIVE)));
+                                .setCanonicalForm(inflectedForm).setAccidence(Sets.newHashSet( Accidence.SINGULAR, Accidence.VOCATIVE)));
         }
 
         if (inflectedForm.endsWith("ियाँ") || inflectedForm.endsWith("ियां")){
@@ -92,15 +89,14 @@ public class NounCanonizer {
 
         //masculines not ending in -A
         if (!inflectedForm.endsWith("ा")){
-            String canonicalForm = inflectedForm;
             results.add(new CanonicalResult().setPossiblePOS(PartOfSpeech.NOUN)
-                                .setCanonicalForm(canonicalForm).setAccidence(Sets.newHashSet( Accidence.SINGULAR, Accidence.DIRECT)));
+                                .setCanonicalForm(inflectedForm).setAccidence(Sets.newHashSet( Accidence.SINGULAR, Accidence.DIRECT)));
             results.add(new CanonicalResult().setPossiblePOS(PartOfSpeech.NOUN)
-                                .setCanonicalForm(canonicalForm).setAccidence(Sets.newHashSet( Accidence.SINGULAR, Accidence.OBLIQUE)));
+                                .setCanonicalForm(inflectedForm).setAccidence(Sets.newHashSet( Accidence.SINGULAR, Accidence.OBLIQUE)));
             results.add(new CanonicalResult().setPossiblePOS(PartOfSpeech.NOUN)
-                                .setCanonicalForm(canonicalForm).setAccidence(Sets.newHashSet( Accidence.SINGULAR, Accidence.VOCATIVE)));
+                                .setCanonicalForm(inflectedForm).setAccidence(Sets.newHashSet( Accidence.SINGULAR, Accidence.VOCATIVE)));
             results.add(new CanonicalResult().setPossiblePOS(PartOfSpeech.NOUN)
-                                .setCanonicalForm(canonicalForm).setAccidence(Sets.newHashSet( Accidence.PLURAL, Accidence.DIRECT)));
+                                .setCanonicalForm(inflectedForm).setAccidence(Sets.newHashSet( Accidence.PLURAL, Accidence.DIRECT)));
 
         }
         if (inflectedForm.endsWith("ों")){
@@ -117,13 +113,12 @@ public class NounCanonizer {
 
         //feminines not ending in -I
         if (!inflectedForm.endsWith("ी")){
-            String canonicalForm = inflectedForm;
             results.add(new CanonicalResult().setPossiblePOS(PartOfSpeech.NOUN)
-                                .setCanonicalForm(canonicalForm).setAccidence(Sets.newHashSet( Accidence.SINGULAR, Accidence.DIRECT)));
+                                .setCanonicalForm(inflectedForm).setAccidence(Sets.newHashSet( Accidence.SINGULAR, Accidence.DIRECT)));
             results.add(new CanonicalResult().setPossiblePOS(PartOfSpeech.NOUN)
-                                .setCanonicalForm(canonicalForm).setAccidence(Sets.newHashSet( Accidence.SINGULAR, Accidence.OBLIQUE)));
+                                .setCanonicalForm(inflectedForm).setAccidence(Sets.newHashSet( Accidence.SINGULAR, Accidence.OBLIQUE)));
             results.add(new CanonicalResult().setPossiblePOS(PartOfSpeech.NOUN)
-                                .setCanonicalForm(canonicalForm).setAccidence(Sets.newHashSet( Accidence.SINGULAR, Accidence.VOCATIVE)));
+                                .setCanonicalForm(inflectedForm).setAccidence(Sets.newHashSet( Accidence.SINGULAR, Accidence.VOCATIVE)));
         }
         if (inflectedForm.endsWith("ें")){
             String canonicalForm = inflectedForm.substring(0, inflectedForm.length()-2);

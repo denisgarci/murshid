@@ -2,8 +2,6 @@ package com.murshid.controllers;
 
 import com.murshid.persistence.domain.RekhtaEntry;
 import com.murshid.services.RekhtaService;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
@@ -16,7 +14,7 @@ import java.util.List;
 @RequestMapping("rekhta")
 public class RekhtaController {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(RekhtaController.class);
+    private RekhtaService rekhtaService;
 
     @PostMapping
     public ResponseEntity<String> persist(@RequestBody RekhtaEntry rekhtaEntry) {
@@ -35,8 +33,9 @@ public class RekhtaController {
     }
 
 
-
     @Inject
-    private RekhtaService rekhtaService;
+    public void setRekhtaService(RekhtaService rekhtaService) {
+        this.rekhtaService = rekhtaService;
+    }
 
 }

@@ -7,8 +7,6 @@ import com.murshid.persistence.domain.views.DictionaryEntryView;
 import com.murshid.persistence.domain.views.StringListWrapper;
 import com.murshid.services.DictionaryService;
 import com.murshid.services.SongsService;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
@@ -23,7 +21,8 @@ import java.util.stream.Collectors;
 @RequestMapping("dictionaries")
 public class DictionariesController {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(DictionariesController.class);
+    private DictionaryService dictionaryService;
+    private SongsService songsService;
 
     /**
      * presents the JS object that will be written in the corresponding Song.
@@ -40,11 +39,8 @@ public class DictionariesController {
     public @ResponseBody
     Map<String, Map<DictionarySource, List<DictionaryEntryView>>> createDictionaryEntriesForNotInflected(@RequestParam(name = "songLatinName") String songLatinName) {
         Optional<Song> song = songsService.findByLatinTitle(songLatinName);
-        if (song.isPresent()) {
-            return dictionaryService.createDictionaryEntriesForNotInflected(song.get());
-        }else{
-            return null;
-        }
+        return song.map( s -> dictionaryService.createDictionaryEntriesForNotInflected(s))
+                .orElse(null);
     }
 
     /**
@@ -62,11 +58,8 @@ public class DictionariesController {
     public @ResponseBody
     Map<String, Map<DictionarySource, List<DictionaryEntryView>>> createDictionaryEntriesForInflected(@RequestParam(name = "songLatinName") String songLatinName) {
         Optional<Song> song = songsService.findByLatinTitle(songLatinName);
-        if (song.isPresent()) {
-            return dictionaryService.createDictionaryEntriesForInflected(song.get());
-        }else{
-            return null;
-        }
+        return song.map(dictionaryService::createDictionaryEntriesForInflected)
+                .orElse(null);
     }
 
     @PostMapping("/findInDictionaries")
@@ -88,14 +81,18 @@ public class DictionariesController {
                     }));
             result.putAll(partial);
         });
-
         return result;
     }
 
     @Inject
-    private DictionaryService dictionaryService;
+    public void setDictionaryService(DictionaryService dictionaryService) {
+        this.dictionaryService = dictionaryService;
+    }
 
     @Inject
-    private SongsService songsService;
+    public void setSongsService(SongsService songsService) {
+        this.songsService = songsService;
+    }
+
 
 }

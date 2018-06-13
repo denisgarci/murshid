@@ -39,7 +39,7 @@ public class DictionaryKey implements Serializable{
     public static DictionaryKey  fromAvMap(Map<String, AttributeValue> avMap){
         DictionaryKey canonicalKey = new DictionaryKey();
         canonicalKey.setHindiWord(avMap.get("hindi_word").getS());
-        canonicalKey.setWordIndex(Integer.valueOf(avMap.get("word_index").getN()));
+        canonicalKey.setWordIndex(safeIntFromAvMap(avMap, "word_index"));
         return canonicalKey;
     }
 
@@ -48,6 +48,17 @@ public class DictionaryKey implements Serializable{
         canonicalKey.setHindiWord(map.get("hindi_word").toString());
         canonicalKey.setWordIndex(safeIntFromMap(map, "word_index"));
         return canonicalKey;
+    }
+
+    private static int safeIntFromAvMap(Map<String, AttributeValue> map, String fieldName){
+        AttributeValue value = map.get(fieldName);
+        if (value.getN() != null) {
+            return Integer.valueOf(value.getN());
+        }else  if (value.getS() != null){
+            return Integer.valueOf(value.getS());
+        }else{
+            throw new IllegalArgumentException("Field name " + fieldName + " has a value " + value + " whose format is not supported");
+        }
     }
 
     private static int safeIntFromMap(Map map, String fieldName){

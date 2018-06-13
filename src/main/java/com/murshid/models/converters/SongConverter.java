@@ -1,20 +1,14 @@
 package com.murshid.models.converters;
 
 import com.amazonaws.services.dynamodbv2.document.Item;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.murshid.dynamo.domain.Song;
 import com.murshid.persistence.domain.views.SongWordsToInflectedTable;
 import com.murshid.persistence.domain.views.SongWordsToNotInflectedTable;
-import jersey.repackaged.com.google.common.collect.Lists;
-
-import java.io.IOException;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
 public class SongConverter {
-
-    static ObjectMapper mapper = new ObjectMapper();
 
     public static Song convert(Item item){
         Song song = new Song();
@@ -50,7 +44,7 @@ public class SongConverter {
         if (item.isPresent("word_list_master")) {
             List<Map<String, Object>> itemList = item.getList("word_list_master");
             List<SongWordsToInflectedTable> wlmEntries = itemList.stream()
-                    .map(a -> WordListMasterEntryConverter.fromMap(a))
+                    .map(WordListMasterEntryConverter::fromMap)
                     .collect(Collectors.toList());
 
             song.setWordListMaster(wlmEntries);
@@ -59,7 +53,7 @@ public class SongConverter {
         if (item.isPresent("word_list_not_inflected")) {
             List<Map<String, Object>> itemList = item.getList("word_list_not_inflected");
             List<SongWordsToNotInflectedTable> wlmEntries = itemList.stream()
-                    .map(a -> WordListNotInflectedEntryConverter.fromMap(a))
+                    .map(WordListNotInflectedEntryConverter::fromMap)
                     .collect(Collectors.toList());
 
             song.setWordListNotInflected(wlmEntries);
@@ -90,15 +84,6 @@ public class SongConverter {
 
         return song;
     }
-
-    private static SongWordsToInflectedTable fromJson(String json){
-        try{
-             return mapper.readValue(json, SongWordsToInflectedTable.class);
-        }catch (IOException ex){
-            throw new RuntimeException("cannpt understand this json as a SongWordsToInflectedTable" + json);
-        }
-    }
-
 
     public static Item convert(Song song){
         Item item = new Item();

@@ -16,7 +16,7 @@ public class AdjectiveCanonizer {
      *                          From the CanonicalConstruct, only the tentative form matters for the moment, so it would be
      *                          convenient to merge all resulting results by canonical form only.
      */
-    public static Set<CanonicalResult> process(String inflectedForm){
+     static Set<CanonicalResult> process(String inflectedForm){
         Set<CanonicalResult> results = new HashSet<>();
 
         //masculine in -A

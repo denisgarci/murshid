@@ -20,6 +20,7 @@ import javax.inject.Inject;
 import javax.inject.Named;
 import java.io.IOException;
 import java.net.URISyntaxException;
+import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.*;
@@ -29,15 +30,18 @@ import java.util.stream.Collectors;
 public class SongsService {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(WikitionaryLetterIngestor.class);
+    private static final String WITH_DELIMITER = "((?<=%1$s)|(?=%1$s))";
 
-    static public final String WITH_DELIMITER = "((?<=%1$s)|(?=%1$s))";
+    private SongRepository songRepository;
+    private SpellCheckRepository spellCheckRepository;
+    private InflectedService inflectedService;
 
     /**
      * Rerurns the texts of a song from the Dynamo songs table, if it exists.
      * @param songTitleLatin        the latin title of the desired song
      * @return                      the song's text
      */
-    public Optional<String> getSong(@Nonnull String songTitleLatin) {
+    private Optional<String> getSong(@Nonnull String songTitleLatin) {
 
         Table table = DynamoAccessor.dynamoDB.getTable("songs");
         Item item = table.getItem("title_latin", songTitleLatin);
@@ -51,9 +55,6 @@ public class SongsService {
 
     /**
      * re-ingests the lyrics of a song (already present in the Dynamo Songs) from a file.
-     * @param songTitleLatin
-     * @param fileName
-     * @return
      */
     public boolean ingestEnglishTranslation(String songTitleLatin, String fileName){
 
@@ -64,13 +65,18 @@ public class SongsService {
         }else{
 
             try {
-                String translationText =  new String(Files.readAllBytes(
-                        Paths.get(getClass().getClassLoader()
-                                          .getResource("translations/" + fileName)
-                                          .toURI())));
+                final URL resource = getClass().getClassLoader()
+                        .getResource("translations/" + fileName);
+                if (resource != null) {
+                    String translationText = new String(Files.readAllBytes(
+                            Paths.get(resource.toURI())));
+                    song.setEnglishTranslation(translationText);
+                    songRepository.save(song);
+                }else{
+                    LOGGER.error("no song file {} found for song title {}", fileName, songTitleLatin);
+                    return false;
+                }
 
-                song.setEnglishTranslation(translationText);
-                songRepository.save(song);
             }catch (URISyntaxException | IOException ex){
                 return false;
             }
@@ -81,9 +87,7 @@ public class SongsService {
 
     /**
      * re-ingests the lyrics of a song (already present in the Dynamo Songs) from a file.
-     * @param songTitleLatin
-     * @param fileName
-     * @return
+     * It needs for the song file to be in the classpath (built)
      */
     public boolean ingestSong(String songTitleLatin, String fileName){
 
@@ -94,13 +98,19 @@ public class SongsService {
         }else{
 
             try {
-                String songText =  new String(Files.readAllBytes(
-                        Paths.get(getClass().getClassLoader()
-                                          .getResource("songs/" + fileName)
-                                          .toURI())));
+                final URL resource = getClass().getClassLoader()
+                        .getResource("songs/" + fileName);
+                if (resource != null) {
+                    String songText =  new String(Files.readAllBytes(
+                            Paths.get(resource
+                                    .toURI())));
 
-                song.setSong(songText);
-                songRepository.save(song);
+                    song.setSong(songText);
+                    songRepository.save(song);
+                }else{
+                    LOGGER.error("no song file {} found for song title {}", fileName, songTitleLatin);
+                    return false;
+                }
             }catch (URISyntaxException | IOException ex){
                 return false;
             }
@@ -121,8 +131,6 @@ public class SongsService {
 
     /**
      * Grabs a song from the Dynamo Songs, and tells which of its word are not in the spell check repository
-     * @param songTitleLatin
-     * @return
      */
     public Set<String> newWordsInSong(@Nonnull String songTitleLatin){
         Optional<String> song = getSong(songTitleLatin);
@@ -170,34 +178,34 @@ public class SongsService {
             while(tokenIndex < allTokens.length){
                 String token = allTokens[tokenIndex];
 
-
-                if (token.equals("[")){
-                    inside = true;
-                    tokenIndex ++;
-                    result.append(token);
-                }else if (token.equals("]")){
-                    inside = false;
-                    tokenIndex ++;
-                    result.append(token);
-                } else {
-
-                        if (hindiTokens.contains(token)){
+                switch(token) {
+                    case "[":
+                        inside = true;
+                        tokenIndex++;
+                        result.append(token);
+                        break;
+                    case "]":
+                        inside = false;
+                        tokenIndex++;
+                        result.append(token);
+                        break;
+                    default:
+                        if (hindiTokens.contains(token)) {
                             if (!inside) {
-                                index += 10;
-                                result.append("<span class=\"relevant\" id=\"" + index + "\">" + token + "</span>");
+                                index += 1;
+                                result.append("<span class=\"relevant\" id=\"").append(index).append("\">").append( token).append("</span>");
                                 result.append(" ");
-                            }else{
+                            } else {
                                 result.append(token);
                             }
-                        }else if (token.equals(" ")){
+                        } else if (token.equals(" ")) {
                             result.append("&nbsp;");
-                        }else if (token.equals("\n")){
+                        } else if (token.equals("\n")) {
                             result.append("<br/>");
-                        }else{
+                        } else {
                             result.append(token);
                         }
-
-                    tokenIndex++;
+                        tokenIndex++;
                 }
                 songRepository.save(song.setHtml(result.toString()));
             }
@@ -212,13 +220,12 @@ public class SongsService {
             Set<String> hindiTokens = SongUtils.wordTokens(translationText);
 
             String[] allTokens = translationText.split(String.format(WITH_DELIMITER, "\\s+|\\\\n|\\?|\\,"));
-            //allTokens = SongUtils.eliminateThingsWithinBrackets(allTokens);
 
             int index = 0;
             for(String token: allTokens){
                 if (hindiTokens.contains(token)){
-                    index += 10;
-                    result.append("<span class=\"translation_word\" id=\"" + index + "\">" + token + "</span>");
+                    index += 1;
+                    result.append("<span class=\"translation_word\" id=\"").append(index).append("\">").append(token).append("</span>");
                     result.append(" ");
                 }else if (token.equals(" ")){
                     result.append("&nbsp;");
@@ -257,10 +264,8 @@ public class SongsService {
     }
 
     public void addEntryToWordListMaster(@Nonnull String songTitleLatin, SongWordsToInflectedTable songWordsToInflectedTable){
-        List<String> indices = songWordsToInflectedTable.getIndices();
 
         Song song = songRepository.findOne(songTitleLatin);
-        Map<String, String> result = new LinkedHashMap<>();
         if (song != null){
             Map<String, Object> entry = new HashMap<>();
             entry.put("song_word_indices", songWordsToInflectedTable.getIndices());
@@ -281,14 +286,24 @@ public class SongsService {
         }
     }
 
-    @Inject
-    private SongRepository songRepository;
 
     @Inject
-    private SpellCheckRepository spellCheckRepository;
+    public SongsService setSongRepository(SongRepository songRepository) {
+        this.songRepository = songRepository;
+        return this;
+    }
 
     @Inject
-    private InflectedService inflectedService;
+    public SongsService setSpellCheckRepository(SpellCheckRepository spellCheckRepository) {
+        this.spellCheckRepository = spellCheckRepository;
+        return this;
+    }
+
+    @Inject
+    public SongsService setInflectedService(InflectedService inflectedService) {
+        this.inflectedService = inflectedService;
+        return this;
+    }
 
 
 

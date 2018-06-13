@@ -3,8 +3,6 @@ package com.murshid.controllers;
 import com.murshid.dynamo.domain.Song;
 import com.murshid.persistence.domain.views.SongWordsToInflectedTable;
 import com.murshid.services.SongsService;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
@@ -17,7 +15,7 @@ import java.util.Optional;
 @RequestMapping("songs")
 public class SongsController {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(SongsController.class);
+    private SongsService songsService;
 
     @PostMapping("/reingest")
     public ResponseEntity<String> insertNew(@RequestParam(name = "songLatinName") String songLatinName, @RequestParam(name = "songFile") String songFile) {
@@ -74,7 +72,8 @@ public class SongsController {
     }
 
     @Inject
-    private SongsService songsService;
-
+    public void setSongsService(SongsService songsService) {
+        this.songsService = songsService;
+    }
 
 }

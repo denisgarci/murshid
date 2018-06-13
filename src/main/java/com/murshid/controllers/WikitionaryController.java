@@ -19,6 +19,9 @@ public class WikitionaryController {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(WikitionaryController.class);
 
+    private WikitionaryService wikitionaryService;
+    private WikitionaryWordProcessor wikitionaryWordProcessor;
+
     @GetMapping("/processAllLetters")
     public String greeting(@RequestParam(name="retryFailed", required=false, defaultValue="false") boolean retryFailed) {
         wikitionaryService.processAllLetters(retryFailed);
@@ -54,7 +57,7 @@ public class WikitionaryController {
             return false;
         } else {
             if (wikitionaryEntry.getDictionaryKey().hindiWord == null) {
-                LOGGER.info("dictionary entry key cannot be null");
+                LOGGER.info("dictionary entry key hindiWord cannot be null");
                 return false;
             }
         }
@@ -68,9 +71,12 @@ public class WikitionaryController {
     }
 
     @Inject
-    private WikitionaryService wikitionaryService;
+    public void setWikitionaryService(WikitionaryService wikitionaryService) {
+        this.wikitionaryService = wikitionaryService;
+    }
 
     @Inject
-    private WikitionaryWordProcessor wikitionaryWordProcessor;
-
+    public void setWikitionaryWordProcessor(WikitionaryWordProcessor wikitionaryWordProcessor) {
+        this.wikitionaryWordProcessor = wikitionaryWordProcessor;
+    }
 }

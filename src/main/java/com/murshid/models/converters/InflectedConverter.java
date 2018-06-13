@@ -3,7 +3,6 @@ package com.murshid.models.converters;
 import com.amazonaws.services.dynamodbv2.document.Item;
 import com.amazonaws.services.dynamodbv2.model.AttributeValue;
 import com.murshid.dynamo.domain.Inflected;
-import com.murshid.models.CanonicalKey;
 import com.murshid.models.DictionaryKey;
 import com.murshid.models.enums.Accidence;
 import com.murshid.models.enums.PartOfSpeech;
@@ -43,26 +42,18 @@ public class InflectedConverter {
             inflected.setMasterDictionaryKey(DictionaryKey.fromMap(item.getMap("master_dictionary_key")));
         }
 
+        if (item.isPresent("master_dictionary_id")){
+            inflected.setMasterDictionaryId(item.getInt("master_dictionary_id"));
+        }
 
         if (item.isPresent("accidence")){
-            inflected.setAccidence(((List<String>)item.get("accidence")).stream().map(Accidence::valueOf).collect(Collectors.toSet()));
+            inflected.setAccidence( item.getList("accidence").stream().map(o -> Accidence.valueOf(o.toString())).collect(Collectors.toSet()));
         }
 
         return inflected;
     }
 
     public static Map<String, AttributeValue> convertToAvMap(Inflected master){
-
-//        List<AttributeValue> canonicalKeys = master.getCanonicalKeys().stream()
-//                .map(ck -> {
-//                    AttributeValue attributeValue = new AttributeValue();
-//                    attributeValue.setM(CanonicalKey.toAvMap(ck));
-//                    return attributeValue;
-//                } )
-//                .collect(Collectors.toList());
-
-//        AttributeValue cksList= new AttributeValue();
-//        cksList.setL(canonicalKeys);
 
         List<AttributeValue> accidences = master.getAccidence().stream()
                 .map(acc -> {
@@ -78,11 +69,14 @@ public class InflectedConverter {
         Map<String, AttributeValue> result = new HashMap<>();
         result.put("inflected_hindi", new AttributeValue(master.getInflectedHindi()));
         result.put("inflected_urdu", new AttributeValue(master.getInflectedUrdu()));
-        result.put("inflected_hindi_index", new AttributeValue(Integer.toString(master.getInflectedHindiIndex())));
+        AttributeValue ihi = new AttributeValue(); ihi.setN(Integer.toString(master.getInflectedHindiIndex()));
+        result.put("inflected_hindi_index", ihi);
         result.put("part_of_speech", new AttributeValue(master.getPartOfSpeech().name()));
         AttributeValue mdk = new AttributeValue();
         mdk.setM(DictionaryKey.toAvMap(master.getMasterDictionaryKey()));
         result.put("master_dictionary_key", mdk);
+        AttributeValue mdi = new AttributeValue(); ihi.setN(Integer.toString(master.getMasterDictionaryId()));
+        result.put("master_dictionary_id", mdi);
         result.put("accidence", accsList  );
 
         return result;
@@ -95,6 +89,7 @@ public class InflectedConverter {
                 .setInflectedUrdu(sAvs.get("inflected_urdu").getS())
                 .setPartOfSpeech(PartOfSpeech.valueOf(sAvs.get("part_of_speech").getS()))
                 .setInflectedHindiIndex(Integer.valueOf(sAvs.get("inflected_hindi_index").getN()))
+                .setMasterDictionaryId(Integer.valueOf(sAvs.get("master_dictionary_id").getN()))
                 .setMasterDictionaryKey(DictionaryKey.fromAvMap(sAvs.get("master_dictionary_key").getM()));
 
         AttributeValue accidenceAv = sAvs.get("accidence");
@@ -108,9 +103,6 @@ public class InflectedConverter {
             master.setAccidence(accidence);
         }
 
-//        master.setCanonicalKeys(canonicalKeys);
-
-
         return master;
     }
 
@@ -121,9 +113,11 @@ public class InflectedConverter {
 
         item = item.with("inflected_urdu", master.getInflectedUrdu());
 
-        item = item.with("inflected_hindi_index", master.getInflectedHindiIndex());
+        item = item.withInt("inflected_hindi_index", master.getInflectedHindiIndex());
 
         item = item.with("part_of_speech", master.getPartOfSpeech().name());
+
+        item = item.withInt("master_dictionary_id", master.getMasterDictionaryId());
 
         item = item.withMap("master_dictionary_key", master.getMasterDictionaryKey().toMap());
 

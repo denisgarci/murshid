@@ -11,7 +11,6 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
 import javax.inject.Inject;
-import java.util.Iterator;
 import java.util.List;
 
 @Controller
@@ -19,30 +18,13 @@ import java.util.List;
 public class PlattsController {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(PlattsController.class);
-
+    private PlattsService plattsService;
 
     @GetMapping("/findAnywhere")
     public @ResponseBody
     List<PlattsEntry> findAnywhere(@RequestParam(name = "word") String word) {
-        List list = Lists.newArrayList(plattsService.findAnywhere(word));
-        return list;
+        return Lists.newArrayList(plattsService.findAnywhere(word));
     }
-
-    //@GetMapping("/allSpaces")
-    public @ResponseBody
-    void allSpaces() {
-        Iterable<PlattsEntry> iterable = plattsService.findAll();
-        Iterator<PlattsEntry> iterator = iterable.iterator();
-        while(iterator.hasNext()){
-            PlattsEntry pe = iterator.next();
-            pe.setMeaning(pe.getMeaning().replace("\n", " ").replace("\r", " "));
-            if (pe.getExtraMeaning() != null) {
-                pe.setExtraMeaning(pe.getExtraMeaning().replace("\n", " ").replace("\r", " "));
-            }
-            plattsService.save(pe);
-        }
-    }
-
 
     @GetMapping("/replaceNukta")
     public @ResponseBody
@@ -90,6 +72,7 @@ public class PlattsController {
     }
 
     @Inject
-    private PlattsService plattsService;
-
+    public void setPlattsService(PlattsService plattsService) {
+        this.plattsService = plattsService;
+    }
 }

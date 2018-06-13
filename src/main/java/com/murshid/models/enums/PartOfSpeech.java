@@ -11,6 +11,7 @@ public enum PartOfSpeech {
     SUFFIX("Suffix"), PREFIX("Prefix"),
     ACRONYM("Acronym"), DETERMINER("Determiner"), PROVERB("Proverb"), VERB_FORM("Verb form"), PARTICLE("Particle"),
     DIACRITIC("Diacritical mark"), PREPOSITION("Preposition"), ADVERBIAL_PHRASE("Adverbial phrase"), ADJECTIVAL_PHRASE("Adjectival phrase"),
+    PHRASE("Phrase"),
     COMPOUND_POSTPOSITION("Compound postposition");
 
     private String label;

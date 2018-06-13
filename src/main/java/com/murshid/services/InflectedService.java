@@ -16,6 +16,7 @@ import com.murshid.models.converters.DynamoAccessor;
 import com.murshid.models.converters.InflectedConverter;
 import com.murshid.models.enums.Accidence;
 import com.murshid.models.enums.PartOfSpeech;
+import com.murshid.persistence.domain.MasterDictionary;
 import com.murshid.persistence.domain.views.InflectedKey;
 import com.murshid.persistence.repo.MasterDictionaryRepository;
 import com.murshid.utils.WordUtils;
@@ -25,6 +26,7 @@ import org.slf4j.LoggerFactory;
 import javax.annotation.Nonnull;
 import javax.inject.Inject;
 import javax.inject.Named;
+import javax.persistence.criteria.CriteriaBuilder;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -79,11 +81,7 @@ public class InflectedService {
     }
 
     public List<Inflected> getAll(){
-
-        ScanRequest scanRequest = new ScanRequest().withTableName("inflected");
-
-        ScanResult scanResult = DynamoAccessor.client.scan(scanRequest);
-        return scanResult.getItems()
+        return inflectedRepository.scanAll()
                 .stream().map(InflectedConverter::fromAvMap)
                 .collect(Collectors.toList());
     }
@@ -115,6 +113,22 @@ public class InflectedService {
         songRepository.save(song);
 
         return result;
+    }
+
+    /**
+     * Utility method
+     */
+    public List<Inflected> cleanAllWitoutMasterDictionaryId() {
+        List<Inflected> allInflected = getAll();
+        Iterator<Inflected> it = allInflected.iterator();
+        while (it.hasNext()) {
+            Inflected inflected = it.next();
+            if (inflected.getMasterDictionaryId() == 0) {
+                delete(inflected);
+            }
+        }
+        LOGGER.info("finished deleting inflected without  master_dictionary_id ");
+        return null;
     }
 
     /**
@@ -155,8 +169,6 @@ public class InflectedService {
             }
             save(master);
         }
-
-
     }
 
     /**
@@ -173,6 +185,7 @@ public class InflectedService {
         target.getAccidence().addAll(addAccidences);
         target.setInflectedHindi(inflectedHindi);
         target.setInflectedHindiIndex(suggestNewIndex(inflectedHindi));
+        target.setMasterDictionaryId(original.getMasterDictionaryId());
         return target;
     }
 
@@ -759,6 +772,7 @@ public class InflectedService {
 
     public List<Inflected> getByInflectedWord(@Nonnull String inflectedWord) {
 
+
         Map<String, AttributeValue> expressionAttributeValues =  new HashMap<String, AttributeValue>();
         expressionAttributeValues.put(":inflectedWord", new AttributeValue().withS(inflectedWord));
 
@@ -781,15 +795,23 @@ public class InflectedService {
 
     public List<Inflected> findByCanonicalWord(@Nonnull String canonicalWord) {
 
-        Iterator<Item> items = inflectedRepository.findByCanonicalWord(canonicalWord);
-
+        List<MasterDictionary> masterDictionaries = masterDictionaryService.findByHindiWord(canonicalWord);
         List<Inflected> result = new ArrayList<>();
-        items.forEachRemaining(it ->{
-            Optional<Inflected> master = inflectedRepository.findOne(it.getString("inflected_hindi"), it.getInt("inflected_hindi_index"));
-            if(master.isPresent()){
-                result.add(master.get());
+        masterDictionaries.forEach(md -> {
+            Iterator<Item> itInf = inflectedRepository.findByMasterDictionaryId (md.getId());
+            while(itInf.hasNext()){
+                Item findRes = itInf.next();
+                String hindiWordInflected = findRes.getString("inflected_hindi");
+                int wordIndexInflected = findRes.getInt("inflected_hindi_index");
+                Optional<Inflected> inflectedOpt = inflectedRepository.findOne(hindiWordInflected, wordIndexInflected);
+                if (inflectedOpt.isPresent()) {
+                    result.add(inflectedOpt.get());
+                }else{
+                    LOGGER.error("there is an inflected {}-{} whose masterDictionary {}-{} doesn't exist ", hindiWordInflected, wordIndexInflected, md.getHindiWord(), md.getWordIndex());
+                }
             }
         });
+
         return result;
     }
 

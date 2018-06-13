@@ -7,9 +7,11 @@ import com.amazonaws.services.dynamodbv2.model.*;
 import com.murshid.dynamo.domain.Inflected;
 import com.murshid.dynamo.domain.NotInflected;
 import com.murshid.dynamo.domain.Song;
+import com.murshid.dynamo.repo.InflectedRepository;
 import com.murshid.dynamo.repo.SongRepository;
 import com.murshid.models.DictionaryKey;
 import com.murshid.models.converters.DynamoAccessor;
+import com.murshid.models.converters.InflectedConverter;
 import com.murshid.models.enums.DictionarySource;
 import com.murshid.models.enums.PartOfSpeech;
 import com.murshid.persistence.domain.*;
@@ -35,7 +37,7 @@ public class MurshidApplication {
 	public static void main(String[] args) throws Exception{
 		context = SpringApplication.run(MurshidApplication.class, args);
 
-       //List<Inflected> allInflected = getAll();
+      //clean();
 
         //replaceNuktas();
 //        paoulate();
@@ -49,6 +51,10 @@ public class MurshidApplication {
 //        addMDKToNotInflected();
 
 //        deleteCanonicalsFromNotInflected();
+
+        //deleteIndex();
+        //masterDictionaryId();
+        //verifyAccidences();
 
 
 
@@ -347,6 +353,36 @@ public class MurshidApplication {
         LOGGER.info("finished deleting canonicals");
     }
 
+    private static void clean() {
+         InflectedService inflectedService = context.getBean(InflectedService.class);
+         inflectedService.cleanAllWitoutMasterDictionaryId();
+    }
+
+
+    private static void verifyAccidences() throws InterruptedException{
+        InflectedRepository inflectedService = context.getBean(InflectedRepository.class);
+        List<Map<String, AttributeValue>> avs = inflectedService.scanAll();
+        avs.forEach(av -> {
+            if (av.containsKey("accidence")){
+                AttributeValue value = av.get("accidence");
+                if (value.getL() == null){
+                    LOGGER.info( "value {} does not have a list in accidences", value);
+                }
+            }
+
+
+            InflectedConverter.fromAvMap(av).getAccidence();
+        });
+        LOGGER.info("finished");
+    }
+
+//
+//
+//        //allInflected.forEach(in -> inflectedService.save(in));
+//        LOGGER.info("finished deleting");
+//        return null;
+//    }
+
 //    private static List<Inflected> paoulate() throws InterruptedException{
 //         InflectedService inflectedService = context.getBean(InflectedService.class);
 //        MasterDictionaryService masterDictionaryService = context.getBean(MasterDictionaryService.class);
@@ -426,20 +462,30 @@ public class MurshidApplication {
     private static void createIndex() throws InterruptedException{
         Table table = DynamoAccessor.dynamoDB.getTable("inflected");
 
-        Index index = table.createGSI(
+        Index index = table. createGSI(
                 new CreateGlobalSecondaryIndexAction()
-                        .withIndexName("idx-canonical_hindi")
+                        .withIndexName("idx-master_dictionary_id")
                         .withKeySchema(
-                                new KeySchemaElement("canonical_hindi", KeyType.HASH))
+                                new KeySchemaElement("master_dictionary_id", KeyType.HASH))
                         .withProvisionedThroughput(
                                 new ProvisionedThroughput(3L, 3L))
                         .withProjection(
                                 new Projection()
                                         .withProjectionType(ProjectionType.KEYS_ONLY)),
-                new AttributeDefinition("canonical_hindi",
-                                        ScalarAttributeType.S));
+                new AttributeDefinition("master_dictionary_id",
+                                        ScalarAttributeType.N));
         index.waitForActive();
         LOGGER.info("index created");
+
+    }
+
+
+    private static void deleteIndex() throws InterruptedException{
+        Table table = DynamoAccessor.dynamoDB.getTable("inflected");
+
+        Index index = table.getIndex ("idx-master_dictionary_id");
+        index.deleteGSI();
+        LOGGER.info("index deleted");
 
     }
 

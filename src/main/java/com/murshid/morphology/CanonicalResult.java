@@ -9,11 +9,11 @@ import java.util.Set;
 
 public class CanonicalResult {
 
-    String canonicalForm;
+    private String canonicalForm;
 
-    PartOfSpeech possiblePOS;
+    private PartOfSpeech possiblePOS;
 
-    Set<Accidence> accidence = new HashSet<>();
+    private Set<Accidence> accidence = new HashSet<>();
 
     @Override
     public boolean equals(Object o) {

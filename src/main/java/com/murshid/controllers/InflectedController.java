@@ -2,8 +2,9 @@ package com.murshid.controllers;
 
 import com.murshid.dynamo.domain.Inflected;
 import com.murshid.dynamo.domain.Song;
-import com.murshid.models.CanonicalKey;
+import com.murshid.persistence.domain.MasterDictionary;
 import com.murshid.services.InflectedService;
+import com.murshid.services.MasterDictionaryService;
 import com.murshid.services.SongsService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -18,9 +19,11 @@ import java.util.*;
 @Controller
 @RequestMapping("inflected")
 public class InflectedController {
-
     private static final Logger LOGGER = LoggerFactory.getLogger(InflectedController.class);
 
+    private MasterDictionaryService masterDictionaryService;
+    private SongsService songsService;
+    private InflectedService inflectedService;
 
     @GetMapping("/tokensNotInInflected")
     public @ResponseBody
@@ -37,15 +40,13 @@ public class InflectedController {
     @GetMapping("/findWord")
     public @ResponseBody
     List<Inflected> findInKeyAndBody(@RequestParam(name = "hindiWord") String word) {
-        List<Inflected> result = inflectedService.getByInflectedWord(word);
-        return result;
+        return inflectedService.getByInflectedWord(word);
     }
 
     @GetMapping("/findByCanonicalWord")
     public @ResponseBody
     List findInByCanonicalWord(@RequestParam(name = "canonicalWord") String canonicalWord) {
-        List result = inflectedService.findByCanonicalWord(canonicalWord);
-        return result;
+        return inflectedService.findByCanonicalWord(canonicalWord);
     }
 
     @GetMapping("/generateInflectedEntriesInSong")
@@ -62,9 +63,9 @@ public class InflectedController {
 
     @PostMapping("/insertNew")
     public ResponseEntity<String> insertNew(@RequestBody Inflected inflected) {
-        //complementCanonicalKeys(inflected);
         inflected.setInflectedHindiIndex(inflectedService.suggestNewIndex(inflected.getInflectedHindi()));
         if (inflectedService.isValid(inflected)) {
+            inflected = complementMasterDictionaryId(inflected);
             if (inflectedService.exists(inflected.getInflectedHindi(), inflected.getInflectedHindiIndex())){
                 LOGGER.info("inflected hindi word {} index {} already exists in inflected table in DynamoDB", inflected.getInflectedHindi(), inflected.getInflectedHindiIndex());
                 return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
@@ -92,6 +93,7 @@ public class InflectedController {
         if (!inflectedService.isValid(infinitive)) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
         }
+        infinitive = complementMasterDictionaryId(infinitive);
 
         List<Inflected> explodedVerbs = inflectedService.explodeAllVerbs(infinitive);
 
@@ -101,13 +103,6 @@ public class InflectedController {
                 return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
             }
         }
-
-        //then check if any of them is already in inflected
-//        boolean someExist = inflectedService.thereAreInflected(infinitive.getCanonicalHindi());
-//        if (someExist){
-//            LOGGER.info("there are already inflected for the canonical hindi word {}. Nothing will be written", infinitive.getCanonicalHindi());
-//            return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
-//        }
 
         boolean wroteAll = inflectedService.writeSeveralWithSuggestedIndexes(explodedVerbs);
         if (!wroteAll) {
@@ -119,11 +114,11 @@ public class InflectedController {
 
     @PostMapping("/insertNewWithExplode")
     public ResponseEntity<String> insertNewWithExplode(@RequestBody Inflected inflected) {
-        //complementCanonicalKeys(inflected);
+
         if (!inflectedService.isValid(inflected)) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
         }
-
+        inflected = complementMasterDictionaryId(inflected);
         List<Inflected> exploded = inflectedService.explode(inflected);
 
         //first validate them all
@@ -145,8 +140,9 @@ public class InflectedController {
 
     @PostMapping("/upsert")
     public ResponseEntity<String> upsert(@RequestBody Inflected inflected) {
-        //complementCanonicalKeys(inflected);
+
         if (inflectedService.isValid(inflected)) {
+            inflected = complementMasterDictionaryId(inflected);
             boolean success = inflectedService.save(inflected);
             if (success) {
                 return ResponseEntity.status(HttpStatus.CREATED).build();
@@ -158,17 +154,29 @@ public class InflectedController {
         }
     }
 
-//    private Inflected complementCanonicalKeys(Inflected inflected){
-//        for (CanonicalKey ck: inflected.getCanonicalKeys()){
-//            ck.setCanonicalWord(inflected.getCanonicalHindi());
-//        }
-//        return inflected;
-//    }
+    private Inflected complementMasterDictionaryId(Inflected inflected){
+        Optional<MasterDictionary> masterDictionary = masterDictionaryService.findByHindiWordAndWordIndex(inflected.getMasterDictionaryKey().hindiWord, inflected.getMasterDictionaryKey().wordIndex);
+        if (masterDictionary.isPresent()){
+            inflected.setMasterDictionaryId(masterDictionary.get().getId());
+        }else{
+            throw new RuntimeException(String.format("master dictionary entry not found for inflected %sलेना-%s", inflected.getInflectedHindi(), inflected.getInflectedHindiIndex()));
+        }
+        return inflected;
+    }
 
     @Inject
-    private InflectedService inflectedService;
+    public void setInflectedService(InflectedService inflectedService) {
+        this.inflectedService = inflectedService;
+    }
 
     @Inject
-    private SongsService songsService;
+    public void setMasterDictionaryService(MasterDictionaryService masterDictionaryService) {
+        this.masterDictionaryService = masterDictionaryService;
+    }
+
+    @Inject
+    public void setSongsService(SongsService songsService) {
+        this.songsService = songsService;
+    }
 
 }

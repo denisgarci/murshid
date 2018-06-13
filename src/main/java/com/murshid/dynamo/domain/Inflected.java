@@ -33,6 +33,11 @@ public class Inflected {
     @Column(name = "inflected_hindi_index")
     private int inflectedHindiIndex;
 
+    @JsonProperty("master_dictionary_id")
+    @Column(name = "master_dictionary_id")
+    private int masterDictionaryId;
+
+
     @JsonProperty("part_of_speech")
     @Column(name = "part_of_speech")
     private PartOfSpeech partOfSpeech;
@@ -78,6 +83,17 @@ public class Inflected {
         this.inflectedHindiIndex = inflectedHindiIndex;
         return this;
     }
+
+    public int getMasterDictionaryId() {
+        return masterDictionaryId;
+    }
+
+    public Inflected setMasterDictionaryId(int masterDictionaryId) {
+        this.masterDictionaryId = masterDictionaryId;
+        return this;
+    }
+
+
 
     public String getInflectedHindi() {
         return inflectedHindi;

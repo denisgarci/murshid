@@ -7,7 +7,6 @@ import com.google.common.collect.ImmutableMap;
 import javax.persistence.Column;
 import javax.persistence.Embeddable;
 import java.io.Serializable;
-import java.math.BigDecimal;
 import java.util.Map;
 
 @Embeddable
@@ -43,7 +42,7 @@ public class DictionaryKey implements Serializable{
         return canonicalKey;
     }
 
-    public static DictionaryKey  fromMap(Map<String, Object> map){
+    public static <T extends Map> DictionaryKey  fromMap(T map){
         DictionaryKey canonicalKey = new DictionaryKey();
         canonicalKey.setHindiWord(map.get("hindi_word").toString());
         canonicalKey.setWordIndex(safeIntFromMap(map, "word_index"));
@@ -66,7 +65,7 @@ public class DictionaryKey implements Serializable{
         if (value instanceof Number) {
             return ((Number) value).intValue();
         }else  if (value instanceof String){
-            return Integer.valueOf((String)value).intValue();
+            return Integer.valueOf((String)value);
         }else{
             throw new IllegalArgumentException("Field name " + fieldName + " has a value " + value + " whose format is not supported");
         }

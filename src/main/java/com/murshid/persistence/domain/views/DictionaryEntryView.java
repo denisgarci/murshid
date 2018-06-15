@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.gson.annotations.SerializedName;
 import com.murshid.models.enums.DictionarySource;
 import com.murshid.models.enums.PartOfSpeech;
+import com.murshid.persistence.domain.DictionaryEntry;
 
 /**
  * A dictionary entry in a format easily displayable as part of a Json/ Javascript object
@@ -74,5 +75,6 @@ public class DictionaryEntryView {
         this.wordIndex = wordIndex;
         return this;
     }
+
 
 }

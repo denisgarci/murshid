@@ -1,6 +1,5 @@
 package com.murshid.services;
 
-import com.murshid.models.DictionaryKey;
 import com.murshid.persistence.domain.MasterDictionary;
 import com.murshid.persistence.repo.MasterDictionaryRepository;
 
@@ -11,6 +10,8 @@ import java.util.Optional;
 
 @Named
 public class MasterDictionaryService {
+
+    private MasterDictionaryRepository masterDictionaryRepository;
 
     public List<MasterDictionary> findByHindiWord(String hindiWord){
         return masterDictionaryRepository.findByHindiWord(hindiWord);
@@ -31,5 +32,9 @@ public class MasterDictionaryService {
     }
 
     @Inject
-    private MasterDictionaryRepository masterDictionaryRepository;
+    public void setMasterDictionaryRepository(MasterDictionaryRepository masterDictionaryRepository) {
+        this.masterDictionaryRepository = masterDictionaryRepository;
+    }
+
+
 }

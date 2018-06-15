@@ -1,11 +1,8 @@
 package com.murshid.services;
 
-import com.google.common.collect.Lists;
 import com.murshid.models.DictionaryKey;
 import com.murshid.persistence.domain.RekhtaEntry;
-import com.murshid.persistence.domain.WikitionaryEntry;
 import com.murshid.persistence.repo.RekhtaRepository;
-import com.murshid.utils.WordUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -14,12 +11,12 @@ import javax.inject.Named;
 import java.util.List;
 import java.util.Optional;
 
-import static com.murshid.utils.WordUtils.KA_NUKTA;
-
 @Named
 public class RekhtaService {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(RekhtaService.class);
+
+    private RekhtaRepository rekhtaRepository;
 
     public RekhtaEntry save(RekhtaEntry rekhtaEntry){
         return rekhtaRepository.save(rekhtaEntry);
@@ -37,22 +34,6 @@ public class RekhtaService {
     public boolean exists(String hindiWord, int index){
         DictionaryKey dictionaryKey = new DictionaryKey().setHindiWord(hindiWord).setWordIndex(index);
         return exists(dictionaryKey);
-    }
-
-    public List<RekhtaEntry> replaceNuktas(){
-        List<RekhtaEntry> list = Lists.newArrayList(findByHindiWordLike("%".concat(KA_NUKTA).concat("%")));
-
-        for (RekhtaEntry pe : list){
-            rekhtaRepository.delete(pe);
-            LOGGER.info("replacing {} with {} ", pe.getDictionaryKey().getHindiWord(), WordUtils.replace2CharsWithNukta(pe.getHindiWord()));
-            pe.getDictionaryKey().setHindiWord(WordUtils.replace2CharsWithNukta(pe.getHindiWord()));
-            save(pe);
-        }
-        return list;
-    }
-
-    private List<RekhtaEntry> findByHindiWordLike(String hindiWord){
-        return rekhtaRepository.findByDictionaryKeyHindiWordLike(hindiWord);
     }
 
     public List<RekhtaEntry> findByHindiWord(String hindiWord){
@@ -94,5 +75,7 @@ public class RekhtaService {
     }
 
     @Inject
-    private RekhtaRepository rekhtaRepository;
+    public void setRekhtaRepository(RekhtaRepository rekhtaRepository) {
+        this.rekhtaRepository = rekhtaRepository;
+    }
 }

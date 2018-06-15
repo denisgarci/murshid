@@ -198,17 +198,26 @@ public class SongsService {
                             } else {
                                 result.append(token);
                             }
-                        } else if (token.equals(" ")) {
-                            result.append("&nbsp;");
-                        } else if (token.equals("\n")) {
-                            result.append("<br/>");
                         } else {
-                            result.append(token);
+                            replaceSpacesAndBreaks(result, token);
                         }
                         tokenIndex++;
                 }
                 songRepository.save(song.setHtml(result.toString()));
             }
+        }
+    }
+
+    private void replaceSpacesAndBreaks(StringBuilder result, String token) {
+        switch (token){
+            case " ":
+                result.append("&nbsp;");
+                break;
+            case "<br/>":
+                result.append("<br/>");
+                break;
+            default:
+                result.append(token);
         }
     }
 
@@ -227,12 +236,8 @@ public class SongsService {
                     index += 1;
                     result.append("<span class=\"translation_word\" id=\"").append(index).append("\">").append(token).append("</span>");
                     result.append(" ");
-                }else if (token.equals(" ")){
-                    result.append("&nbsp;");
-                }else if (token.equals("\n")){
-                    result.append("<br/>");
-                }else {
-                    result.append(token);
+                }else{
+                    replaceSpacesAndBreaks(result, token);
                 }
                 songRepository.save(song.setEnglishTranslationHtml(result.toString()));
             }

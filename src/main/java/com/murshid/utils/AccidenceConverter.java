@@ -9,7 +9,7 @@ import java.util.Optional;
 
 public class AccidenceConverter {
 
-    public static Optional<Accidence> wikiToGeneralAccidence(WikiAccidence wikiAccidence){
+    private static Optional<Accidence> wikiToGeneralAccidence(WikiAccidence wikiAccidence){
         switch(wikiAccidence){
             case MASCULINE:
                 return Optional.of(Accidence.MASCULINE);
@@ -32,9 +32,7 @@ public class AccidenceConverter {
         List<Accidence> result = new ArrayList<>();
         wikiAccidences.forEach(wa -> {
             Optional<Accidence> accidence = wikiToGeneralAccidence(wa);
-            if (accidence.isPresent()){
-                result.add(accidence.get());
-            }
+            accidence.ifPresent(result::add);
         });
         return result;
     }

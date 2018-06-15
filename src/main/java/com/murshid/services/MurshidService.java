@@ -12,6 +12,8 @@ import java.util.Optional;
 @Named
 public class MurshidService {
 
+    private MurshidRepository murshidRepository;
+
     public MurshidEntry save(MurshidEntry murshidEntry){
         return murshidRepository.save(murshidEntry);
     }
@@ -45,5 +47,9 @@ public class MurshidService {
     }
 
     @Inject
-    private MurshidRepository murshidRepository;
+    public void setMurshidRepository(MurshidRepository murshidRepository) {
+        this.murshidRepository = murshidRepository;
+    }
+
+
 }

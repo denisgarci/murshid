@@ -11,6 +11,8 @@ import javax.inject.Named;
 @Named
 public class SpellCheckService {
 
+    private SpellCheckRepository spellCheckRepository;
+
     public SpellCheckEntry upsert(@Nonnull String hindiWord, @Nonnull String urduWord){
         SpellCheckEntry spellCheckEntry = spellCheckRepository.findOne(hindiWord);
         if (spellCheckEntry == null){
@@ -29,17 +31,17 @@ public class SpellCheckService {
         }
     }
 
-    public boolean wordsExist(String hindiWord){
+    public boolean wordsDontExist(String hindiWord){
         String[] tokens = hindiWord.split(" ");
         for (String hindi: tokens){
             if (!spellCheckRepository.exists(hindi)){
-                return false;
+                return true;
             }
         }
-        return true;
+        return false;
     }
 
-    public String passMultipleWordsToUrdu(String hindiWords){
+    String passMultipleWordsToUrdu(String hindiWords){
         String[] tokens = hindiWords.split(" ");
         StringBuilder sb = new StringBuilder();
         for (String hindi : tokens){
@@ -50,7 +52,7 @@ public class SpellCheckService {
     }
 
 
-    public String getUrduSpelling(String hindiWord){
+    private String getUrduSpelling(String hindiWord){
         SpellCheckEntry spellCheckEntry = spellCheckRepository.findByHindiWord(hindiWord);
         if (spellCheckEntry!= null){
             return spellCheckEntry.getUrduWord();
@@ -60,5 +62,8 @@ public class SpellCheckService {
     }
 
     @Inject
-    private SpellCheckRepository spellCheckRepository;
+    public void setSpellCheckRepository(SpellCheckRepository spellCheckRepository) {
+        this.spellCheckRepository = spellCheckRepository;
+    }
+
 }

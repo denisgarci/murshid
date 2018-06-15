@@ -13,7 +13,7 @@ import java.util.HashSet;
 import java.util.Set;
 import java.util.TreeSet;
 
-public class Inflected {
+public class Inflected implements Cloneable {
 
     @JsonProperty("master_dictionary_key")
     @Column(name = "master_dictionary_key")

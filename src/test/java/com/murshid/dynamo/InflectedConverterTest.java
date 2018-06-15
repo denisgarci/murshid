@@ -68,6 +68,7 @@ public class InflectedConverterTest {
         masterDictionaryKey.put("hindi_word", new AttributeValue().withS("भी"));
         masterDictionaryKey.put("word_index", new AttributeValue().withN("0"));
         avMap.put("master_dictionary_key", new AttributeValue().withM(masterDictionaryKey));
+        avMap.put("master_dictionary_id", new AttributeValue().withN("32"));
 
         //create Accidences
         AttributeValue avAcc1 = new AttributeValue(Accidence.FEMININE.name());

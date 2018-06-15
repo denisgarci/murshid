@@ -11,8 +11,8 @@ import java.util.List;
 
 public interface DictionaryEntryRepository extends CrudRepository<DictionaryEntry, Integer> {
 
-    DictionaryEntry findByWordIndexAndDictionarySourceAndMasterDictionary_HindiWordAndMasterDictionary_PartOfSpeech(int wordIndex, DictionarySource dictionarySource, String hindiWord, PartOfSpeech partOfSpeech);
-
     List<DictionaryEntry> findByMasterDictionary(MasterDictionary masterDictionary);
+
+    List<DictionaryEntry> findByMasterDictionaryAndDictionarySource(MasterDictionary masterDictionary, DictionarySource dictionarySource);
 
 }

@@ -2,7 +2,6 @@ package com.murshid.services;
 
 import com.google.common.collect.Lists;
 import com.murshid.models.DictionaryKey;
-import com.murshid.persistence.domain.PlattsEntry;
 import com.murshid.persistence.domain.WikitionaryEntry;
 import com.murshid.persistence.repo.SpellCheckRepository;
 import com.murshid.persistence.repo.WikitionaryRepository;
@@ -13,6 +12,7 @@ import org.springframework.beans.BeansException;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
 
+import javax.annotation.Nonnull;
 import javax.inject.Inject;
 import javax.inject.Named;
 import java.util.Collections;
@@ -45,7 +45,7 @@ public class WikitionaryService implements ApplicationContextAware {
         pool.shutdown();
     }
 
-    public List<WikitionaryEntry> replaceNuktas(){
+    public void replaceNuktas(){
         List<WikitionaryEntry> list = Lists.newArrayList(findByHindiWordLike("%".concat(KA_NUKTA).concat("%")));
 
         for (WikitionaryEntry pe : list){
@@ -54,7 +54,6 @@ public class WikitionaryService implements ApplicationContextAware {
             pe.getDictionaryKey().setHindiWord(WordUtils.replace2CharsWithNukta(pe.getHindiWord()));
             save(pe);
         }
-        return list;
     }
 
     private List<WikitionaryEntry> findByHindiWordLike(String hindiWord){
@@ -67,7 +66,7 @@ public class WikitionaryService implements ApplicationContextAware {
 
     class LoggerThreadFactory implements ThreadFactory {
         private int counter;
-        public Thread newThread(Runnable r) {
+        public Thread newThread(@Nonnull Runnable r) {
             return new Thread(r, "letter-ingestion " + counter++);
         }
     }

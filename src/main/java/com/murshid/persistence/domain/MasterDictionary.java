@@ -50,15 +50,17 @@ public class MasterDictionary  {
         return hindiWord;
     }
 
-    public void setHindiWord(String hindiWord) {
+    public MasterDictionary setHindiWord(String hindiWord) {
         this.hindiWord = hindiWord;
+        return this;
     }
 
     public int getWordIndex() {
         return wordIndex;
     }
 
-    public void setWordIndex(int wordIndex) {
+    public MasterDictionary setWordIndex(int wordIndex) {
         this.wordIndex = wordIndex;
+        return this;
     }
 }

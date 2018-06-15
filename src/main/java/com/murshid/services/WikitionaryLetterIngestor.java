@@ -1,22 +1,16 @@
 package com.murshid.services;
 
-import com.google.common.collect.Lists;
-import com.murshid.ingestor.wikitionary.WikiUtils;
 import com.murshid.ingestor.wikitionary.WikitionaryCaller;
-import com.murshid.ingestor.wikitionary.models.WikiEntry;
 import com.murshid.models.enums.DictionarySource;
 import com.murshid.persistence.domain.SpellCheckEntry;
 import com.murshid.persistence.repo.SpellCheckRepository;
-import org.jsoup.nodes.Document;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
 import javax.inject.Inject;
-import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 
 @Component
 @Scope("prototype")
@@ -25,6 +19,9 @@ public class WikitionaryLetterIngestor implements Runnable{
     private static final Logger LOGGER = LoggerFactory.getLogger(WikitionaryLetterIngestor.class);
     private String letter;
     private boolean retryFailed;
+
+    private SpellCheckRepository spellCheckRepository;
+    private WikitionaryWordProcessor wikitionaryWordProcessor;
 
     /**
      * Reads words from the hindi_words list, and tries to ingest that hindiWordIndex from the Wikidictionary website
@@ -50,7 +47,6 @@ public class WikitionaryLetterIngestor implements Runnable{
          }
 
         WikitionaryCaller caller = new WikitionaryCaller();
-        String currentWord = null;
 
         for (SpellCheckEntry hindiWord: targetHindiWords){
             wikitionaryWordProcessor.processWord(caller, hindiWord.getHindiWord());
@@ -59,22 +55,15 @@ public class WikitionaryLetterIngestor implements Runnable{
         LOGGER.info("finished processing letter {}", letter);
     }
 
-    private List<WikiEntry> attemptWithWord(String word, Document document){
-        Optional<WikiEntry> entry = WikiUtils.populateEntry(word, document);
-        List<WikiEntry> result = new ArrayList<>();
-        if (entry.isPresent()) {
-            result = Lists.newArrayList(entry.get());
-        } else {
-            result = WikiUtils.populateEtymologyEntries(word, document);
-        }
-        return result;
+    @Inject
+    public void setSpellCheckRepository(SpellCheckRepository spellCheckRepository) {
+        this.spellCheckRepository = spellCheckRepository;
     }
 
     @Inject
-    private SpellCheckRepository spellCheckRepository;
-
-    @Inject
-    private WikitionaryWordProcessor wikitionaryWordProcessor;
+    public void setWikitionaryWordProcessor(WikitionaryWordProcessor wikitionaryWordProcessor) {
+        this.wikitionaryWordProcessor = wikitionaryWordProcessor;
+    }
 
 
 

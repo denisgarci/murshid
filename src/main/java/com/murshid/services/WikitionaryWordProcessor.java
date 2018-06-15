@@ -1,6 +1,5 @@
 package com.murshid.services;
 
-import com.google.common.collect.Lists;
 import com.murshid.ingestor.utils.FunctionUtil;
 import com.murshid.ingestor.wikitionary.WikiUtils;
 import com.murshid.ingestor.wikitionary.WikitionaryCaller;
@@ -35,6 +34,9 @@ import java.util.Optional;
 public class WikitionaryWordProcessor {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(WikitionaryWordProcessor.class);
+
+    private WikitionaryRepository wikitionaryRepository;
+    private AttemptsRepository attemptsRepository;
 
     public void processWord(@Nonnull WikitionaryCaller caller,  @NotNull final String hindiWord){
 
@@ -105,18 +107,23 @@ public class WikitionaryWordProcessor {
 
     private List<WikiEntry> attemptWithWord(String word, Document document){
         Optional<WikiEntry> entry = WikiUtils.populateEntry(word, document);
-        List<WikiEntry> result = new ArrayList<>();
-        if (entry.isPresent()) {
-            result = Lists.newArrayList(entry.get());
-        } else {
-            result = WikiUtils.populateEtymologyEntries(word, document);
-        }
-        return result;
+        return entry.map(e -> {
+            List<WikiEntry> list = new ArrayList<>();
+            list.add(e);
+            return list;
+        }).orElse(WikiUtils.populateEtymologyEntries(word, document));
+    }
+
+
+    @Inject
+    public void setWikitionaryRepository(WikitionaryRepository wikitionaryRepository) {
+        this.wikitionaryRepository = wikitionaryRepository;
     }
 
     @Inject
-    private WikitionaryRepository wikitionaryRepository;
+    public void setAttemptsRepository(AttemptsRepository attemptsRepository) {
+        this.attemptsRepository = attemptsRepository;
+    }
 
-    @Inject
-    private AttemptsRepository attemptsRepository;
+
 }

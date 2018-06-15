@@ -16,6 +16,8 @@ import static com.murshid.utils.WordUtils.KA_NUKTA;
 @Named
 public class PlattsService {
 
+    private PlattsRepository plattsRepository;
+
     public List<PlattsEntry> findAnywhere(String word){
         List<PlattsEntry> inHindiOrUrdu = plattsRepository.findByDictionaryKeyHindiWordOrUrduWord(word, word);
         if (inHindiOrUrdu.isEmpty()){
@@ -26,15 +28,11 @@ public class PlattsService {
         }
     }
 
-    public Iterable<PlattsEntry> findAll(){
-        return plattsRepository.findAll();
-    }
-
     public List<PlattsEntry> findByHindiWord(String hindiWord){
         return plattsRepository.findByDictionaryKeyHindiWord(hindiWord);
     }
 
-    public List<PlattsEntry> findByHindiWordLike(String hindiWord){
+    private List<PlattsEntry> findByHindiWordLike(String hindiWord){
         return plattsRepository.findByDictionaryKeyHindiWordLike(hindiWord);
     }
 
@@ -97,5 +95,7 @@ public class PlattsService {
     }
 
     @Inject
-    private PlattsRepository plattsRepository;
+    public void setPlattsRepository(PlattsRepository plattsRepository) {
+        this.plattsRepository = plattsRepository;
+    }
 }

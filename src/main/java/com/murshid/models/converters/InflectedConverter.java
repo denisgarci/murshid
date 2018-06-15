@@ -6,8 +6,6 @@ import com.murshid.dynamo.domain.Inflected;
 import com.murshid.models.DictionaryKey;
 import com.murshid.models.enums.Accidence;
 import com.murshid.models.enums.PartOfSpeech;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.util.HashMap;
 import java.util.List;
@@ -16,8 +14,6 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 public class InflectedConverter {
-
-    private static final Logger LOGGER = LoggerFactory.getLogger(InflectedConverter.class);
 
     public static Inflected convert(Item item){
         Inflected inflected = new Inflected();

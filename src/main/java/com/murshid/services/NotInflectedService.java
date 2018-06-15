@@ -4,26 +4,15 @@ import com.amazonaws.services.dynamodbv2.document.Item;
 import com.amazonaws.services.dynamodbv2.model.AttributeValue;
 import com.amazonaws.services.dynamodbv2.model.ScanRequest;
 import com.amazonaws.services.dynamodbv2.model.ScanResult;
-import com.google.common.collect.Lists;
-import com.google.common.collect.Sets;
 import com.google.gson.Gson;
-import com.murshid.dynamo.domain.Inflected;
 import com.murshid.dynamo.domain.NotInflected;
 import com.murshid.dynamo.domain.Song;
 import com.murshid.dynamo.repo.NotInflectedRepository;
 import com.murshid.dynamo.repo.SongRepository;
-import com.murshid.models.CanonicalKey;
-import com.murshid.models.DictionaryKey;
 import com.murshid.models.converters.DynamoAccessor;
-import com.murshid.models.converters.InflectedConverter;
 import com.murshid.models.converters.NotInflectedConverter;
-import com.murshid.models.enums.Accidence;
-import com.murshid.models.enums.PartOfSpeech;
-import com.murshid.persistence.domain.MurshidEntry;
-import com.murshid.persistence.domain.PlattsEntry;
-import com.murshid.persistence.domain.RekhtaEntry;
-import com.murshid.persistence.domain.WikitionaryEntry;
 import com.murshid.persistence.domain.views.NotInflectedKey;
+import com.murshid.persistence.domain.views.SongWordsToNotInflectedTable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -38,6 +27,10 @@ public class NotInflectedService {
     private static final Logger LOGGER = LoggerFactory.getLogger(NotInflectedService.class);
 
     private static Gson gsonMapper = new Gson();
+
+    private NotInflectedRepository notInflectedRepository;
+    private SongRepository songRepository;
+    private SpellCheckService spellCheckService;
 
 
     public List<NotInflected> getAll(){
@@ -72,7 +65,7 @@ public class NotInflectedService {
 
             result.put(notInflected.getKey(), value);
         });
-        song.setNotInflectedEntries(gsonMapper.toJson(result).toString());
+        song.setNotInflectedEntries(gsonMapper.toJson(result));
         songRepository.save(song);
 
         return result;
@@ -84,13 +77,13 @@ public class NotInflectedService {
      * @param song         a song model
      * @return             a list (not necessarily ordered) of said master keys
      */
-    public List<NotInflected> allEntriesForSong(Song song){
+    private List<NotInflected> allEntriesForSong(Song song){
 
         if (song.getWordListNotInflected() != null) {
 
             //collect all master keys, without repetition
             Set<NotInflectedKey> mks = song.getWordListNotInflected()
-                    .stream().map(wlm -> wlm.getNotInflectedKey())
+                    .stream().map(SongWordsToNotInflectedTable::getNotInflectedKey)
                     .collect(Collectors.toSet());
 
             return mks.stream().map(mk ->
@@ -99,30 +92,8 @@ public class NotInflectedService {
                     .map(Optional::get)
                     .collect(Collectors.toList());
         }else{
-            return Collections.EMPTY_LIST;
+            return Collections.emptyList();
         }
-    }
-
-    public void validateAll(){
-
-        ScanRequest scanRequest = new ScanRequest().withTableName("not_inflected");
-
-        ScanResult scanResult = DynamoAccessor.client.scan(scanRequest);
-        List<NotInflected> masters = scanResult.getItems()
-                .stream().map(NotInflectedConverter::fromAvMap)
-                .collect(Collectors.toList());
-
-
-
-        for(NotInflected master: masters){
-            LOGGER.info("NotInflected=" + master);
-            if (!isValid(master)){
-                throw new RuntimeException(String.format("not_inflected entry invalid: hindi=%s index=%s", master.getHindi(), master.getHindiIndex()));
-            }
-            save(master);
-        }
-
-
     }
 
     /**
@@ -142,7 +113,7 @@ public class NotInflectedService {
 
     public List<NotInflected> getByHindi(@Nonnull String hindi) {
 
-        Map<String, AttributeValue> expressionAttributeValues =  new HashMap<String, AttributeValue>();
+        Map<String, AttributeValue> expressionAttributeValues =  new HashMap<>();
         expressionAttributeValues.put(":hindi", new AttributeValue().withS(hindi));
 
         ScanRequest scanRequest = new ScanRequest()
@@ -183,7 +154,7 @@ public class NotInflectedService {
             return false;
         }
 
-        if (!spellCheckService.wordsExist(master.getHindi())){
+        if (spellCheckService.wordsDontExist(master.getHindi())){
             LOGGER.info("the not_inflected hindi  {} has words that do not exist in spell_check ", master.getHindi());
             return false;
         }
@@ -193,46 +164,23 @@ public class NotInflectedService {
             return false;
         }
 
-        if (!validateCanonicalKeys(master)){
-            LOGGER.info("some of the canonical keys are not present or incorrect");
-            return false;
-        }
-
-        return true;
-    }
-
-    /**
-     * checks if all canonical keys contained in Master (if any)
-     * really exist in the respective entities
-     * @param master    the Master record
-     * @return          true if all canonical keys exist, false otherwise
-     */
-    public boolean validateCanonicalKeys(NotInflected master){
-
         return true;
     }
 
     @Inject
-    private NotInflectedRepository notInflectedRepository;
+    public void setNotInflectedRepository(NotInflectedRepository notInflectedRepository) {
+        this.notInflectedRepository = notInflectedRepository;
+    }
 
     @Inject
-    private SongRepository songRepository;
-
-
-    @Inject
-    private WikitionaryService wikitionaryService;
+    public void setSongRepository(SongRepository songRepository) {
+        this.songRepository = songRepository;
+    }
 
     @Inject
-    private PlattsService plattsService;
-
-    @Inject
-    private MurshidService murshidService;
-
-    @Inject
-    private RekhtaService rekhtaService;
-
-    @Inject
-    private SpellCheckService spellCheckService;
+    public void setSpellCheckService(SpellCheckService spellCheckService) {
+        this.spellCheckService = spellCheckService;
+    }
 
 
 

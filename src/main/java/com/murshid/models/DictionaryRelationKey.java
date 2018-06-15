@@ -28,11 +28,6 @@ public class DictionaryRelationKey implements Serializable{
     @Column(name ="hindi_word_index")
     public int hindiWordIndex;
 
-    @JsonProperty("dictionary_source")
-    @Column(name ="dictionary_source")
-    @Enumerated(EnumType.STRING)
-    public DictionarySource dictionarySource;
-
     public DictionaryRelationKey setHindiWord(String hindiWordIndex) {
         this.hindiWord = hindiWordIndex;
         return this;
@@ -40,11 +35,6 @@ public class DictionaryRelationKey implements Serializable{
 
     public DictionaryRelationKey setHindiWordIndex(int hindiWordIndex) {
         this.hindiWordIndex = hindiWordIndex;
-        return this;
-    }
-
-    public DictionaryRelationKey setDictionarySource(DictionarySource dictionarySource) {
-        this.dictionarySource = dictionarySource;
         return this;
     }
 
@@ -56,20 +46,14 @@ public class DictionaryRelationKey implements Serializable{
         return hindiWordIndex;
     }
 
-    public DictionarySource getDictionarySource() {
-        return dictionarySource;
-    }
-
     public Map<String, Object>  toMap(){
         return ImmutableMap.of("hindi_word", hindiWord,
-                               "hindi_word_index", hindiWordIndex,
-                               "dictionary_source", dictionarySource.name());
+                               "hindi_word_index", hindiWordIndex);
     }
 
     public static Map<String, AttributeValue>  toAvMap(DictionaryRelationKey canonicalKey ){
         return ImmutableMap.of("hindi_word", new AttributeValue().withS(canonicalKey.hindiWord),
-                               "hindi_wprd_index", new AttributeValue().withN(Integer.toString(canonicalKey.hindiWordIndex)),
-                               "dictionary_source", new AttributeValue().withS(canonicalKey.dictionarySource.name()));
+                               "hindi_wprd_index", new AttributeValue().withN(Integer.toString(canonicalKey.hindiWordIndex)));
     }
 
     public static DictionaryRelationKey fromAvMap(Map<String, AttributeValue> avMap){
@@ -77,7 +61,6 @@ public class DictionaryRelationKey implements Serializable{
         if (avMap.containsKey("hindi_word"))
         canonicalKey.setHindiWord(avMap.get("hindi_word").getS());
         canonicalKey.setHindiWordIndex(Integer.valueOf(avMap.get("hindi_word_index").getN()));
-        canonicalKey.setDictionarySource(DictionarySource.valueOf(avMap.get("dictionary_source").getS()));
         return canonicalKey;
     }
 
@@ -86,7 +69,6 @@ public class DictionaryRelationKey implements Serializable{
         canonicalKey.setHindiWord((String)avMap.get("hindi_word"));
         BigDecimal bdCi = (BigDecimal) avMap.get("hindi_word_index");
         canonicalKey.setHindiWordIndex(bdCi.intValue());
-        canonicalKey.setDictionarySource(DictionarySource.valueOf((String)avMap.get("dictionary_source")));
         return canonicalKey;
     }
 
@@ -100,16 +82,6 @@ public class DictionaryRelationKey implements Serializable{
         return new HashCodeBuilder(17, 37)
                 .append(getHindiWord())
                 .append(getHindiWordIndex())
-                .append(getDictionarySource())
                 .toHashCode();
-    }
-
-    public String toKey(){
-        Preconditions.checkNotNull(this.dictionarySource, "dictionary source cannot be null");
-        Preconditions.checkNotNull(this.getHindiWord(), "hindi word cannot be null");
-
-        return this.dictionarySource.name().concat("_")
-                .concat(this.getHindiWord()).concat("_")
-                .concat(Integer.toString(this.hindiWordIndex));
     }
 }

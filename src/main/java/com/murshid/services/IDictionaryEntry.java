@@ -18,9 +18,4 @@ public interface IDictionaryEntry {
 
     DictionarySource getDictionarySource();
 
-    /**
-     * A string key of the form source-word-index, e.g.:  "REKHTA_कहा_0"
-     */
-    String getStringKey();
-
 }

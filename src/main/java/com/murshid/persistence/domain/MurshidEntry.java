@@ -87,15 +87,6 @@ public class MurshidEntry implements IDictionaryEntry {
         return this;
     }
 
-    @Override
-    public String getStringKey() {
-        return DictionarySource.MURSHID.name()
-                .concat("_")
-                .concat(getHindiWord())
-                .concat("_")
-                .concat(Integer.toString(getWordIndex()));
-    }
-
     public String getHindiWord(){
         return this.dictionaryKey.hindiWord;
     }

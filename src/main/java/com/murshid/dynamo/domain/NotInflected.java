@@ -1,18 +1,12 @@
 package com.murshid.dynamo.domain;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.google.common.collect.Sets;
-import com.murshid.models.CanonicalKey;
 import com.murshid.models.DictionaryKey;
-import com.murshid.models.enums.Accidence;
 import com.murshid.models.enums.PartOfSpeech;
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 
 import javax.persistence.Column;
-import java.util.HashSet;
-import java.util.Set;
-import java.util.TreeSet;
 
 public class NotInflected {
     @JsonProperty("master_dictionary_key")

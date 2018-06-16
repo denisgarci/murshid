@@ -99,15 +99,6 @@ public class WikitionaryEntry implements IDictionaryEntry {
     }
 
     @Override
-    public String getStringKey() {
-        return DictionarySource.WIKITIONARY.name()
-                .concat("_")
-                .concat(getHindiWord())
-                .concat("_")
-                .concat(Integer.toString(getWordIndex()));
-    }
-
-    @Override
     public int getWordIndex() {
         return dictionaryKey.wordIndex;
     }

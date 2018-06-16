@@ -128,15 +128,6 @@ public class PlattsEntry implements IDictionaryEntry {
         return this;
     }
 
-    @Override
-    public String getStringKey() {
-        return DictionarySource.PLATTS.name()
-                .concat("_")
-                .concat(getHindiWord())
-                .concat("_")
-                .concat(Integer.toString(getWordIndex()));
-    }
-
     public String getExtraMeaning() {
         return extraMeaning;
     }

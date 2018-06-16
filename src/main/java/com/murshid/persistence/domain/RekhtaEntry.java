@@ -13,17 +13,17 @@ public class RekhtaEntry implements IDictionaryEntry {
     @EmbeddedId
     private DictionaryKey dictionaryKey;
 
-    @Column(name = "latin", nullable = true)
+    @Column(name = "latin")
     private String latinWord;
 
-    @Column(name = "urdu", nullable = true)
+    @Column(name = "urdu")
     private String urduWord;
 
-    @Column(name = "meaning", nullable = false)
+    @Column(name = "meaning")
     private String meaning;
 
     @Enumerated(EnumType.STRING)
-    @Column(name ="part_of_speech", nullable = true)
+    @Column(name ="part_of_speech")
     private PartOfSpeech partOfSpeech;
 
     public PartOfSpeech getPartOfSpeech() {
@@ -69,15 +69,6 @@ public class RekhtaEntry implements IDictionaryEntry {
     public RekhtaEntry setUrduWord(String urduWord) {
         this.urduWord = urduWord;
         return this;
-    }
-
-    @Override
-    public String getStringKey() {
-        return DictionarySource.REKHTA.name()
-                .concat("_")
-                .concat(getHindiWord())
-                .concat("_")
-                .concat(Integer.toString(getWordIndex()));
     }
 
     @Override

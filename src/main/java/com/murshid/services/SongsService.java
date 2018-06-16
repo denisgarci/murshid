@@ -213,7 +213,7 @@ public class SongsService {
             case " ":
                 result.append("&nbsp;");
                 break;
-            case "<br/>":
+            case "\n":
                 result.append("<br/>");
                 break;
             default:

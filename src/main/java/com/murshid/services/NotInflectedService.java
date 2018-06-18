@@ -86,11 +86,12 @@ public class NotInflectedService {
                     .stream().map(SongWordsToNotInflectedTable::getNotInflectedKey)
                     .collect(Collectors.toSet());
 
-            return mks.stream().map(mk ->
-                    notInflectedRepository.findOne(mk.getHindi(), mk.getHindiIndex()))
-                    .filter(Optional::isPresent)
-                    .map(Optional::get)
-                    .collect(Collectors.toList());
+            return mks.stream()
+                    .map(mk -> notInflectedRepository.findOne(mk.getHindi(), mk.getHindiIndex())
+                        .orElseThrow(() ->
+                                new IllegalArgumentException(
+                                        String.format("the not-inflected entry %s-%s in the song, is not in the not_inflected repository ", mk.getHindi(), mk.getHindiIndex())))
+                    ).collect(Collectors.toList());
         }else{
             return Collections.emptyList();
         }

@@ -1,5 +1,6 @@
 package com.murshid.services;
 
+import com.murshid.dynamo.domain.Inflected;
 import com.murshid.persistence.domain.SpellCheckEntry;
 import com.murshid.persistence.repo.SpellCheckRepository;
 import com.murshid.utils.WordUtils;
@@ -7,6 +8,7 @@ import com.murshid.utils.WordUtils;
 import javax.annotation.Nonnull;
 import javax.inject.Inject;
 import javax.inject.Named;
+import java.util.List;
 
 @Named
 public class SpellCheckService {
@@ -51,6 +53,15 @@ public class SpellCheckService {
         return sb.toString();
     }
 
+
+    public void loadUrdus(List<Inflected> inflectedList){
+        inflectedList.forEach( inf -> {
+            SpellCheckEntry spellCheckEntry = spellCheckRepository.findByHindiWord(inf.getInflectedHindi());
+            if (spellCheckEntry!= null){
+                inf.setInflectedUrdu(spellCheckEntry.getUrduWord());
+            }
+        });
+    }
 
     private String getUrduSpelling(String hindiWord){
         SpellCheckEntry spellCheckEntry = spellCheckRepository.findByHindiWord(hindiWord);

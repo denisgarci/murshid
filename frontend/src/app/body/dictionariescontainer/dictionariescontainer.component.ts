@@ -39,7 +39,7 @@ export class DictionariescontainerComponent implements OnInit {
 
       let masterDictionaryKeyInflected = inflectedEntry.master_dictionary_key.hindi_word + "_" + inflectedEntry.master_dictionary_key.word_index;
 
-      dec.canonical_hindi = inflectedEntry.master_dictionary_key.hindi_word;
+      dec.canonical_hindi = inflectedEntry.canonical_hindi;
       dec.inflected_hindi = inflectedEntry.inflected_hindi;
       dec.accidence = inflectedEntry.accidence;
       dec.accidence_labels = [];
@@ -49,7 +49,12 @@ export class DictionariescontainerComponent implements OnInit {
       dec.inflected_part_of_speech_label = inflectedEntry.part_of_speech_label;
 
 
-      dec.dictionary_entries_inflected = this.songsService.dictionaryEntriesInflected[masterDictionaryKeyInflected];
+      if (masterDictionaryKeyInflected in this.songsService.dictionaryEntriesInflected) {
+        dec.dictionary_entries_inflected = this.songsService.dictionaryEntriesInflected[masterDictionaryKeyInflected];
+      }else{
+        console.log("the masterDictionaryKey " + masterDictionaryKeyInflected + " does not exist in the map of dictionary entries");
+        return;
+      }
 
 
       let notInflectedKey = this.songsService.notInflectedGeo[message];

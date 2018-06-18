@@ -7,7 +7,7 @@ public enum PartOfSpeech {
     NUMERAL("Numeral"), ORDINAL("Ordinal"),
     RELATIVE_PRONOUN("Relative pronoun"), PERSONAL_PRONOUN("Personal pronoun"), POSSESSIVE_PRONOUN("Possessive pronoun"), DEMONSTRATIVE_PRONOUN("Demonstrative pronoun"),
     PROPER_NOUN("Proper noun"),
-    INFINITIVE("Infinitive"), PARTICIPLE("Participle"), ABSOLUTIVE("Absolutive"), VERBAL_NOUN("Verbal noun"),
+    INFINITIVE("Infinitive"), PARTICIPLE("Participle"), VERBAL_NOUN("Verbal noun"),
     SUFFIX("Suffix"), PREFIX("Prefix"),
     ACRONYM("Acronym"), DETERMINER("Determiner"), PROVERB("Proverb"), VERB_FORM("Verb form"), PARTICLE("Particle"),
     DIACRITIC("Diacritical mark"), PREPOSITION("Preposition"), ADVERBIAL_PHRASE("Adverbial phrase"), ADJECTIVAL_PHRASE("Adjectival phrase"),

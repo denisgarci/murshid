@@ -1,11 +1,11 @@
 package com.murshid.controllers;
 
+import com.google.common.collect.Lists;
 import com.murshid.dynamo.domain.Inflected;
 import com.murshid.dynamo.domain.Song;
-import com.murshid.persistence.domain.MasterDictionary;
 import com.murshid.services.InflectedService;
-import com.murshid.services.MasterDictionaryService;
 import com.murshid.services.SongsService;
+import com.murshid.services.SpellCheckService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
@@ -18,12 +18,13 @@ import java.util.*;
 
 @Controller
 @RequestMapping("inflected")
+@SuppressWarnings("unused")
 public class InflectedController {
     private static final Logger LOGGER = LoggerFactory.getLogger(InflectedController.class);
 
-    private MasterDictionaryService masterDictionaryService;
     private SongsService songsService;
     private InflectedService inflectedService;
+    private SpellCheckService spellCheckService;
 
     @GetMapping("/tokensNotInInflected")
     public @ResponseBody
@@ -64,8 +65,15 @@ public class InflectedController {
     @PostMapping("/insertNew")
     public ResponseEntity<String> insertNew(@RequestBody Inflected inflected) {
         inflected.setInflectedHindiIndex(inflectedService.suggestNewIndex(inflected.getInflectedHindi()));
+
+        spellCheckService.loadUrdus(Lists.newArrayList(inflected));
+
+        if (!inflectedService.validateSpellCheckIngroup(Lists.newArrayList(inflected)).isEmpty()){
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
+        }
+
         if (inflectedService.isValid(inflected)) {
-            inflected = complementMasterDictionaryId(inflected);
+            inflected = inflectedService.complementMasterDictionaryId(inflected);
             if (inflectedService.exists(inflected.getInflectedHindi(), inflected.getInflectedHindiIndex())){
                 LOGGER.info("inflected hindi word {} index {} already exists in inflected table in DynamoDB", inflected.getInflectedHindi(), inflected.getInflectedHindiIndex());
                 return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
@@ -84,18 +92,22 @@ public class InflectedController {
     @PostMapping("/insertAllVerbsWithExplode")
     public ResponseEntity<String> insertAllverbsWithExplode(@RequestBody Inflected infinitive) {
 
+        spellCheckService.loadUrdus(Lists.newArrayList(infinitive));
+
         if (!inflectedService.isInfinitiveMasculineSingularDirect(infinitive)){
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
         }
 
-        //complementCanonicalKeys(infinitive);
-
         if (!inflectedService.isValid(infinitive)) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
         }
-        infinitive = complementMasterDictionaryId(infinitive);
+        infinitive = inflectedService.complementMasterDictionaryId(infinitive);
 
         List<Inflected> explodedVerbs = inflectedService.explodeAllVerbs(infinitive);
+
+        if (!inflectedService.validateSpellCheckIngroup(explodedVerbs).isEmpty()){
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
+        }
 
         //first validate them all
         for (Inflected master: explodedVerbs) {
@@ -118,8 +130,16 @@ public class InflectedController {
         if (!inflectedService.isValid(inflected)) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
         }
-        inflected = complementMasterDictionaryId(inflected);
+
+
+        inflected = inflectedService.complementMasterDictionaryId(inflected);
         List<Inflected> exploded = inflectedService.explode(inflected);
+
+        spellCheckService.loadUrdus(exploded);
+
+        if (!inflectedService.validateSpellCheckIngroupWithSupplement(exploded)){
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
+        }
 
         //first validate them all
         for (Inflected master: exploded) {
@@ -141,8 +161,14 @@ public class InflectedController {
     @PostMapping("/upsert")
     public ResponseEntity<String> upsert(@RequestBody Inflected inflected) {
 
+        spellCheckService.loadUrdus(Lists.newArrayList(inflected));
+
+        if (!inflectedService.validateSpellCheckIngroup(Lists.newArrayList(inflected)).isEmpty()){
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
+        }
+
         if (inflectedService.isValid(inflected)) {
-            inflected = complementMasterDictionaryId(inflected);
+            inflected =  inflectedService.complementMasterDictionaryId(inflected);
             boolean success = inflectedService.save(inflected);
             if (success) {
                 return ResponseEntity.status(HttpStatus.CREATED).build();
@@ -154,29 +180,21 @@ public class InflectedController {
         }
     }
 
-    private Inflected complementMasterDictionaryId(Inflected inflected){
-        Optional<MasterDictionary> masterDictionary = masterDictionaryService.findByHindiWordAndWordIndex(inflected.getMasterDictionaryKey().hindiWord, inflected.getMasterDictionaryKey().wordIndex);
-        if (masterDictionary.isPresent()){
-            inflected.setMasterDictionaryId(masterDictionary.get().getId());
-        }else{
-            throw new RuntimeException(String.format("master dictionary entry not found for inflected %sलेना-%s", inflected.getInflectedHindi(), inflected.getInflectedHindiIndex()));
-        }
-        return inflected;
-    }
-
     @Inject
     public void setInflectedService(InflectedService inflectedService) {
         this.inflectedService = inflectedService;
     }
 
     @Inject
-    public void setMasterDictionaryService(MasterDictionaryService masterDictionaryService) {
-        this.masterDictionaryService = masterDictionaryService;
-    }
-
-    @Inject
     public void setSongsService(SongsService songsService) {
         this.songsService = songsService;
     }
+
+    @Inject
+    public void setSpellCheckService(SpellCheckService spellCheckService) {
+        this.spellCheckService = spellCheckService;
+    }
+
+
 
 }

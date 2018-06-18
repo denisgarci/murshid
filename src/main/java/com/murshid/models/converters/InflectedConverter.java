@@ -46,6 +46,11 @@ public class InflectedConverter {
             inflected.setAccidence( item.getList("accidence").stream().map(o -> Accidence.valueOf(o.toString())).collect(Collectors.toSet()));
         }
 
+        if (item.isPresent("own_meaning")){
+            inflected.setOwnMeaning( item.getBOOL("own_meaning"));
+        }
+
+
         return inflected;
     }
 
@@ -74,6 +79,8 @@ public class InflectedConverter {
         AttributeValue mdi = new AttributeValue(); ihi.setN(Integer.toString(master.getMasterDictionaryId()));
         result.put("master_dictionary_id", mdi);
         result.put("accidence", accsList  );
+        AttributeValue ownMeaningAV = new AttributeValue().withBOOL(master.isOwnMeaning());
+        result.put("own_meaning", ownMeaningAV);
 
         return result;
     }
@@ -87,6 +94,10 @@ public class InflectedConverter {
                 .setInflectedHindiIndex(Integer.valueOf(sAvs.get("inflected_hindi_index").getN()))
                 .setMasterDictionaryId(Integer.valueOf(sAvs.get("master_dictionary_id").getN()))
                 .setMasterDictionaryKey(DictionaryKey.fromAvMap(sAvs.get("master_dictionary_key").getM()));
+
+                if (sAvs.containsKey("own_meaning")){
+                    master.setOwnMeaning(sAvs.get("own_meaning").getBOOL());
+                }
 
         AttributeValue accidenceAv = sAvs.get("accidence");
 
@@ -122,6 +133,8 @@ public class InflectedConverter {
             item = item.withList("accidence", accidence.stream()
                     .map(Accidence::name).collect(Collectors.toList()));
         }
+
+        item = item.withBoolean("own_meaning", master.isOwnMeaning());
 
         return item;
     }

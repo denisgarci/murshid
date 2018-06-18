@@ -23,6 +23,10 @@ public class Inflected implements Cloneable {
     @Column(name = "inflected_hindi")
     private String inflectedHindi;
 
+    @JsonProperty("canonical_hindi")
+    @Column(name = "canonical_hindi")
+    private String canonicalHindi;
+
     @JsonProperty("inflected_urdu")
     @Column(name = "inflected_urdu")
     private String inflectedUrdu;
@@ -34,6 +38,10 @@ public class Inflected implements Cloneable {
     @JsonProperty("master_dictionary_id")
     @Column(name = "master_dictionary_id")
     private int masterDictionaryId;
+
+    @JsonProperty("own_meaning")
+    @Column(name = "own_meaning")
+    private boolean ownMeaning;
 
 
     @JsonProperty("part_of_speech")
@@ -109,6 +117,23 @@ public class Inflected implements Cloneable {
     public Inflected setInflectedUrdu(String inflectedUrdu) {
         this.inflectedUrdu = inflectedUrdu;
         return this;
+    }
+
+    public String getCanonicalHindi() {
+        return canonicalHindi;
+    }
+
+    public Inflected setCanonicalHindi(String canonicalHindi) {
+        this.canonicalHindi = canonicalHindi;
+        return this;
+    }
+
+    public boolean isOwnMeaning() {
+        return ownMeaning;
+    }
+
+    public void setOwnMeaning(boolean ownMeaning) {
+        this.ownMeaning = ownMeaning;
     }
 
     @Override

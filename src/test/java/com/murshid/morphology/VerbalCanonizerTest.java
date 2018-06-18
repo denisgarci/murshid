@@ -76,14 +76,14 @@ public class VerbalCanonizerTest {
         Set<CanonicalResult> results = VerbalCanonizer.process(absolutive1);
 
         Set <CanonicalResult> expected = Sets.newHashSet(
-                new CanonicalResult().setPossiblePOS(PartOfSpeech.ABSOLUTIVE)
+                new CanonicalResult().setPossiblePOS(PartOfSpeech.VERB).setAccidence(Sets.newHashSet(Accidence.ABSOLUTIVE))
                         .setCanonicalForm(speakcanonical));
         assertTrue(results.containsAll(expected));
 
         String absolutive2 = "बोलके";
         results = VerbalCanonizer.process(absolutive2);
         expected = Sets.newHashSet(
-                new CanonicalResult().setPossiblePOS(PartOfSpeech.ABSOLUTIVE)
+                new CanonicalResult().setPossiblePOS(PartOfSpeech.VERB).setAccidence(Sets.newHashSet(Accidence.ABSOLUTIVE))
                         .setCanonicalForm(speakcanonical));
         assertTrue(results.containsAll(expected));
 
@@ -91,7 +91,7 @@ public class VerbalCanonizerTest {
         String absolutive3 = "बोल";
         results = VerbalCanonizer.process(absolutive3);
         expected = Sets.newHashSet(
-                new CanonicalResult().setPossiblePOS(PartOfSpeech.ABSOLUTIVE)
+                new CanonicalResult().setPossiblePOS(PartOfSpeech.VERB).setAccidence(Sets.newHashSet(Accidence.ABSOLUTIVE))
                         .setCanonicalForm(speakcanonical));
         assertTrue(results.containsAll(expected));
     }

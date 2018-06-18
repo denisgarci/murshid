@@ -2,6 +2,7 @@ package com.murshid.models;
 
 import com.amazonaws.services.dynamodbv2.model.AttributeValue;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableMap;
 
 import javax.persistence.Column;
@@ -43,6 +44,8 @@ public class DictionaryKey implements Serializable{
     }
 
     public static <T extends Map> DictionaryKey  fromMap(T map){
+        Preconditions.checkArgument(map.containsKey("hindi_word"), String.format("The dictionary key %s should contain hindi_word ", map));
+        Preconditions.checkArgument(map.containsKey("word_index"), String.format("The dictionary key %s should contain word_index ", map));
         DictionaryKey canonicalKey = new DictionaryKey();
         canonicalKey.setHindiWord(map.get("hindi_word").toString());
         canonicalKey.setWordIndex(safeIntFromMap(map, "word_index"));

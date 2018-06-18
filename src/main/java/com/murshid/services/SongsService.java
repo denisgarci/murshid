@@ -10,6 +10,7 @@ import com.murshid.dynamo.repo.SongRepository;
 import com.murshid.models.converters.DynamoAccessor;
 import com.murshid.models.converters.WordListMasterEntryConverter;
 import com.murshid.persistence.domain.views.SongWordsToInflectedTable;
+import com.murshid.persistence.domain.views.SongWordsToNotInflectedTable;
 import com.murshid.persistence.repo.SpellCheckRepository;
 import com.murshid.utils.SongUtils;
 import org.slf4j.Logger;
@@ -25,6 +26,7 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.*;
 import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
 @Named
 public class SongsService {
@@ -169,7 +171,7 @@ public class SongsService {
             String songText = song.getSong();
             Set<String> hindiTokens = SongUtils.wordTokens(songText);
 
-            String[] allTokens = songText.split(String.format(WITH_DELIMITER, "\\s+|\\\\n|\\?|\\,|\\[|\\]"));
+            String[] allTokens = songText.split(String.format(WITH_DELIMITER, "\\s+|\\\\n|\\?|\\,|\\[|\\]|\\."));
             //allTokens = SongUtils.eliminateThingsWithinBrackets(allTokens);
 
             int index = 0;
@@ -203,8 +205,8 @@ public class SongsService {
                         }
                         tokenIndex++;
                 }
-                songRepository.save(song.setHtml(result.toString()));
             }
+            songRepository.save(song.setHtml(result.toString()));
         }
     }
 
@@ -212,6 +214,15 @@ public class SongsService {
         switch (token){
             case " ":
                 result.append("&nbsp;");
+                break;
+            case "?":
+                result.append("<span class='punctuationMark'>?</span>");
+                break;
+            case ".":
+                result.append("<span class='punctuationMark'>.</span>");
+                break;
+            case ",":
+                result.append("<span class='punctuationMark'>,</span>");
                 break;
             case "\n":
                 result.append("<br/>");
@@ -228,7 +239,7 @@ public class SongsService {
             String translationText = song.getEnglishTranslation();
             Set<String> hindiTokens = SongUtils.wordTokens(translationText);
 
-            String[] allTokens = translationText.split(String.format(WITH_DELIMITER, "\\s+|\\\\n|\\?|\\,"));
+            String[] allTokens = translationText.split(String.format(WITH_DELIMITER, "\\s+|\\\\n|\\?|\\,|\\."));
 
             int index = 0;
             for(String token: allTokens){
@@ -266,6 +277,24 @@ public class SongsService {
         }
 
         return true;
+    }
+
+    @SuppressWarnings("unused")
+    public void resequenceSongWordsToInflected(@Nonnull String songTitleLatin){
+        Song song = songRepository.findOne(songTitleLatin);
+        if (song != null){
+            int index = 1;
+            for(SongWordsToInflectedTable entry: song.getWordListMaster()){
+                int is = entry.getIndices().size();
+                List<String> values = IntStream.iterate(index, i -> i + 1).limit(is).boxed()
+                        .map(i-> Integer.toString(i)).collect(Collectors.toList());
+                entry.setIndices(values);
+                index += is;
+            }
+            songRepository.save(song);
+        }else{
+            LOGGER.error("song {} not found", songTitleLatin);
+        }
     }
 
     public void addEntryToWordListMaster(@Nonnull String songTitleLatin, SongWordsToInflectedTable songWordsToInflectedTable){

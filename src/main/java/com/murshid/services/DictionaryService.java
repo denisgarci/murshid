@@ -49,8 +49,13 @@ public class DictionaryService {
 
         Set<DictionaryKey> masterDictionaryKeys = inflectedEntries.entrySet().stream()
                 .map(me -> {
-                      LinkedTreeMap mdkMap = (LinkedTreeMap)me.getValue().get("master_dictionary_key");
-                      return DictionaryKey.fromMap(mdkMap);
+                      LinkedTreeMap value = me.getValue();
+                      if (value.containsKey("master_dictionary_key")){
+                          LinkedTreeMap mdkMap = (LinkedTreeMap)value.get("master_dictionary_key");
+                          return DictionaryKey.fromMap(mdkMap);
+                      }else{
+                          throw new IllegalArgumentException(String.format("the inflected entry %s does not have a master_dictionary_key", value));
+                      }
                     }
                 ).collect(Collectors.toSet());
 

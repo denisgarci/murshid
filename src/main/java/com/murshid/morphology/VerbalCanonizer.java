@@ -52,12 +52,12 @@ public class VerbalCanonizer {
         //absolutives
         {
             String canonicalForm = inflectedForm.concat("ना");
-            results.add(new CanonicalResult().setPossiblePOS(PartOfSpeech.ABSOLUTIVE)
+            results.add(new CanonicalResult().setPossiblePOS(PartOfSpeech.VERB).setAccidence(Sets.newHashSet(Accidence.ABSOLUTIVE))
                                 .setCanonicalForm(canonicalForm));
         }
         if (inflectedForm.endsWith("कर") || inflectedForm.endsWith("के")){
                 String canonicalForm = inflectedForm.substring(0, inflectedForm.length()-2).concat("ना");
-                results.add(new CanonicalResult().setPossiblePOS(PartOfSpeech.ABSOLUTIVE)
+                results.add(new CanonicalResult().setPossiblePOS(PartOfSpeech.VERB).setAccidence(Sets.newHashSet(Accidence.ABSOLUTIVE))
                                     .setCanonicalForm(canonicalForm));
         }
 

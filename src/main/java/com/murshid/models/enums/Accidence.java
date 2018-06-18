@@ -11,6 +11,7 @@ public enum Accidence {
     NON_ASPECTUAL("non aspectual"), HABITUAL("habitual"), CONTINUOUS("continuous"), PERFECTIVE("perfective"), IMPERFECTIVE("imperfective"),
     FACTUAL("factual"), CONTRAFACTUAL("contrafactual"),
     LONG_FORM("long form"),
+    ABSOLUTIVE("absolutive"),
     VERB_ROOT("Verb root");
 
     public String getLabel() {

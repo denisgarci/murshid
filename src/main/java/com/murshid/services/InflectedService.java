@@ -12,6 +12,7 @@ import com.murshid.dynamo.domain.Inflected;
 import com.murshid.dynamo.domain.Song;
 import com.murshid.dynamo.repo.InflectedRepository;
 import com.murshid.dynamo.repo.SongRepository;
+import com.murshid.models.DictionaryKey;
 import com.murshid.models.converters.DynamoAccessor;
 import com.murshid.models.converters.InflectedConverter;
 import com.murshid.models.enums.Accidence;
@@ -26,6 +27,7 @@ import org.slf4j.LoggerFactory;
 import javax.annotation.Nonnull;
 import javax.inject.Inject;
 import javax.inject.Named;
+import javax.persistence.criteria.CriteriaBuilder;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -77,7 +79,13 @@ public class InflectedService {
             value.put("inflected_urdu", inflected.getInflectedUrdu());
             value.put("accidence", inflected.getAccidence());
             value.put("part_of_speech", inflected.getPartOfSpeech());
-            value.put("master_dictionary_key", inflected.getMasterDictionaryKey().toMap());
+            value.put("canonical_hindi", inflected.getMasterDictionaryKey().getHindiWord());
+            if (!inflected.isOwnMeaning()) {
+                value.put("master_dictionary_key", inflected.getMasterDictionaryKey().toMap());
+            }else{
+                final DictionaryKey dk = new DictionaryKey().setHindiWord(inflected.getInflectedHindi()).setWordIndex(inflected.getInflectedHindiIndex());
+                value.put("master_dictionary_key", dk.toMap());
+            }
 
             result.put(inflected.getKey(), value);
         });
@@ -85,6 +93,16 @@ public class InflectedService {
         songRepository.save(song);
 
         return result;
+    }
+
+    public Inflected complementMasterDictionaryId(Inflected inflected){
+        Optional<MasterDictionary> masterDictionary = masterDictionaryService.findByHindiWordAndWordIndex(inflected.getMasterDictionaryKey().hindiWord, inflected.getMasterDictionaryKey().wordIndex);
+        if (masterDictionary.isPresent()){
+            inflected.setMasterDictionaryId(masterDictionary.get().getId());
+        }else{
+            throw new IllegalArgumentException(String.format("master dictionary entry not found for inflected %sलेना-%s", inflected.getInflectedHindi(), inflected.getInflectedHindiIndex()));
+        }
+        return inflected;
     }
 
     /**
@@ -100,11 +118,13 @@ public class InflectedService {
                 .stream().map(SongWordsToInflectedTable::getInflectedKey)
                 .collect(Collectors.toSet());
 
-        return mks.stream().map(mk ->
-            inflectedRepository.findOne(mk.getInflectedHindi(), mk.getInflectedHindiIndex()))
-                .filter(Optional::isPresent)
-                .map(Optional::get)
-                .collect(Collectors.toList());
+        return mks.stream()
+                .map(mk -> inflectedRepository.findOne(mk.getInflectedHindi(), mk.getInflectedHindiIndex())
+                        .orElseThrow(() ->
+                                new IllegalArgumentException(
+                                        String.format("the not-inflected entry %s-%s in the song, is not in the not_inflected repository ", mk.getInflectedHindi(), mk.getInflectedHindiIndex())))
+                ).collect(Collectors.toList());
+
     }
 
     public void validateAll(){
@@ -115,7 +135,6 @@ public class InflectedService {
         List<Inflected> masters = scanResult.getItems()
                 .stream().map(InflectedConverter::fromAvMap)
                 .collect(Collectors.toList());
-
 
 
         for(Inflected master: masters){
@@ -219,8 +238,8 @@ public class InflectedService {
 
         //absolutives
         {
-            Inflected absolutiveRoot = clone(infinitive, Lists.newArrayList(Accidence.MASCULINE, Accidence.DIRECT, Accidence.SINGULAR), Collections.emptyList(), 2, "");
-            absolutiveRoot.setPartOfSpeech(PartOfSpeech.ABSOLUTIVE);
+            Inflected absolutiveRoot = clone(infinitive, Lists.newArrayList(Accidence.MASCULINE, Accidence.DIRECT, Accidence.SINGULAR), Lists.newArrayList(Accidence.ABSOLUTIVE), 2, "");
+            absolutiveRoot.setPartOfSpeech(PartOfSpeech.VERB);
             result.add(clone(absolutiveRoot, Collections.emptyList(), Collections.emptyList(), 0, ""));
             result.add(clone(absolutiveRoot, Collections.emptyList(), Collections.emptyList(), 0, "कर"));
             result.add(clone(absolutiveRoot, Collections.emptyList(), Collections.emptyList(), 0, "के"));
@@ -463,6 +482,49 @@ public class InflectedService {
 
         return result;
 
+    }
+
+    /**
+     * Validates a group of "exploded inflected" against spell_check, to verify if they have Urdu counterpart.
+     * Some like vocative plural can be added on the fly, based on the oblique plural.
+     * @param inflectedList     the list of Inflected to validate
+     * @return                  true if all have Urdu counterparts (or they have been added), false otherwise
+     */
+    public boolean validateSpellCheckIngroupWithSupplement(List<Inflected> inflectedList){
+        List<Inflected> notInSpellChecker = validateSpellCheckIngroup(inflectedList);
+        if (notInSpellChecker.isEmpty()){
+            return true;
+        }else{
+            List<Inflected> vocativePlurals = notInSpellChecker.stream().filter(inf -> inf.getAccidence().containsAll(Lists.newArrayList(Accidence.VOCATIVE, Accidence.PLURAL))).collect(Collectors.toList());
+            if (vocativePlurals.size() >1){
+                return false;
+            }
+            Inflected vocativePlural = vocativePlurals.get(0);
+
+            List<Inflected> obliquePlurals = inflectedList.stream().filter(inf -> inf.getAccidence().containsAll(Lists.newArrayList(Accidence.OBLIQUE, Accidence.PLURAL))).collect(Collectors.toList());
+            if (obliquePlurals.size() >1){
+                return false;
+            }
+            Inflected obliquePlural = obliquePlurals.get(0);
+
+            String vocativePluralString = vocativePlural.getInflectedHindi();
+            String obliquePluralString = obliquePlural.getInflectedHindi();
+            String obliquePluralStringUrdu = obliquePlural.getInflectedUrdu();
+
+            if (obliquePluralString.substring(0, obliquePluralString.length()-1).equals(vocativePluralString)){
+                String vocativePluralStringUrdu =  obliquePluralStringUrdu.substring(0, obliquePluralStringUrdu.length()-1);
+                vocativePlural.setInflectedUrdu(vocativePluralStringUrdu);
+                LOGGER.info("the vocative plural {} has been supplemented in spell_check", vocativePluralStringUrdu);
+                spellCheckService.upsert(vocativePlural.getInflectedHindi(), vocativePluralStringUrdu);
+            }
+            return true;
+        }
+    }
+
+    public List<Inflected> validateSpellCheckIngroup(List<Inflected> inflectedList){
+        List<Inflected> notInSpellCheck = inflectedList.stream().filter(inf -> !spellCheckService.exists(inf.getInflectedHindi())).collect(Collectors.toList());
+        notInSpellCheck.forEach(nisch -> LOGGER.info("the word {} does not have urdu counterpar in spell_check", nisch.getInflectedHindi()));
+        return notInSpellCheck;
     }
 
 
@@ -840,12 +902,6 @@ public class InflectedService {
             LOGGER.info("inflected hindi cannot be null");
             return false;
         }
-
-        if (spellCheckService.wordsDontExist(inflected.getInflectedHindi())){
-            LOGGER.info("the inflected hindi words {} do not exist in spell_check ", inflected.getInflectedHindi());
-            return false;
-        }
-
 
         if (!keyExistsInMasterDictionary(inflected)){
             LOGGER.info("no master_dictionary key {}-{} exists, as suggested by {}", inflected.getMasterDictionaryKey().getHindiWord(), inflected.getMasterDictionaryKey().getWordIndex(), inflected.getInflectedHindi());

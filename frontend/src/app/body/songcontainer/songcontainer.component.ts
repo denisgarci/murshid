@@ -46,6 +46,14 @@ export class SongcontainerComponent implements OnInit {
         let spanSelected = allRelevant[index];
         this.songsService.itemHoverChange.next(spanSelected.id);
         spanSelected.classList.add("selectedRed");
+
+
+        var topPos = spanSelected.getBoundingClientRect().top + window.scrollY;
+        var leftPos = spanSelected.getBoundingClientRect().left + window.scrollX;
+
+        let bcr = spanSelected.getBoundingClientRect();
+        document.getElementById("dictionariesContainer").style.top = topPos + 20 + 'px';
+        document.getElementById("dictionariesContainer").style.left = leftPos + 20 + 'px';
       });
 
       allRelevant[index].addEventListener("mouseleave", () =>  {

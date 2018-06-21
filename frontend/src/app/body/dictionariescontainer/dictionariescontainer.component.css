@@ -1,11 +1,24 @@
 .dictionaries_container{
   padding: 10px;
-  order: 1;
+  /* order: 1; */
   flex: 0 0 500px;
   width: 500px;
-  align-self: flex-start;
-  display: flex;
+  /* align-self: flex-start; */
+  display: none;
   flex-direction: column;
+  z-index: 2;
+  position: absolute;
+  left: 0px;
+  opacity: 1;
+  background: antiquewhite;
+}
+
+.modal-open{
+  display: flex;
+}
+
+.modal-close{
+  display: none;
 }
 
 .dictionary_name {

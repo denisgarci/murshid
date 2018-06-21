@@ -1,4 +1,4 @@
-import {Component, OnInit} from '@angular/core';
+import {Component, ElementRef, OnInit, Renderer2} from '@angular/core';
 import {SongsService} from "../../services/songs.service";
 import {DictionariesContent} from "../../models/DictionariesContent";
 import {Globals} from "../../globals";
@@ -14,7 +14,7 @@ export class DictionariescontainerComponent implements OnInit {
 
   objectKeys = Object.keys;
 
-  constructor(private songsService: SongsService, private globals: Globals) {
+  constructor(private songsService: SongsService,  private renderer: Renderer2, private elementRef: ElementRef, private globals: Globals) {
   }
 
   ngOnInit() {
@@ -72,8 +72,15 @@ export class DictionariescontainerComponent implements OnInit {
       }
 
       this.content = dec;
+      this.renderer.addClass(this.elementRef.nativeElement.firstElementChild, "modal-open");
 
     });
+  }
+
+  closeModal(){
+    this.renderer.removeClass(this.elementRef.nativeElement.firstElementChild, "modal-open");
+    //this.renderer.setProperty(this.elementRef.nativeElement, "visible", false);
+    console.log("closed modal")
   }
 
 }

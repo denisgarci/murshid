@@ -13,6 +13,7 @@ import { TranslationscontainerComponent } from './body/translationscontainer/tra
 import { SongsService } from './services/songs.service';
 import {FormsModule} from "@angular/forms";
 import {Globals} from "./globals";
+import { FooterComponent } from './footer/footer.component';
 
 
 
@@ -23,7 +24,8 @@ import {Globals} from "./globals";
     BodyComponent,
     SongcontainerComponent,
     DictionariescontainerComponent,
-    TranslationscontainerComponent
+    TranslationscontainerComponent,
+    FooterComponent
   ],
   imports: [
     BrowserModule, HttpClientModule, FormsModule

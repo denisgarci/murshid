@@ -496,13 +496,13 @@ public class InflectedService {
             return true;
         }else{
             List<Inflected> vocativePlurals = notInSpellChecker.stream().filter(inf -> inf.getAccidence().containsAll(Lists.newArrayList(Accidence.VOCATIVE, Accidence.PLURAL))).collect(Collectors.toList());
-            if (vocativePlurals.size() >1){
+            if (vocativePlurals.size() != 1){
                 return false;
             }
             Inflected vocativePlural = vocativePlurals.get(0);
 
             List<Inflected> obliquePlurals = inflectedList.stream().filter(inf -> inf.getAccidence().containsAll(Lists.newArrayList(Accidence.OBLIQUE, Accidence.PLURAL))).collect(Collectors.toList());
-            if (obliquePlurals.size() >1){
+            if (obliquePlurals.size() != 1){
                 return false;
             }
             Inflected obliquePlural = obliquePlurals.get(0);

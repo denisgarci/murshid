@@ -34,6 +34,9 @@ public class WikitionaryEntry implements IDictionaryEntry {
     @Column(name ="part_of_speech", nullable = true)
     private PartOfSpeech partOfSpeech;
 
+    @Transient
+    private String canonicalHindi;
+
     public PartOfSpeech getPartOfSpeech() {
         return partOfSpeech;
     }
@@ -96,6 +99,14 @@ public class WikitionaryEntry implements IDictionaryEntry {
     public WikitionaryEntry setEtymology(String etymology) {
         this.etymology = etymology;
         return this;
+    }
+
+    public String getCanonicalHindi() {
+        return canonicalHindi;
+    }
+
+    public void setCanonicalHindi(String canonicalHindi) {
+        this.canonicalHindi = canonicalHindi;
     }
 
     @Override

@@ -1,5 +1,7 @@
-<div class="dictionaries_container" id="dictionariesContainer" >
-  <button (click)="closeModal();">Close</button>
+<div class="dictionaries_container" id="dictionariesContainer">
+  <div id="mydivheader">
+    <button (click)="closeModal();">X</button>
+  </div>
   <div *ngIf="content">
 
     <div class="dictionary_global_header">
@@ -16,7 +18,7 @@
     <div *ngFor="let dictionarySource of objectKeys(content.dictionary_entries_inflected); let i = index" class="dictionary_entry_array">
       <span class="dictionary_name">{{dictionarySource}}</span>
       <div *ngFor="let   dicEntry of content.dictionary_entries_inflected[dictionarySource]; let e = index">
-        <span *ngIf="e != 0" class="secondary_canonical_hindi">{{dicEntry.hindi_word}}</span>
+        <span *ngIf="e != 0" class="secondary_canonical_hindi">{{dicEntry.canonical_hindi}}</span>
         <p class="dictionary_entry_content">
           {{dicEntry.meaning}}
         </p>
@@ -28,6 +30,7 @@
       <div *ngFor="let dictionarySource of objectKeys(content.dictionary_entries_not_inflected); let i = index" class="dictionary_entry_array">
         <span class="dictionary_name_not_inflected">{{dictionarySource}}</span>
         <div *ngFor="let   dicEntry of content.dictionary_entries_not_inflected[dictionarySource]; let e = index">
+          <br/>
           <span class="secondary_canonical_hindi">{{dicEntry.hindi_word}}</span>
           <p class="dictionary_entry_content">
             {{dicEntry.meaning}}

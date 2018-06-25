@@ -79,12 +79,14 @@ public class InflectedService {
             value.put("inflected_urdu", inflected.getInflectedUrdu());
             value.put("accidence", inflected.getAccidence());
             value.put("part_of_speech", inflected.getPartOfSpeech());
-            value.put("canonical_hindi", inflected.getMasterDictionaryKey().getHindiWord());
+
             if (!inflected.isOwnMeaning()) {
                 value.put("master_dictionary_key", inflected.getMasterDictionaryKey().toMap());
+                value.put("canonical_hindi", inflected.getMasterDictionaryKey().getHindiWord());
             }else{
                 final DictionaryKey dk = new DictionaryKey().setHindiWord(inflected.getInflectedHindi()).setWordIndex(inflected.getInflectedHindiIndex());
                 value.put("master_dictionary_key", dk.toMap());
+                value.put("canonical_hindi", inflected.getCanonicalHindi());
             }
 
             result.put(inflected.getKey(), value);
@@ -129,7 +131,7 @@ public class InflectedService {
 
     public void validateAll(){
 
-        ScanRequest scanRequest = new ScanRequest().withTableName("master");
+        ScanRequest scanRequest = new ScanRequest().withTableName("inflected");
 
         ScanResult scanResult = DynamoAccessor.client.scan(scanRequest);
         List<Inflected> masters = scanResult.getItems()
@@ -492,9 +494,12 @@ public class InflectedService {
      */
     public boolean validateSpellCheckIngroupWithSupplement(List<Inflected> inflectedList){
         List<Inflected> notInSpellChecker = validateSpellCheckIngroup(inflectedList);
-        if (notInSpellChecker.isEmpty()){
+        if (notInSpellChecker.isEmpty()) {
             return true;
+        }else if (notInSpellChecker.size() > 1){
+            return false;
         }else{
+            //try to supplement vocative plural, if than one only is missing
             List<Inflected> vocativePlurals = notInSpellChecker.stream().filter(inf -> inf.getAccidence().containsAll(Lists.newArrayList(Accidence.VOCATIVE, Accidence.PLURAL))).collect(Collectors.toList());
             if (vocativePlurals.size() != 1){
                 return false;
@@ -523,7 +528,7 @@ public class InflectedService {
 
     public List<Inflected> validateSpellCheckIngroup(List<Inflected> inflectedList){
         List<Inflected> notInSpellCheck = inflectedList.stream().filter(inf -> !spellCheckService.exists(inf.getInflectedHindi())).collect(Collectors.toList());
-        notInSpellCheck.forEach(nisch -> LOGGER.info("the word {} does not have urdu counterpar in spell_check", nisch.getInflectedHindi()));
+        notInSpellCheck.forEach(nisch -> LOGGER.info("the Hindi word {} does not have Urdu counterpart in spell_check", nisch.getInflectedHindi()));
         return notInSpellCheck;
     }
 
@@ -863,6 +868,8 @@ public class InflectedService {
         if (partOfSpeech == PartOfSpeech.VERB){
             if (accidence.equals(Sets.newHashSet(Accidence.VERB_ROOT))) {
                 return true;
+            }else if (accidence.equals(Sets.newHashSet(Accidence.ABSOLUTIVE))) {
+                    return true;
             }else if (!hasPerson || !hasNumber || !hasTense){
                 LOGGER.info("accidence validation failure: part of speech VERB in {} has to have at least person, number and tense", inflected);
                 return false;

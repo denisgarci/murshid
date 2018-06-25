@@ -50,6 +50,10 @@ public class InflectedConverter {
             inflected.setOwnMeaning( item.getBOOL("own_meaning"));
         }
 
+        if (item.isPresent("canonical_hindi")){
+            inflected.setCanonicalHindi( item.getString("canonical_hindi"));
+        }
+
 
         return inflected;
     }
@@ -81,6 +85,7 @@ public class InflectedConverter {
         result.put("accidence", accsList  );
         AttributeValue ownMeaningAV = new AttributeValue().withBOOL(master.isOwnMeaning());
         result.put("own_meaning", ownMeaningAV);
+        result.put("canonical_hindi", new AttributeValue(master.getCanonicalHindi()));
 
         return result;
     }
@@ -97,6 +102,10 @@ public class InflectedConverter {
 
                 if (sAvs.containsKey("own_meaning")){
                     master.setOwnMeaning(sAvs.get("own_meaning").getBOOL());
+                }
+
+                if (sAvs.containsKey("canonical_hindi")){
+                    master.setCanonicalHindi(sAvs.get("canonical_hindi").getS());
                 }
 
         AttributeValue accidenceAv = sAvs.get("accidence");
@@ -135,6 +144,8 @@ public class InflectedConverter {
         }
 
         item = item.withBoolean("own_meaning", master.isOwnMeaning());
+
+        item = item.with("canonical_hindi", master.getCanonicalHindi());
 
         return item;
     }

@@ -4,7 +4,6 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.gson.annotations.SerializedName;
 import com.murshid.models.enums.DictionarySource;
 import com.murshid.models.enums.PartOfSpeech;
-import com.murshid.persistence.domain.DictionaryEntry;
 
 /**
  * A dictionary entry in a format easily displayable as part of a Json/ Javascript object
@@ -24,6 +23,10 @@ public class DictionaryEntryView {
 
     @SerializedName("word_index")
     private int wordIndex;
+
+    @SerializedName("canonical_hindi")
+    private String canonicalHindi;
+
 
     public DictionarySource getDictionarySource() {
         return dictionarySource;
@@ -73,6 +76,16 @@ public class DictionaryEntryView {
 
     public DictionaryEntryView setWordIndex(int wordIndex) {
         this.wordIndex = wordIndex;
+        return this;
+    }
+
+    @JsonProperty("canonical_hindi")
+    public String getCanonicalHindi() {
+        return canonicalHindi;
+    }
+
+    public DictionaryEntryView setCanonicalHindi(String canonicalHindi) {
+        this.canonicalHindi = canonicalHindi;
         return this;
     }
 

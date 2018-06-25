@@ -18,4 +18,13 @@ public interface IDictionaryEntry {
 
     DictionarySource getDictionarySource();
 
+    /***
+     * transient
+     */
+    String getCanonicalHindi();
+
+    /**
+     * transient
+     */
+    void setCanonicalHindi(String canonicalHindi);
 }

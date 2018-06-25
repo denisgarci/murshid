@@ -1,6 +1,5 @@
 package com.murshid.persistence.domain;
 
-import com.murshid.models.CanonicalKey;
 import com.murshid.models.DictionaryKey;
 import com.murshid.models.enums.Accidence;
 import com.murshid.models.enums.DictionarySource;
@@ -30,17 +29,8 @@ public class MurshidEntry implements IDictionaryEntry {
     @Column(name ="part_of_speech", nullable = true)
     private PartOfSpeech partOfSpeech;
 
-    public CanonicalKey getCanonicalKey() {
-        return canonicalKey;
-    }
-
-    public MurshidEntry setCanonicalKey(CanonicalKey canonicalKey) {
-        this.canonicalKey = canonicalKey;
-        return this;
-    }
-
-    @Embedded
-    private CanonicalKey canonicalKey;
+    @Transient
+    private String canonicalHindi;
 
     public PartOfSpeech getPartOfSpeech() {
         return partOfSpeech;
@@ -85,6 +75,15 @@ public class MurshidEntry implements IDictionaryEntry {
     public MurshidEntry setMeaning(String meaning) {
         this.meaning = meaning;
         return this;
+    }
+
+    public void setCanonicalHindi(String canonicalHindi) {
+        this.canonicalHindi = canonicalHindi;
+    }
+
+    @Override
+    public String getCanonicalHindi() {
+        return canonicalHindi;
     }
 
     public String getHindiWord(){

@@ -5,6 +5,7 @@ import com.amazonaws.services.dynamodbv2.document.Index;
 import com.amazonaws.services.dynamodbv2.document.Table;
 import com.amazonaws.services.dynamodbv2.model.*;
 import com.google.common.collect.Sets;
+import com.murshid.dynamo.domain.Inflected;
 import com.murshid.dynamo.domain.NotInflected;
 import com.murshid.dynamo.domain.Song;
 import com.murshid.dynamo.repo.InflectedRepository;
@@ -14,6 +15,7 @@ import com.murshid.models.converters.InflectedConverter;
 import com.murshid.models.enums.Accidence;
 import com.murshid.models.enums.PartOfSpeech;
 import com.murshid.services.*;
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.boot.SpringApplication;
@@ -33,7 +35,7 @@ public class MurshidApplication {
 	public static void main(String[] args) throws Exception{
 		context = SpringApplication.run(MurshidApplication.class, args);
 
-        //absolutive();
+        //resequence();
 
 	}
 
@@ -42,13 +44,20 @@ public class MurshidApplication {
 
     private static void resequence() {
         SongsService inflectedService = context.getBean(SongsService.class);
-        inflectedService.resequenceSongWordsToInflected("Alvida");
+        inflectedService.resequenceSongWordsToInflected("Dard Dilom Ke");
         LOGGER.info("finished resequencung");
     }
 
 
     private static void validateAll() throws InterruptedException{
         InflectedService masterService = context.getBean(InflectedService.class);
+        List<Inflected> all = masterService.getAll();
+        all.forEach(inf -> {
+            if (inf.isOwnMeaning() && StringUtils.isEmpty(inf.getCanonicalHindi())){
+                LOGGER.info("{}-{} doesn't have canonical_hindi", inf.getInflectedHindi(), inf.getInflectedHindiIndex());
+            }
+        });
+
         masterService.validateAll();
         LOGGER.info("finished validating");
     }

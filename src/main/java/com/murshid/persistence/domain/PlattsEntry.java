@@ -42,6 +42,9 @@ public class PlattsEntry implements IDictionaryEntry {
     @Column(name ="part_of_speech", nullable = true)
     private PartOfSpeech partOfSpeech;
 
+    @Transient
+    private String canonicalHindi;
+
     public int getSection() {
         return section;
     }
@@ -135,6 +138,15 @@ public class PlattsEntry implements IDictionaryEntry {
     public PlattsEntry setExtraMeaning(String extraMeaning) {
         this.extraMeaning = extraMeaning;
         return this;
+    }
+
+    @Override
+    public String getCanonicalHindi() {
+        return canonicalHindi;
+    }
+
+    public void setCanonicalHindi(String canonicalHindi) {
+        this.canonicalHindi = canonicalHindi;
     }
 
     @Override

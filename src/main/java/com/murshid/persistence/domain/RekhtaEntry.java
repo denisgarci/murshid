@@ -26,6 +26,9 @@ public class RekhtaEntry implements IDictionaryEntry {
     @Column(name ="part_of_speech")
     private PartOfSpeech partOfSpeech;
 
+    @Transient
+    private String canonicalHindi;
+
     public PartOfSpeech getPartOfSpeech() {
         return partOfSpeech;
     }
@@ -69,6 +72,15 @@ public class RekhtaEntry implements IDictionaryEntry {
     public RekhtaEntry setUrduWord(String urduWord) {
         this.urduWord = urduWord;
         return this;
+    }
+
+    @Override
+    public String getCanonicalHindi() {
+        return canonicalHindi;
+    }
+
+    public void setCanonicalHindi(String canonicalHindi) {
+        this.canonicalHindi = canonicalHindi;
     }
 
     @Override

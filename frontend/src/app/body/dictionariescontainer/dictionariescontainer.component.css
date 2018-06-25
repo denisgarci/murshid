@@ -1,5 +1,5 @@
 .dictionaries_container{
-  padding: 10px;
+  padding: 2px;
   /* order: 1; */
   flex: 0 0 500px;
   width: 500px;
@@ -8,7 +8,7 @@
   flex-direction: column;
   z-index: 2;
   position: absolute;
-  left: 0px;
+  left: 0;
   opacity: 1;
   background: antiquewhite;
 }
@@ -45,14 +45,14 @@
 
 .part_of_speech {
   font-family: Tahoma, Arial, sans-serif;
-  color: darkgrey;
+  color: #6c6c6c;
 }
 
 .accidence_word{
   padding-left: 5px;
   font-style: italic;
   font-family: Tahoma, Arial, sans-serif;
-  color: darkgrey;
+  color: #6c6c6c;
 }
 
 .canonical_hindi{
@@ -63,8 +63,8 @@
 .secondary_canonical_hindi{
   font-weight: bold;
   padding-left: 10px;
-  border-bottom: 0px;
-  margin-bottom: 0px;
+  border-bottom: 0;
+  margin-bottom: 0;
 }
 
 .dictionary_entry_content{
@@ -74,7 +74,7 @@
   font-family: Tahoma, Arial, sans-serif;
   padding-left: 8px;
   padding-right: 8px;
-  color: #222;
+  color: #6c6c6c;
 }
 
 
@@ -83,5 +83,16 @@
   border: 0.5px solid darkgrey;
   border-radius: 5px;
   margin: 10px;
+  background: white;
+}
 
+#mydivheader {
+  padding: 2px;
+  cursor: move;
+  z-index: 10;
+  background-color: #2196F3;
+  display: flex;
+  flex-flow: row nowrap;
+  justify-content: flex-end;
+  align-items: stretch;
 }

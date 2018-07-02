@@ -1,5 +1,6 @@
 package com.murshid.controllers;
 
+import com.murshid.persistence.domain.PlattsEntry;
 import com.murshid.persistence.domain.RekhtaEntry;
 import com.murshid.services.RekhtaService;
 import org.springframework.http.HttpStatus;

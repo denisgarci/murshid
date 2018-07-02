@@ -124,7 +124,7 @@ public class InflectedService {
                 .map(mk -> inflectedRepository.findOne(mk.getInflectedHindi(), mk.getInflectedHindiIndex())
                         .orElseThrow(() ->
                                 new IllegalArgumentException(
-                                        String.format("the not-inflected entry %s-%s in the song, is not in the not_inflected repository ", mk.getInflectedHindi(), mk.getInflectedHindiIndex())))
+                                        String.format("the inflected entry %s-%s in the song, is not in the inflected repository ", mk.getInflectedHindi(), mk.getInflectedHindiIndex())))
                 ).collect(Collectors.toList());
 
     }
@@ -527,7 +527,7 @@ public class InflectedService {
     }
 
     public List<Inflected> validateSpellCheckIngroup(List<Inflected> inflectedList){
-        List<Inflected> notInSpellCheck = inflectedList.stream().filter(inf -> !spellCheckService.exists(inf.getInflectedHindi())).collect(Collectors.toList());
+        List<Inflected> notInSpellCheck = inflectedList.stream().filter(inf -> spellCheckService.wordsDontExist(inf.getInflectedHindi())).collect(Collectors.toList());
         notInSpellCheck.forEach(nisch -> LOGGER.info("the Hindi word {} does not have Urdu counterpart in spell_check", nisch.getInflectedHindi()));
         return notInSpellCheck;
     }

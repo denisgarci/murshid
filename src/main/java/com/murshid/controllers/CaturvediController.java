@@ -1,7 +1,9 @@
 package com.murshid.controllers;
 
 import com.google.common.collect.Lists;
+import com.murshid.persistence.domain.CaturvediEntry;
 import com.murshid.persistence.domain.PlattsEntry;
+import com.murshid.services.CaturvediService;
 import com.murshid.services.PlattsService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -14,50 +16,45 @@ import javax.inject.Inject;
 import java.util.List;
 
 @Controller
-@RequestMapping("platts")
-public class PlattsController {
+@RequestMapping("caturvedi")
+public class CaturvediController {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(PlattsController.class);
-    private PlattsService plattsService;
+    private static final Logger LOGGER = LoggerFactory.getLogger(CaturvediController.class);
+    private CaturvediService caturvediService;
 
     @GetMapping("/findAnywhere")
     public @ResponseBody
-    List<PlattsEntry> findAnywhere(@RequestParam(name = "word") String word) {
-        return Lists.newArrayList(plattsService.findAnywhere(word));
+    List<CaturvediEntry> findAnywhere(@RequestParam(name = "word") String word) {
+        return Lists.newArrayList(caturvediService.findAnywhere(word));
     }
 
     @PostMapping
-    public ResponseEntity<String> persistPlatts(@RequestBody PlattsEntry plattsEntry) {
-        if (isValid(plattsEntry)) {
-            plattsService.save(plattsEntry);
+    public ResponseEntity<String> persist(@RequestBody CaturvediEntry caturvediEntry) {
+        if (isValid(caturvediEntry)) {
+            caturvediService.save(caturvediEntry);
             return ResponseEntity.status(HttpStatus.CREATED).build();
         } else {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
         }
     }
 
-    private boolean isValid(PlattsEntry plattsEntry) {
-        if (plattsEntry.getPartOfSpeech() == null) {
+    private boolean isValid(CaturvediEntry caturvediEntry) {
+        if (caturvediEntry.getPartOfSpeech() == null) {
             LOGGER.info("partOfSpeech cannot be null");
             return false;
         }
 
-        if (plattsEntry.getDictionaryKey() == null) {
+        if (caturvediEntry.getDictionaryKey() == null) {
             LOGGER.info("dictionary key cannot be null");
             return false;
         } else {
-            if (plattsEntry.getDictionaryKey().hindiWord == null) {
-                LOGGER.info("hindi hindiWordIndex cannot be null");
+            if (caturvediEntry.getDictionaryKey().hindiWord == null) {
+                LOGGER.info("hindi word index cannot be null");
                 return false;
             }
         }
 
-        if (plattsEntry.getUrduWord() == null) {
-            LOGGER.info("urduWord cannot be null");
-            return false;
-        }
-
-        if (plattsEntry.getMeaning() == null) {
+        if (caturvediEntry.getMeaning() == null) {
             LOGGER.info("body cannot be null");
             return false;
         }
@@ -66,7 +63,7 @@ public class PlattsController {
     }
 
     @Inject
-    public void setPlattsService(PlattsService plattsService) {
-        this.plattsService = plattsService;
+    public void setCaturvediService(CaturvediService caturvediService) {
+        this.caturvediService = caturvediService;
     }
 }

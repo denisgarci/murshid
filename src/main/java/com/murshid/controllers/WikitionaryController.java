@@ -1,6 +1,7 @@
 package com.murshid.controllers;
 
 import com.murshid.ingestor.wikitionary.WikitionaryCaller;
+import com.murshid.persistence.domain.PlattsEntry;
 import com.murshid.persistence.domain.WikitionaryEntry;
 import com.murshid.services.WikitionaryService;
 import com.murshid.services.WikitionaryWordProcessor;
@@ -12,6 +13,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
 import javax.inject.Inject;
+import java.util.List;
 
 @Controller
 @RequestMapping("wikitionary")
@@ -34,6 +36,13 @@ public class WikitionaryController {
         wikitionaryWordProcessor.processWord(wikitionaryCaller, hindiWord);
         LOGGER.info("received hindiWordIndex " + hindiWord);
         return "processWord/" + hindiWord;
+    }
+
+    @GetMapping("/replaceGaNukta")
+    public @ResponseBody
+    List<PlattsEntry> replaceGaNukta() {
+         wikitionaryService.replaceGaNuktas();
+         return null;
     }
 
     @PostMapping

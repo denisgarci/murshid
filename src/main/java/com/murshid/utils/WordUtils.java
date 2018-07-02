@@ -48,8 +48,16 @@ public class WordUtils {
     public static String KA_NUKTA = new String(new char[]{0x915, 0x93C});
     public static String QA = new String(new char[]{0x958});
 
-    public static String replace2CharsWithNukta(String original) {
+    public static String GA_NUKTA = new String(new char[]{0x917, 0x93C});
+    public static String GHA = new String(new char[]{0x95A});
+
+
+    public static String replace2CharsWithKaNukta(String original) {
         return original.replace(KA_NUKTA, QA);
+    }
+
+    public static String replace2CharsWithGhaNukta(String original) {
+        return original.replace(GA_NUKTA, GHA);
     }
 
 

@@ -22,6 +22,7 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ThreadFactory;
 
+import static com.murshid.utils.WordUtils.GA_NUKTA;
 import static com.murshid.utils.WordUtils.KA_NUKTA;
 
 @Named
@@ -45,13 +46,24 @@ public class WikitionaryService implements ApplicationContextAware {
         pool.shutdown();
     }
 
-    public void replaceNuktas(){
+    public void replaceKaNuktas(){
         List<WikitionaryEntry> list = Lists.newArrayList(findByHindiWordLike("%".concat(KA_NUKTA).concat("%")));
 
         for (WikitionaryEntry pe : list){
             wikitionaryRepository.delete(pe);
-            LOGGER.info("replacing {} with {} ", pe.getDictionaryKey().getHindiWord(), WordUtils.replace2CharsWithNukta(pe.getHindiWord()));
-            pe.getDictionaryKey().setHindiWord(WordUtils.replace2CharsWithNukta(pe.getHindiWord()));
+            LOGGER.info("replacing {} with {} ", pe.getDictionaryKey().getHindiWord(), WordUtils.replace2CharsWithKaNukta(pe.getHindiWord()));
+            pe.getDictionaryKey().setHindiWord(WordUtils.replace2CharsWithKaNukta(pe.getHindiWord()));
+            save(pe);
+        }
+    }
+
+    public void replaceGaNuktas(){
+        List<WikitionaryEntry> list = Lists.newArrayList(findByHindiWordLike("%".concat(GA_NUKTA).concat("%")));
+
+        for (WikitionaryEntry pe : list){
+            wikitionaryRepository.delete(pe);
+            LOGGER.info("replacing {} with {} ", pe.getDictionaryKey().getHindiWord(), WordUtils.replace2CharsWithGhaNukta(pe.getHindiWord()));
+            pe.getDictionaryKey().setHindiWord(WordUtils.replace2CharsWithGhaNukta(pe.getHindiWord()));
             save(pe);
         }
     }

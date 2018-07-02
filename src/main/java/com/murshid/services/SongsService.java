@@ -250,8 +250,8 @@ public class SongsService {
                 }else{
                     replaceSpacesAndBreaks(result, token);
                 }
-                songRepository.save(song.setEnglishTranslationHtml(result.toString()));
             }
+            songRepository.save(song.setEnglishTranslationHtml(result.toString()));
         }
     }
 

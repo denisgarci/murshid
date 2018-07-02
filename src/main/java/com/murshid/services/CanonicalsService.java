@@ -15,8 +15,11 @@ import java.util.stream.Collectors;
 @Named
 public class CanonicalsService {
 
-
-
+    private WikitionaryService wikitionaryService;
+    private PlattsService plattsService;
+    private RekhtaService rekhtaService;
+    private MurshidService murshidService;
+    private CaturvediService caturvediService;
 
 
     public List<CanonicalWrapper> suggestCanonicals(@Nonnull String inflected){
@@ -28,19 +31,36 @@ public class CanonicalsService {
             result.addAll(plattsService.findByHindiWord(cw).stream().map(we -> new CanonicalWrapper(DictionarySource.PLATTS, we)).collect(Collectors.toList()));
             result.addAll( rekhtaService.findByHindiWord(cw).stream().map(we -> new CanonicalWrapper(DictionarySource.REKHTA, we)).collect(Collectors.toList()));
             result.addAll(murshidService.findByHindiWord(cw).stream().map(we -> new CanonicalWrapper(DictionarySource.MURSHID, we)).collect(Collectors.toList()));
+            result.addAll(caturvediService.findByHindiWord(cw).stream().map(we -> new CanonicalWrapper(DictionarySource.CATURVEDI, we)).collect(Collectors.toList()));
         }
 
         return result;
     }
 
-    @Inject
-    protected WikitionaryService wikitionaryService;
-    @Inject
-    protected PlattsService plattsService;
-    @Inject
-    protected RekhtaService rekhtaService;
-    @Inject
-    protected MurshidService murshidService;
 
+    @Inject
+    public void setWikitionaryService(WikitionaryService wikitionaryService) {
+        this.wikitionaryService = wikitionaryService;
+    }
+
+    @Inject
+    public void setPlattsService(PlattsService plattsService) {
+        this.plattsService = plattsService;
+    }
+
+    @Inject
+    public void setRekhtaService(RekhtaService rekhtaService) {
+        this.rekhtaService = rekhtaService;
+    }
+
+    @Inject
+    public void setMurshidService(MurshidService murshidService) {
+        this.murshidService = murshidService;
+    }
+
+    @Inject
+    public void setCaturvediService(CaturvediService caturvediService) {
+        this.caturvediService = caturvediService;
+    }
 
 }

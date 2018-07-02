@@ -11,6 +11,7 @@ import javax.inject.Named;
 import java.util.List;
 import java.util.Optional;
 
+import static com.murshid.utils.WordUtils.GA_NUKTA;
 import static com.murshid.utils.WordUtils.KA_NUKTA;
 
 @Named
@@ -40,6 +41,33 @@ public class PlattsService {
     /**
      * Replaces all hindi_word occurrences of
      *
+     * ग	DEVANAGARI LETTER GA    0917	2327	&‌#2327;	&‌#x0917;
+     * ़	devanagari sign nukta	04474	2364	0x93C	&#2364;
+     *
+     * with the single letter "DEVANAGARI LETTER GHHA"
+     *
+     * DEVANAGARI LETTER GHHA	ग़	Option+095A	ALT+2394	&‌#2394;	&‌#x095A;
+     *
+     * to parse, use https://unicodelookup.com/?#%E0%A5%98/1
+     *
+     * Attention: since this process changes part of the primary keys, entries have to be deleted, then reinserted
+     *
+     * @return   the list of changed and persisted PlattsEntries
+     */
+    public List<PlattsEntry> replaceGhaNuktas(){
+        List<PlattsEntry> list = Lists.newArrayList(findByHindiWordLike("%".concat(GA_NUKTA).concat("%")));
+
+        for (PlattsEntry pe : list){
+            plattsRepository.delete(pe);
+            pe.getDictionaryKey().setHindiWord(WordUtils.replace2CharsWithGhaNukta(pe.getHindiWord()));
+            save(pe);
+        }
+        return list;
+    }
+
+    /**
+     * Replaces all hindi_word occurrences of
+     *
      * क	devanagari letter ka	04425	2325	0x915	&#2325;
      * ़	devanagari sign nukta	04474	2364	0x93C	&#2364;
      *
@@ -53,12 +81,12 @@ public class PlattsService {
      *
      * @return   the list of changed and persisted PlattsEntries
      */
-    public List<PlattsEntry> replaceNuktas(){
+    public List<PlattsEntry> replaceKaNuktas(){
         List<PlattsEntry> list = Lists.newArrayList(findByHindiWordLike("%".concat(KA_NUKTA).concat("%")));
 
         for (PlattsEntry pe : list){
             plattsRepository.delete(pe);
-            pe.getDictionaryKey().setHindiWord(WordUtils.replace2CharsWithNukta(pe.getHindiWord()));
+            pe.getDictionaryKey().setHindiWord(WordUtils.replace2CharsWithKaNukta(pe.getHindiWord()));
             save(pe);
         }
         return list;

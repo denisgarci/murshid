@@ -1,6 +1,7 @@
 <div class="dictionaries_container" id="dictionariesContainer">
   <div id="mydivheader">
-    <button (click)="closeModal();">X</button>
+    <button id="dictionaryPinButton" (click)="togglePin();" class="window-button pin-button-white"></button>
+    <button (click)="closeModal();" class="window-button close-button"></button>
   </div>
   <div *ngIf="content">
 

@@ -10,8 +10,8 @@ import com.murshid.services.IDictionaryEntry;
 import javax.persistence.*;
 import java.util.List;
 
-@Entity(name = "caturvedi")
-public class CaturvediEntry implements IDictionaryEntry {
+@Entity(name = "bahri")
+public class BahriEntry implements IDictionaryEntry {
 
     @EmbeddedId
     private DictionaryKey dictionaryKey;
@@ -44,7 +44,7 @@ public class CaturvediEntry implements IDictionaryEntry {
         return section;
     }
 
-    public CaturvediEntry setSection(int section) {
+    public BahriEntry setSection(int section) {
         this.section = section;
         return this;
     }
@@ -53,7 +53,7 @@ public class CaturvediEntry implements IDictionaryEntry {
         return entry;
     }
 
-    public CaturvediEntry setEntry(int entry) {
+    public BahriEntry setEntry(int entry) {
         this.entry = entry;
         return this;
     }
@@ -62,12 +62,12 @@ public class CaturvediEntry implements IDictionaryEntry {
         return partOfSpeech;
     }
 
-    public CaturvediEntry setPartOfSpeech(PartOfSpeech partOfSpeech) {
+    public BahriEntry setPartOfSpeech(PartOfSpeech partOfSpeech) {
         this.partOfSpeech = partOfSpeech;
         return this;
     }
 
-    public CaturvediEntry setMeaning(String meaning) {
+    public BahriEntry setMeaning(String meaning) {
         this.meaning = meaning;
         return this;
     }
@@ -76,7 +76,7 @@ public class CaturvediEntry implements IDictionaryEntry {
         return latinWord;
     }
 
-    public CaturvediEntry setLatinWord(String latinWord) {
+    public BahriEntry setLatinWord(String latinWord) {
         this.latinWord = latinWord;
         return this;
     }
@@ -85,7 +85,7 @@ public class CaturvediEntry implements IDictionaryEntry {
         return dictionaryKey;
     }
 
-    public CaturvediEntry setDictionaryKey(DictionaryKey dictionaryKey) {
+    public BahriEntry setDictionaryKey(DictionaryKey dictionaryKey) {
         this.dictionaryKey = dictionaryKey;
         return this;
     }
@@ -94,7 +94,7 @@ public class CaturvediEntry implements IDictionaryEntry {
         return extraMeaning;
     }
 
-    public CaturvediEntry setExtraMeaning(String extraMeaning) {
+    public BahriEntry setExtraMeaning(String extraMeaning) {
         this.extraMeaning = extraMeaning;
         return this;
     }
@@ -118,7 +118,7 @@ public class CaturvediEntry implements IDictionaryEntry {
 
     @Override
     public DictionarySource getDictionarySource() {
-        return DictionarySource.CATURVEDI;
+        return DictionarySource.BAHRI;
     }
 
     @Override

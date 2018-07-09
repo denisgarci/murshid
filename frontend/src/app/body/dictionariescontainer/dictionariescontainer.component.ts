@@ -75,24 +75,41 @@ export class DictionariescontainerComponent implements OnInit {
       this.renderer.addClass(this.elementRef.nativeElement.firstElementChild, "modal-open");
 
     });
-    this.dragElement(document.getElementById(("dictionariesContainer")));
+    this.dragElement(document.getElementById("dictionariesContainer"), this.songsService);
   }
 
   closeModal(){
     this.renderer.removeClass(this.elementRef.nativeElement.firstElementChild, "modal-open");
   }
 
-  dragElement(elmnt) {
+
+  togglePin() {
+    this.songsService.pinned = !this.songsService.pinned;
+    this.songsService.pinnedLeftStyle = document.getElementById("dictionariesContainer").style.left;
+    this.songsService.pinnedTopStyle = document.getElementById("dictionariesContainer").style.top;
+
+    let pinButton = document.getElementById("dictionaryPinButton");
+    if (this.songsService.pinned){
+      pinButton.classList.remove("pin-button-white");
+      pinButton.classList.add("pin-button-red");
+    }else{
+      pinButton.classList.remove("pin-button-red");
+      pinButton.classList.add("pin-button-white");
+    }
+
+  }
+
+  dragElement(elmnt, songService) {
     var pos1 = 0, pos2 = 0, pos3 = 0, pos4 = 0;
     if (document.getElementById(elmnt.id + "header")) {
       /* if present, the header is where you move the DIV from:*/
-      document.getElementById(elmnt.id + "header").onmousedown = dragMouseDown;
+      document.getElementById(elmnt.id + "header").onmousedown = () =>  dragMouseDown(songService, event);
     } else {
       /* otherwise, move the DIV from anywhere inside the DIV:*/
-      elmnt.onmousedown = dragMouseDown;
+      elmnt.onmousedown =   () => dragMouseDown(songService, event);
     }
 
-    function dragMouseDown(e) {
+    function dragMouseDown(songService, e) {
       e = e || window.event;
       e.preventDefault();
       // get the mouse cursor position at startup:
@@ -100,10 +117,10 @@ export class DictionariescontainerComponent implements OnInit {
       pos4 = e.clientY;
       document.onmouseup = closeDragElement;
       // call a function whenever the cursor moves:
-      document.onmousemove = elementDrag;
+      document.onmousemove = () =>  elementDrag(songService, event);
     }
 
-    function elementDrag(e) {
+    function elementDrag(songService, e) {
       e = e || window.event;
       e.preventDefault();
       // calculate the new cursor position:
@@ -114,6 +131,10 @@ export class DictionariescontainerComponent implements OnInit {
       // set the element's new position:
       elmnt.style.top = (elmnt.offsetTop - pos2) + "px";
       elmnt.style.left = (elmnt.offsetLeft - pos1) + "px";
+
+      songService.pinnedTopStyle = elmnt.style.top;
+      songService.pinnedLeftStyle = elmnt.style.left;
+
     }
 
     function closeDragElement() {

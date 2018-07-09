@@ -74,7 +74,29 @@
   font-family: Tahoma, Arial, sans-serif;
   padding-left: 8px;
   padding-right: 8px;
+  line-height: 1.7em;
   color: #6c6c6c;
+}
+
+.window-button{
+  background-repeat: no-repeat;
+  width: 18px;
+  height: 18px;
+  margin: 1px;
+  background-size: 100%;
+}
+
+
+.close-button{
+  background-image:  url(../../../assets/letter-x.png);
+}
+
+.pin-button-red{
+  background-image:  url(../../../assets/pushpin_red.png);
+}
+
+.pin-button-white{
+  background-image:  url(../../../assets/pushpin_white.png);
 }
 
 
@@ -84,6 +106,8 @@
   border-radius: 5px;
   margin: 10px;
   background: white;
+  max-height: 120px;
+  overflow: auto;
 }
 
 #mydivheader {

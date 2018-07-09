@@ -33,6 +33,11 @@ export class SongsService {
   public itemHoverChange = new BehaviorSubject<string>(null);
   public itemHoverChangeObservable = this.itemHoverChange.asObservable();
 
+  //dictionary window position
+  public pinned: boolean;
+  public pinnedLeftStyle: string;
+  public pinnedTopStyle: string;
+
 
 
   constructor(private http: HttpClient, private globals: Globals) { }

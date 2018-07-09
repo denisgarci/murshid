@@ -20,6 +20,7 @@ public class CanonicalsService {
     private RekhtaService rekhtaService;
     private MurshidService murshidService;
     private CaturvediService caturvediService;
+    private BahriService bahriService;
 
 
     public List<CanonicalWrapper> suggestCanonicals(@Nonnull String inflected){
@@ -32,11 +33,17 @@ public class CanonicalsService {
             result.addAll( rekhtaService.findByHindiWord(cw).stream().map(we -> new CanonicalWrapper(DictionarySource.REKHTA, we)).collect(Collectors.toList()));
             result.addAll(murshidService.findByHindiWord(cw).stream().map(we -> new CanonicalWrapper(DictionarySource.MURSHID, we)).collect(Collectors.toList()));
             result.addAll(caturvediService.findByHindiWord(cw).stream().map(we -> new CanonicalWrapper(DictionarySource.CATURVEDI, we)).collect(Collectors.toList()));
+            result.addAll(bahriService.findByHindiWord(cw).stream().map(we -> new CanonicalWrapper(DictionarySource.BAHRI, we)).collect(Collectors.toList()));
         }
 
         return result;
     }
 
+
+    @Inject
+    public void setBahriService(BahriService bahriService) {
+        this.bahriService = bahriService;
+    }
 
     @Inject
     public void setWikitionaryService(WikitionaryService wikitionaryService) {

@@ -48,12 +48,17 @@ export class SongcontainerComponent implements OnInit {
         spanSelected.classList.add("selectedRed");
 
 
-        var topPos = spanSelected.getBoundingClientRect().top + window.scrollY;
-        var leftPos = spanSelected.getBoundingClientRect().left + window.scrollX;
+        let topPos = spanSelected.getBoundingClientRect().top + window.scrollY;
+        let leftPos = spanSelected.getBoundingClientRect().left + window.scrollX;
 
-        let bcr = spanSelected.getBoundingClientRect();
-        document.getElementById("dictionariesContainer").style.top = topPos + 20 + 'px';
-        document.getElementById("dictionariesContainer").style.left = leftPos + 20 + 'px';
+        let dictionatiesContainer = document.getElementById("dictionariesContainer");
+        if (this.songsService.pinned) {
+          dictionatiesContainer.style.left = this.songsService.pinnedLeftStyle;
+          dictionatiesContainer.style.top = this.songsService.pinnedTopStyle;
+        }else{
+          dictionatiesContainer.style.top = topPos + 20 + 'px';
+          dictionatiesContainer.style.left = leftPos + 20 + 'px';
+        }
       });
 
       allRelevant[index].addEventListener("mouseleave", () =>  {

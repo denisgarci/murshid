@@ -36,6 +36,7 @@ public class DictionaryService {
     private MurshidService murshidService;
     private RekhtaService rekhtaService;
     private CaturvediService caturvediService;
+    private BahriService bahriService;
     private SongRepository songRepository;
 
     /**
@@ -157,6 +158,18 @@ public class DictionaryService {
                         result.get(mapKey).put(DictionarySource.CATURVEDI, dews);
                     }
                     break;
+
+                    case BAHRI: {
+                        List<BahriEntry> concreteEntries = Lists.newArrayList(toBahriEntry(de, canonicalWord));
+                        concreteEntries.addAll(dictionaryRelationsService.getRelatedDictionaryEntries(masterDictionary.getHindiWord(), masterDictionary.getWordIndex(), DictionarySource.BAHRI)
+                                .stream().map(die -> toBahriEntry(die, die.masterDictionary.getHindiWord())).collect(Collectors.toList()));
+
+                        List<DictionaryEntryView> dews = concreteEntries.stream().map(this::fromConcreteDictionaryEntry).collect(Collectors.toList());
+
+                        result.get(mapKey).put(DictionarySource.BAHRI, dews);
+                    }
+                    break;
+
                 }
             });
         });
@@ -190,7 +203,7 @@ public class DictionaryService {
     private MurshidEntry toMurshidEntry(DictionaryEntry dictionaryEntry, String canonicalWord){
         MurshidEntry entry = murshidService.findOne(dictionaryEntry.masterDictionary.getHindiWord(), dictionaryEntry.getWordIndex())
                 .orElseThrow(() ->
-                        new RuntimeException(String.format("rekhta dictionary entry not found for dictionaryEntry record %s-%s", dictionaryEntry.masterDictionary.getHindiWord(),dictionaryEntry.getWordIndex())));
+                        new RuntimeException(String.format("murshid dictionary entry not found for dictionaryEntry record %s-%s", dictionaryEntry.masterDictionary.getHindiWord(),dictionaryEntry.getWordIndex())));
         entry.setCanonicalHindi(canonicalWord);
         return entry;
     }
@@ -198,11 +211,18 @@ public class DictionaryService {
     private CaturvediEntry toCaturvediEntry(DictionaryEntry dictionaryEntry, String canonicalWord){
         CaturvediEntry entry = caturvediService.findOne(dictionaryEntry.masterDictionary.getHindiWord(), dictionaryEntry.getWordIndex())
                 .orElseThrow(() ->
-                        new RuntimeException(String.format("cattuvedu dictionary entry not found for dictionaryEntry record %s-%s", dictionaryEntry.masterDictionary.getHindiWord(),dictionaryEntry.getWordIndex())));
+                        new RuntimeException(String.format("cattuvedi dictionary entry not found for dictionaryEntry record %s-%s", dictionaryEntry.masterDictionary.getHindiWord(),dictionaryEntry.getWordIndex())));
         entry.setCanonicalHindi(canonicalWord);
         return entry;
     }
 
+    private BahriEntry toBahriEntry(DictionaryEntry dictionaryEntry, String canonicalWord){
+        BahriEntry entry = bahriService.findOne(dictionaryEntry.masterDictionary.getHindiWord(), dictionaryEntry.getWordIndex())
+                .orElseThrow(() ->
+                        new RuntimeException(String.format("bahri dictionary entry not found for dictionaryEntry record %s-%s", dictionaryEntry.masterDictionary.getHindiWord(),dictionaryEntry.getWordIndex())));
+        entry.setCanonicalHindi(canonicalWord);
+        return entry;
+    }
 
 
     private <T extends IDictionaryEntry> DictionaryEntryView fromConcreteDictionaryEntry(T concreteDictionaryEntry){
@@ -218,11 +238,12 @@ public class DictionaryService {
     public List<CanonicalWrapper> findDictionaryEntries(@Nonnull String hindiWord){
 
         List<CanonicalWrapper> result = new ArrayList<>();
-        result.addAll( wikitionaryService.findByHindiWord(hindiWord).stream().map(we -> new CanonicalWrapper(DictionarySource.WIKITIONARY, we)).collect(Collectors.toList()));
+        result.addAll(wikitionaryService.findByHindiWord(hindiWord).stream().map(we -> new CanonicalWrapper(DictionarySource.WIKITIONARY, we)).collect(Collectors.toList()));
         result.addAll(plattsService.findByHindiWord(hindiWord).stream().map(we -> new CanonicalWrapper(DictionarySource.PLATTS, we)).collect(Collectors.toList()));
-        result.addAll( rekhtaService.findByHindiWord(hindiWord).stream().map(we -> new CanonicalWrapper(DictionarySource.REKHTA, we)).collect(Collectors.toList()));
+        result.addAll(rekhtaService.findByHindiWord(hindiWord).stream().map(we -> new CanonicalWrapper(DictionarySource.REKHTA, we)).collect(Collectors.toList()));
         result.addAll(murshidService.findByHindiWord(hindiWord).stream().map(we -> new CanonicalWrapper(DictionarySource.MURSHID, we)).collect(Collectors.toList()));
         result.addAll(caturvediService.findByHindiWord(hindiWord).stream().map(we -> new CanonicalWrapper(DictionarySource.CATURVEDI, we)).collect(Collectors.toList()));
+        result.addAll(bahriService.findByHindiWord(hindiWord).stream().map(we -> new CanonicalWrapper(DictionarySource.BAHRI, we)).collect(Collectors.toList()));
 
         return result;
     }
@@ -272,6 +293,12 @@ public class DictionaryService {
     public void setCaturvediService(CaturvediService caturvediService) {
         this.caturvediService = caturvediService;
     }
+
+    @Inject
+    public void setBahriService(BahriService bahriService) {
+        this.bahriService = bahriService;
+    }
+
 
 
 

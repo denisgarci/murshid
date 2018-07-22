@@ -35,7 +35,7 @@ public class MurshidApplication {
 	public static void main(String[] args) throws Exception{
 		context = SpringApplication.run(MurshidApplication.class, args);
 
-        //resequence();
+        reorder();
 
 	}
 
@@ -45,6 +45,12 @@ public class MurshidApplication {
     private static void resequence() {
         SongsService inflectedService = context.getBean(SongsService.class);
         inflectedService.resequenceSongWordsToInflected("Dard Dilom Ke");
+        LOGGER.info("finished resequencung");
+    }
+
+    private static void reorder() {
+        SongsService inflectedService = context.getBean(SongsService.class);
+        inflectedService.sortBySpanId("Fevicol Se");
         LOGGER.info("finished resequencung");
     }
 

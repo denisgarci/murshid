@@ -34,7 +34,7 @@ public class SpellCheckService {
     }
 
     public boolean wordsDontExist(String hindiWord){
-        String[] tokens = hindiWord.split(" ");
+        String[] tokens = hindiWord.split("\\s+");
         for (String hindi: tokens){
             if (!spellCheckRepository.exists(hindi)){
                 return true;

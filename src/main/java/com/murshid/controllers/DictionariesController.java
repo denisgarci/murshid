@@ -15,6 +15,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 @Controller
@@ -62,26 +63,17 @@ public class DictionariesController {
                 .orElse(null);
     }
 
-    @PostMapping("/findInDictionaries")
+    @GetMapping("/findInDictionaries")
     public @ResponseBody
-    Map<String, Map<String, String>> returnMap(@RequestBody StringListWrapper stringListWrapper) {
+    Map<String, CanonicalWrapper> returnMap(@RequestParam(name = "hindiWord") String hindiWord) {
 
-        Map<String, Map<String, String>> result = new HashMap<>();
+        Map<String, String> result = new HashMap<>();
 
-        stringListWrapper.strings.forEach(string -> {
-            List<CanonicalWrapper> canonicalWrappers = dictionaryService.findDictionaryEntries(string);
-            Map<String, Map<String, String>> partial = canonicalWrappers.stream()
-                    .collect(Collectors.toMap(CanonicalWrapper::getKey, a ->{
-                        Map<String, String> body = new HashMap<>();
-                        body.put("dictionarySourceTo", a.getDictionarySource().name());
-                        body.put("meaning", a.getEntry().getMeaning());
-                        //result.put("partOfSpeech", a.getEntry().getPartOfSpeech().name());
-                        body.put("hindiWord", a.getEntry().getHindiWord());
-                        return body;
-                    }));
-            result.putAll(partial);
-        });
-        return result;
+
+            List<CanonicalWrapper> canonicalWrappers = dictionaryService.findDictionaryEntries(hindiWord);
+            Map<String, CanonicalWrapper> partial = canonicalWrappers.stream()
+                    .collect(Collectors.toMap(CanonicalWrapper::getKey, Function.identity()));
+            return partial;
     }
 
     @Inject

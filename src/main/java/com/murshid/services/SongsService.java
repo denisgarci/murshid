@@ -4,11 +4,13 @@ import com.amazonaws.services.dynamodbv2.document.Item;
 import com.amazonaws.services.dynamodbv2.document.Table;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
+import com.google.gson.Gson;
 import com.murshid.dynamo.domain.Inflected;
 import com.murshid.dynamo.domain.Song;
 import com.murshid.dynamo.repo.SongRepository;
 import com.murshid.models.converters.DynamoAccessor;
 import com.murshid.models.converters.WordListMasterEntryConverter;
+import com.murshid.models.converters.WordListNotInflectedEntryConverter;
 import com.murshid.persistence.domain.views.SongWordsToInflectedTable;
 import com.murshid.persistence.domain.views.SongWordsToNotInflectedTable;
 import com.murshid.persistence.repo.SpellCheckRepository;
@@ -37,6 +39,9 @@ public class SongsService {
     private SongRepository songRepository;
     private SpellCheckRepository spellCheckRepository;
     private InflectedService inflectedService;
+    private NotInflectedService notInflectedService;
+
+    private static Gson gson = new Gson();
 
     /**
      * Rerurns the texts of a song from the Dynamo songs table, if it exists.
@@ -171,7 +176,7 @@ public class SongsService {
             String songText = song.getSong();
             Set<String> hindiTokens = SongUtils.wordTokens(songText);
 
-            String[] allTokens = songText.split(String.format(WITH_DELIMITER, "\\s+|\\\\n|\\?|\\,|\\[|\\]|\\."));
+            String[] allTokens = songText.split(String.format(WITH_DELIMITER, "\\s+|\\\\n|\\?|\\,|\\[|\\]|\\.|\\…"));
             //allTokens = SongUtils.eliminateThingsWithinBrackets(allTokens);
 
             int index = 0;
@@ -216,13 +221,10 @@ public class SongsService {
                 result.append("&nbsp;");
                 break;
             case "?":
-                result.append("<span class='punctuationMark'>?</span>");
-                break;
             case ".":
-                result.append("<span class='punctuationMark'>.</span>");
-                break;
             case ",":
-                result.append("<span class='punctuationMark'>,</span>");
+            case "…":
+                result.append("<span class='punctuationMark'>").append(token).append("</span>");
                 break;
             case "\n":
                 result.append("<br/>");
@@ -255,28 +257,69 @@ public class SongsService {
         }
     }
 
-
-    public boolean validate(@Nonnull String songTitleLatin, SongWordsToInflectedTable songWordsToInflectedTable){
+    public boolean validate(@Nonnull String songTitleLatin, SongWordsToNotInflectedTable notInflectedToAppend){
         Song song = songRepository.findOne(songTitleLatin);
         if (song == null){
             LOGGER.error("the song {} was not found in Master", songTitleLatin);
             return false;
         }
 
-        String hindiWord= songWordsToInflectedTable.getInflectedKey().getInflectedHindi();
-        int wordIndex = songWordsToInflectedTable.getInflectedKey().getInflectedHindiIndex();
+        String hindiWord= notInflectedToAppend.getNotInflectedKey().getHindi();
+        int wordIndex = notInflectedToAppend.getNotInflectedKey().getHindiIndex();
+        if (!notInflectedService.exists(hindiWord, wordIndex)){
+            LOGGER.error("the not-inflected key with hindi {} and hindi_index={} does not exist", hindiWord, wordIndex);
+            return false;
+        }
+
+        if (song.getWordListNotInflected().contains(notInflectedToAppend)){
+            LOGGER.error("the song {} already contains this songWordsToNotInflectedTable entry={}", songTitleLatin,
+                    notInflectedToAppend);
+            return false;
+        }
+
+        return true;
+    }
+
+
+    public boolean validate(@Nonnull String songTitleLatin, SongWordsToInflectedTable inflectedToAppend){
+        Song song = songRepository.findOne(songTitleLatin);
+        if (song == null){
+            LOGGER.error("the song {} was not found in Master", songTitleLatin);
+            return false;
+        }
+
+        String hindiWord= inflectedToAppend.getInflectedKey().getInflectedHindi();
+        int wordIndex = inflectedToAppend.getInflectedKey().getInflectedHindiIndex();
         if (!inflectedService.exists(hindiWord, wordIndex)){
             LOGGER.error("the inflected key with inflected_hindi {} and inflected_hindi_index={} does not exist", hindiWord, wordIndex);
             return false;
         }
 
-        if (song.getWordListMaster().contains(songWordsToInflectedTable)){
+        if (song.getWordListMaster().contains(inflectedToAppend)){
             LOGGER.error("the song {} already contains this songWordsToInflectedTable entry={}", songTitleLatin,
-                         songWordsToInflectedTable);
+                         inflectedToAppend);
             return false;
         }
 
         return true;
+    }
+
+    @SuppressWarnings("unused")
+    /**
+     * reorders the song's inflected entries by the first element of each inflected's span id array.
+     * Useful to call it after an inflected entry has just been appended at the end, for a word that is not the last.
+     */
+    public void sortBySpanId(@Nonnull String songTitleLatin){
+        Song song = songRepository.findOne(songTitleLatin);
+        if (song != null){
+            List<SongWordsToInflectedTable> inflected = song.getWordListMaster();
+            inflected =  inflected.stream().sorted(Comparator.comparing(entry -> entry.getIndices().get(0)))
+                    .collect(Collectors.toList());
+            song.setWordListMaster(inflected);
+            songRepository.save(song);
+        }else{
+            LOGGER.error("song {} not found", songTitleLatin);
+        }
     }
 
     @SuppressWarnings("unused")
@@ -297,7 +340,7 @@ public class SongsService {
         }
     }
 
-    public void addEntryToWordListMaster(@Nonnull String songTitleLatin, SongWordsToInflectedTable songWordsToInflectedTable){
+    public void appendToInflected(@Nonnull String songTitleLatin, SongWordsToInflectedTable songWordsToInflectedTable){
 
         Song song = songRepository.findOne(songTitleLatin);
         if (song != null){
@@ -320,6 +363,28 @@ public class SongsService {
         }
     }
 
+    public void appendNotInflected(@Nonnull String songTitleLatin, SongWordsToNotInflectedTable notInflectedToAppend){
+
+        Song song = songRepository.findOne(songTitleLatin);
+        if (song != null){
+            Map<String, Object> entry = new HashMap<>();
+            entry.put("song_word_indices", notInflectedToAppend.getIndices());
+
+            Map<String, Object> masterKey = new HashMap<>();
+            masterKey.put("hindi", notInflectedToAppend.getNotInflectedKey().getHindi());
+            masterKey.put("hindi_index", notInflectedToAppend.getNotInflectedKey().getHindiIndex());
+
+            entry.put("not_inflected_key", masterKey);
+
+            List<SongWordsToNotInflectedTable> wordListNotInflected = song.getWordListNotInflected();
+            if (wordListNotInflected == null){
+                wordListNotInflected = Lists.newArrayList();
+                song.setWordListNotInflected(wordListNotInflected);
+            }
+            wordListNotInflected.add(WordListNotInflectedEntryConverter.fromMap(entry));
+            songRepository.save(song);
+        }
+    }
 
     @Inject
     public SongsService setSongRepository(SongRepository songRepository) {
@@ -336,6 +401,12 @@ public class SongsService {
     @Inject
     public SongsService setInflectedService(InflectedService inflectedService) {
         this.inflectedService = inflectedService;
+        return this;
+    }
+
+    @Inject
+    public SongsService setNotInflectedService(NotInflectedService notInflectedService) {
+        this.notInflectedService = notInflectedService;
         return this;
     }
 

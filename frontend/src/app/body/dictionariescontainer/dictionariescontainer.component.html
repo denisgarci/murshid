@@ -5,9 +5,18 @@
   </div>
   <div *ngIf="content">
 
-    <div class="dictionary_global_header">
-      <span>{{content.inflected_hindi}}</span> &nbsp;-&nbsp; <span class="part_of_speech">{{content.inflected_part_of_speech_label}}</span>
-    </div>
+    <span *ngIf="content.inflected_hindi;then header_inflected else header_not_inflected"></span>
+    <ng-template #header_inflected>
+      <div class="dictionary_global_header">
+        <span>{{content.inflected_hindi}}</span> &nbsp;-&nbsp; <span class="part_of_speech">{{content.inflected_part_of_speech_label}}</span>
+      </div>
+    </ng-template>
+    <ng-template #header_not_inflected>
+      <div class="dictionary_global_header">
+        <span>{{content.not_inflected_hindi}}</span> &nbsp;-&nbsp; <span class="part_of_speech">{{content.not_inflected_part_of_speech_label}}</span>
+      </div>
+    </ng-template>
+
 
     <div *ngIf="content.accidence_labels.length" >
       <span class="accidence_word" *ngFor="let accidenceLabel of content.accidence_labels">{{accidenceLabel}}</span>
@@ -15,18 +24,18 @@
       <span class="canonical_hindi">{{content.canonical_hindi}}</span>
     </div>
 
-    <br/>
-    <div *ngFor="let dictionarySource of objectKeys(content.dictionary_entries_inflected); let i = index" class="dictionary_entry_array">
-      <span class="dictionary_name">{{dictionarySource}}</span>
-      <div *ngFor="let   dicEntry of content.dictionary_entries_inflected[dictionarySource]; let e = index">
-        <span *ngIf="e != 0" class="secondary_canonical_hindi">{{dicEntry.canonical_hindi}}</span>
-        <p class="dictionary_entry_content">
-          {{dicEntry.meaning}}
-        </p>
+    <span *ngIf="content.dictionary_entries_inflected">
+      <div *ngFor="let dictionarySource of objectKeys(content.dictionary_entries_inflected); let i = index" class="dictionary_entry_array">
+        <span class="dictionary_name">{{dictionarySource}}</span>
+        <div *ngFor="let   dicEntry of content.dictionary_entries_inflected[dictionarySource]; let e = index">
+          <span *ngIf="e != 0" class="secondary_canonical_hindi">{{dicEntry.canonical_hindi}}</span>
+          <p class="dictionary_entry_content">
+            {{dicEntry.meaning}}
+          </p>
+        </div>
       </div>
-    </div>
+    </span>
 
-    <br/>
     <span *ngIf="content.dictionary_entries_not_inflected">
       <div *ngFor="let dictionarySource of objectKeys(content.dictionary_entries_not_inflected); let i = index" class="dictionary_entry_array">
         <span class="dictionary_name_not_inflected">{{dictionarySource}}</span>

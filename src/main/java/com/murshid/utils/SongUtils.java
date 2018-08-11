@@ -6,6 +6,7 @@ import javax.annotation.Nonnull;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Set;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 public class SongUtils {
@@ -35,6 +36,7 @@ public class SongUtils {
         result = result.replace("/", " ");
         result = result.replace(".", " ");
         result = result.replace(",", " ");
+        result = result.replaceAll(Pattern.quote("…"), " ");
         result = result.replace("\n", " ");
         result = result.trim().replaceAll(" +", " "); //replaces any number of spaces with a single one
         String[] tokens = result.split("\\s+"); // \s+ matches all whitespaces (of any size), including blank spaces and carriages returns

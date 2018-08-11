@@ -27,6 +27,7 @@ import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.*;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
@@ -176,7 +177,9 @@ public class SongsService {
             String songText = song.getSong();
             Set<String> hindiTokens = SongUtils.wordTokens(songText);
 
-            String[] allTokens = songText.split(String.format(WITH_DELIMITER, "\\s+|\\\\n|\\?|\\,|\\[|\\]|\\.|\\…"));
+            String periodQuoted = Pattern.quote("…");
+
+            String[] allTokens = songText.split(String.format(WITH_DELIMITER, "\\s+|\\\\n|\\?|\\,|\\[|\\]|\\.|" + periodQuoted));
             //allTokens = SongUtils.eliminateThingsWithinBrackets(allTokens);
 
             int index = 0;
@@ -313,7 +316,7 @@ public class SongsService {
         Song song = songRepository.findOne(songTitleLatin);
         if (song != null){
             List<SongWordsToInflectedTable> inflected = song.getWordListMaster();
-            inflected =  inflected.stream().sorted(Comparator.comparing(entry -> entry.getIndices().get(0)))
+            inflected =  inflected.stream().sorted(Comparator.comparing(entry -> Integer.valueOf(entry.getIndices().get(0))))
                     .collect(Collectors.toList());
             song.setWordListMaster(inflected);
             songRepository.save(song);

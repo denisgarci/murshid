@@ -4,6 +4,7 @@ import com.amazonaws.services.dynamodbv2.document.Item;
 import com.amazonaws.services.dynamodbv2.model.AttributeValue;
 import com.amazonaws.services.dynamodbv2.model.ScanRequest;
 import com.amazonaws.services.dynamodbv2.model.ScanResult;
+import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
@@ -21,15 +22,17 @@ import com.murshid.persistence.domain.MasterDictionary;
 import com.murshid.persistence.domain.views.InflectedKey;
 import com.murshid.persistence.domain.views.SongWordsToInflectedTable;
 import com.murshid.utils.WordUtils;
+import org.apache.commons.lang3.tuple.Pair;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.annotation.Nonnull;
 import javax.inject.Inject;
 import javax.inject.Named;
-import javax.persistence.criteria.CriteriaBuilder;
 import java.util.*;
 import java.util.stream.Collectors;
+
+import static java.util.stream.Collectors.*;
 
 @Named
 public class InflectedService {
@@ -57,15 +60,15 @@ public class InflectedService {
     public List<Inflected> getAll(){
         return inflectedRepository.scanAll()
                 .stream().map(InflectedConverter::fromAvMap)
-                .collect(Collectors.toList());
+                .collect(toList());
     }
 
     /**
-     * retrieves all Inflected entries relevant for a song, but instead of in List form, in a Map<String, Object> form
+     * retrieves all InflectedRepositoryDB entries relevant for a song, but instead of in List form, in a Map<String, Object> form
      * that is suitable to be transformed into a Javascript object.
      * Then, writes them in String form into the Song's DynamoDB record.
      *
-     * Also returns the Inflected entries retrieved
+     * Also returns the InflectedRepositoryDB entries retrieved
      *
      * @param song      a Song model
      * @return          a Map<String, Object> similar easily transformable into a JS object
@@ -97,18 +100,17 @@ public class InflectedService {
         return result;
     }
 
-    public Inflected complementMasterDictionaryId(Inflected inflected){
+    public int findMasterDictionaryId(Inflected inflected){
         Optional<MasterDictionary> masterDictionary = masterDictionaryService.findByHindiWordAndWordIndex(inflected.getMasterDictionaryKey().hindiWord, inflected.getMasterDictionaryKey().wordIndex);
-        if (masterDictionary.isPresent()){
-            inflected.setMasterDictionaryId(masterDictionary.get().getId());
+         if (masterDictionary.isPresent()){
+            return masterDictionary.get().getId();
         }else{
             throw new IllegalArgumentException(String.format("master dictionary entry not found for inflected %sलेना-%s", inflected.getInflectedHindi(), inflected.getInflectedHindiIndex()));
         }
-        return inflected;
     }
 
     /**
-     * Retrieves all DynamoDB.Inflected entries relevant for a Song.
+     * Retrieves all DynamoDB.InflectedRepositoryDB entries relevant for a Song.
      * The song is assumed to have the word_list_master member populated
      * @param song         a song model
      * @return             a list (not necessarily ordered) of said master keys
@@ -118,14 +120,17 @@ public class InflectedService {
         //collect all master keys, without repetition
         Set<InflectedKey> mks = song.getWordListMaster()
                 .stream().map(SongWordsToInflectedTable::getInflectedKey)
-                .collect(Collectors.toSet());
+                //we filter the null/-1, because they are just placeholders for the sake of structure of keeping inflected entries sequential
+                //for example, when only a non-inflected entry accounts for the item that span
+                .filter(ik -> ik.getInflectedHindiIndex() != -1)
+                .collect(toSet());
 
         return mks.stream()
                 .map(mk -> inflectedRepository.findOne(mk.getInflectedHindi(), mk.getInflectedHindiIndex())
                         .orElseThrow(() ->
                                 new IllegalArgumentException(
                                         String.format("the inflected entry %s-%s in the song, is not in the inflected repository ", mk.getInflectedHindi(), mk.getInflectedHindiIndex())))
-                ).collect(Collectors.toList());
+                ).collect(toList());
 
     }
 
@@ -136,7 +141,7 @@ public class InflectedService {
         ScanResult scanResult = DynamoAccessor.client.scan(scanRequest);
         List<Inflected> masters = scanResult.getItems()
                 .stream().map(InflectedConverter::fromAvMap)
-                .collect(Collectors.toList());
+                .collect(toList());
 
 
         for(Inflected master: masters){
@@ -150,11 +155,11 @@ public class InflectedService {
 
     /**
      * Utility method for cloning an inflected entry into another similar one
-     * @param original                  the original Inflected entry
+     * @param original                  the original InflectedRepositoryDB entry
      * @param removeAccidences          what Accidence entries to remove
      * @param addAccidences             what Accidence entrues to add
-     * @param inflectedHindi            the new Inflected hindi word (the Urud one is retrieved from the database)
-     * @return                          the new Inflected instance
+     * @param inflectedHindi            the new InflectedRepositoryDB hindi word (the Urud one is retrieved from the database)
+     * @return                          the new InflectedRepositoryDB instance
      */
     private Inflected clone(Inflected original, List<Accidence> removeAccidences, List<Accidence> addAccidences, String inflectedHindi){
         Inflected target = (Inflected)original.clone();
@@ -275,27 +280,8 @@ public class InflectedService {
             result.add(verbalNoun);
             result.addAll(participlesInAA(verbalNoun));
         }
+        explodeSubjunctives(infinitive, result);
 
-        //subjunctive
-        {
-            Inflected subjunctiveRoot = clone(infinitive, Lists.newArrayList(Accidence.MASCULINE, Accidence.DIRECT), Lists.newArrayList(Accidence.SUBJUNCTIVE), 2, "");
-            subjunctiveRoot.setPartOfSpeech(PartOfSpeech.VERB);
-            if (!WordUtils.endsWithVowel(subjunctiveRoot.getInflectedHindi())) {
-                result.add(clone(subjunctiveRoot, Collections.emptyList(), Lists.newArrayList(Accidence._1ST), 0, "ूँ"));
-                result.add(clone(subjunctiveRoot, Collections.emptyList(), Lists.newArrayList(Accidence._2ND), 0, "े"));
-                result.add(clone(subjunctiveRoot, Collections.emptyList(), Lists.newArrayList(Accidence._3RD), 0, "े"));
-                result.add(clone(subjunctiveRoot, Lists.newArrayList(Accidence.SINGULAR), Lists.newArrayList(Accidence.PLURAL, Accidence._1ST), 0, "ें"));
-                result.add(clone(subjunctiveRoot, Lists.newArrayList(Accidence.SINGULAR), Lists.newArrayList(Accidence.PLURAL, Accidence._3RD), 0, "ें"));
-                result.add(clone(subjunctiveRoot, Lists.newArrayList(Accidence.SINGULAR), Lists.newArrayList(Accidence.PLURAL, Accidence._2ND), 0, "ो"));
-            }else{
-                result.add(clone(subjunctiveRoot, Collections.emptyList(), Lists.newArrayList(Accidence._1ST), 0, "ऊँ"));
-                result.add(clone(subjunctiveRoot, Collections.emptyList(), Lists.newArrayList(Accidence._2ND), 0, "ए"));
-                result.add(clone(subjunctiveRoot, Collections.emptyList(), Lists.newArrayList(Accidence._3RD), 0, "ए"));
-                result.add(clone(subjunctiveRoot, Lists.newArrayList(Accidence.SINGULAR), Lists.newArrayList(Accidence.PLURAL, Accidence._1ST), 0, "एँ"));
-                result.add(clone(subjunctiveRoot, Lists.newArrayList(Accidence.SINGULAR), Lists.newArrayList(Accidence.PLURAL, Accidence._3RD), 0, "एँ"));
-                result.add(clone(subjunctiveRoot, Lists.newArrayList(Accidence.SINGULAR), Lists.newArrayList(Accidence.PLURAL, Accidence._2ND), 0, "ओ"));
-            }
-        }
 
         //future
         {
@@ -318,7 +304,16 @@ public class InflectedService {
                 inflectFeminineFutureRootVocalic(result, futureRootFem);
             }
         }
+        explodeImperatives(infinitive, result);
 
+
+        return result;
+
+    }
+
+    @VisibleForTesting
+    protected void explodeImperatives(Inflected infinitive, List<Inflected> result) {
+        //imperative
         {
             Inflected imperativeRoot = clone(infinitive, Lists.newArrayList(Accidence.DIRECT, Accidence.SINGULAR, Accidence.MASCULINE), Lists.newArrayList(Accidence.IMPERATIVE), 2, "");
             imperativeRoot.setPartOfSpeech(PartOfSpeech.VERB);
@@ -328,15 +323,71 @@ public class InflectedService {
                 result.add(clone(imperativeRoot, Collections.emptyList(), Lists.newArrayList(Accidence.PLURAL, Accidence._3RD), 0, "िये"));
                 result.add(clone(imperativeRoot, Collections.emptyList(), Lists.newArrayList(Accidence.PLURAL, Accidence._3RD), 0, "िए"));
             }else {
-                result.add(clone(imperativeRoot, Collections.emptyList(), Lists.newArrayList(Accidence.SINGULAR, Accidence._2ND), 0, ""));
-                result.add(clone(imperativeRoot, Collections.emptyList(), Lists.newArrayList(Accidence.PLURAL, Accidence._2ND), 0, "ओ"));
-                result.add(clone(imperativeRoot, Collections.emptyList(), Lists.newArrayList(Accidence.PLURAL, Accidence._3RD), 0, "इये"));
-                result.add(clone(imperativeRoot, Collections.emptyList(), Lists.newArrayList(Accidence.PLURAL, Accidence._3RD), 0, "इए"));
+
+                String root = imperativeRoot.getInflectedHindi();
+                //roots in -ii and -uu shorten before some imperative endings
+                if (root.endsWith("ी")) {
+                    result.add(clone(imperativeRoot, Collections.emptyList(), Lists.newArrayList(Accidence.SINGULAR, Accidence._2ND), 0, ""));
+                    result.add(clone(imperativeRoot, Collections.emptyList(), Lists.newArrayList(Accidence.PLURAL, Accidence._2ND), 1, "िओ"));
+                    result.add(clone(imperativeRoot, Collections.emptyList(), Lists.newArrayList(Accidence.PLURAL, Accidence._3RD), 1, "िये"));
+                    result.add(clone(imperativeRoot, Collections.emptyList(), Lists.newArrayList(Accidence.PLURAL, Accidence._3RD), 1, "िए"));
+                }else if (root.endsWith("ू")) {
+                    result.add(clone(imperativeRoot, Collections.emptyList(), Lists.newArrayList(Accidence.SINGULAR, Accidence._2ND), 0, ""));
+                    result.add(clone(imperativeRoot, Collections.emptyList(), Lists.newArrayList(Accidence.PLURAL, Accidence._2ND), 1, "ुओ"));
+                    result.add(clone(imperativeRoot, Collections.emptyList(), Lists.newArrayList(Accidence.PLURAL, Accidence._3RD), 1, "ुये"));
+                    result.add(clone(imperativeRoot, Collections.emptyList(), Lists.newArrayList(Accidence.PLURAL, Accidence._3RD), 1, "ुए"));
+                }else{
+                    result.add(clone(imperativeRoot, Collections.emptyList(), Lists.newArrayList(Accidence.SINGULAR, Accidence._2ND), 0, ""));
+                    result.add(clone(imperativeRoot, Collections.emptyList(), Lists.newArrayList(Accidence.PLURAL, Accidence._2ND), 0, "ओ"));
+                    result.add(clone(imperativeRoot, Collections.emptyList(), Lists.newArrayList(Accidence.PLURAL, Accidence._3RD), 0, "इये"));
+                    result.add(clone(imperativeRoot, Collections.emptyList(), Lists.newArrayList(Accidence.PLURAL, Accidence._3RD), 0, "इए"));
+                }
             }
         }
+    }
 
-        return result;
-
+    /**
+     * Explodes the infinitive into subjunctive forms
+     * @param infinitive        the InflectedRepositoryDB object containing the verb infinitive
+     * @param result            the list where we put the explosion results
+     */
+    protected void explodeSubjunctives(Inflected infinitive, List<Inflected> result) {
+        //subjunctive
+        {
+            Inflected subjunctiveRoot = clone(infinitive, Lists.newArrayList(Accidence.MASCULINE, Accidence.DIRECT), Lists.newArrayList(Accidence.SUBJUNCTIVE), 2, "");
+            subjunctiveRoot.setPartOfSpeech(PartOfSpeech.VERB);
+            if (!WordUtils.endsWithVowel(subjunctiveRoot.getInflectedHindi())) {
+                result.add(clone(subjunctiveRoot, Collections.emptyList(), Lists.newArrayList(Accidence._1ST), 0, "ूँ"));
+                result.add(clone(subjunctiveRoot, Collections.emptyList(), Lists.newArrayList(Accidence._2ND), 0, "े"));
+                result.add(clone(subjunctiveRoot, Collections.emptyList(), Lists.newArrayList(Accidence._3RD), 0, "े"));
+                result.add(clone(subjunctiveRoot, Lists.newArrayList(Accidence.SINGULAR), Lists.newArrayList(Accidence.PLURAL, Accidence._1ST), 0, "ें"));
+                result.add(clone(subjunctiveRoot, Lists.newArrayList(Accidence.SINGULAR), Lists.newArrayList(Accidence.PLURAL, Accidence._3RD), 0, "ें"));
+                result.add(clone(subjunctiveRoot, Lists.newArrayList(Accidence.SINGULAR), Lists.newArrayList(Accidence.PLURAL, Accidence._2ND), 0, "ो"));
+            }else{
+                if (subjunctiveRoot.getInflectedHindi().endsWith("ी")){
+                    result.add(clone(subjunctiveRoot, Collections.emptyList(), Lists.newArrayList(Accidence._1ST), 1, "िऊँ"));
+                    result.add(clone(subjunctiveRoot, Collections.emptyList(), Lists.newArrayList(Accidence._2ND), 1, "िए"));
+                    result.add(clone(subjunctiveRoot, Collections.emptyList(), Lists.newArrayList(Accidence._3RD), 1, "िए"));
+                    result.add(clone(subjunctiveRoot, Lists.newArrayList(Accidence.SINGULAR), Lists.newArrayList(Accidence.PLURAL, Accidence._1ST), 1, "िएँ"));
+                    result.add(clone(subjunctiveRoot, Lists.newArrayList(Accidence.SINGULAR), Lists.newArrayList(Accidence.PLURAL, Accidence._3RD), 1, "िएँ"));
+                    result.add(clone(subjunctiveRoot, Lists.newArrayList(Accidence.SINGULAR), Lists.newArrayList(Accidence.PLURAL, Accidence._2ND), 1, "िओ"));
+                }else if (subjunctiveRoot.getInflectedHindi().endsWith("ू")){
+                    result.add(clone(subjunctiveRoot, Collections.emptyList(), Lists.newArrayList(Accidence._1ST), 1, "ुऊँ"));
+                    result.add(clone(subjunctiveRoot, Collections.emptyList(), Lists.newArrayList(Accidence._2ND), 1, "ुए"));
+                    result.add(clone(subjunctiveRoot, Collections.emptyList(), Lists.newArrayList(Accidence._3RD), 1, "ुए"));
+                    result.add(clone(subjunctiveRoot, Lists.newArrayList(Accidence.SINGULAR), Lists.newArrayList(Accidence.PLURAL, Accidence._1ST), 1, "ुएँ"));
+                    result.add(clone(subjunctiveRoot, Lists.newArrayList(Accidence.SINGULAR), Lists.newArrayList(Accidence.PLURAL, Accidence._3RD), 1, "ुएँ"));
+                    result.add(clone(subjunctiveRoot, Lists.newArrayList(Accidence.SINGULAR), Lists.newArrayList(Accidence.PLURAL, Accidence._2ND), 1, "ुओ"));
+                }else {
+                    result.add(clone(subjunctiveRoot, Collections.emptyList(), Lists.newArrayList(Accidence._1ST), 0, "ऊँ"));
+                    result.add(clone(subjunctiveRoot, Collections.emptyList(), Lists.newArrayList(Accidence._2ND), 0, "ए"));
+                    result.add(clone(subjunctiveRoot, Collections.emptyList(), Lists.newArrayList(Accidence._3RD), 0, "ए"));
+                    result.add(clone(subjunctiveRoot, Lists.newArrayList(Accidence.SINGULAR), Lists.newArrayList(Accidence.PLURAL, Accidence._1ST), 0, "एँ"));
+                    result.add(clone(subjunctiveRoot, Lists.newArrayList(Accidence.SINGULAR), Lists.newArrayList(Accidence.PLURAL, Accidence._3RD), 0, "एँ"));
+                    result.add(clone(subjunctiveRoot, Lists.newArrayList(Accidence.SINGULAR), Lists.newArrayList(Accidence.PLURAL, Accidence._2ND), 0, "ओ"));
+                }
+            }
+        }
     }
 
     private void inflectFeminineFutureRootVocalic(List<Inflected> result, Inflected futureRootFem) {
@@ -489,45 +540,65 @@ public class InflectedService {
     /**
      * Validates a group of "exploded inflected" against spell_check, to verify if they have Urdu counterpart.
      * Some like vocative plural can be added on the fly, based on the oblique plural.
-     * @param inflectedList     the list of Inflected to validate
+     * @param inflectedList     the list of InflectedRepositoryDB to validate
      * @return                  true if all have Urdu counterparts (or they have been added), false otherwise
      */
-    public boolean validateSpellCheckIngroupWithSupplement(List<Inflected> inflectedList){
+    public boolean validateSpellCheckIngroupWithSupplement(List<Inflected> inflectedList, int masterDictionaryId){
         List<Inflected> notInSpellChecker = validateSpellCheckIngroup(inflectedList);
-        if (notInSpellChecker.isEmpty()) {
+
+        if (notInSpellChecker.isEmpty()){
             return true;
-        }else if (notInSpellChecker.size() > 1){
-            return false;
+        }
+
+
+        List<Inflected> allExisting = findByMasterDictionaryId(masterDictionaryId);
+        List<Pair<Inflected, Optional<String>>> processed = notInSpellChecker.stream().map(notFound -> spellCheckService.propose(notFound, inflectedList))
+                .collect(toList());
+
+        //for those processed that still have no suggestion, make a second pass, but know using not the exploded forms as
+        //auxiliars, but the forms already existing in the database.
+        processed = processed.stream().map(pr ->{
+            if (pr.getRight().isPresent()){
+                return pr;
+            }else{
+                return  spellCheckService.propose(pr.getLeft(), allExisting);
+            }
+        }).collect(Collectors.toList());
+
+        //we create a map because the proper transliteration for the same hindi word could have been found for some accidences, but not for others
+        Map<String, String> hindiToUrdu = processed.stream().filter(pair -> pair.getRight().isPresent())
+                .collect(toMap(this::extractInflectedHindi, this::extractString, (v1, v2) -> v1));
+
+        //now, re-process, removing the values whose hindi has counterpart, even if not for the same exact accidence
+        List<Pair<Inflected, Optional<String>>> stillEmpty = processed.stream().filter(pr -> !pr.getRight().isPresent()
+                && !hindiToUrdu.containsKey(pr.getLeft().getInflectedHindi()))
+                .collect(toList());
+
+        if ( stillEmpty.isEmpty()){
+            //write all that have been suggested
+            List<Pair<Inflected, Optional<String>>> writable = processed.stream().filter(pr -> pr.getRight().isPresent())
+                    .collect(toList());
+            writable.forEach(pr -> spellCheckService.upsert(pr.getLeft().getInflectedHindi(), pr.getRight().get()));
+
+            return true;
         }else{
-            //try to supplement vocative plural, if than one only is missing
-            List<Inflected> vocativePlurals = notInSpellChecker.stream().filter(inf -> inf.getAccidence().containsAll(Lists.newArrayList(Accidence.VOCATIVE, Accidence.PLURAL))).collect(Collectors.toList());
-            if (vocativePlurals.size() != 1){
-                return false;
-            }
-            Inflected vocativePlural = vocativePlurals.get(0);
-
-            List<Inflected> obliquePlurals = inflectedList.stream().filter(inf -> inf.getAccidence().containsAll(Lists.newArrayList(Accidence.OBLIQUE, Accidence.PLURAL))).collect(Collectors.toList());
-            if (obliquePlurals.size() != 1){
-                return false;
-            }
-            Inflected obliquePlural = obliquePlurals.get(0);
-
-            String vocativePluralString = vocativePlural.getInflectedHindi();
-            String obliquePluralString = obliquePlural.getInflectedHindi();
-            String obliquePluralStringUrdu = obliquePlural.getInflectedUrdu();
-
-            if (obliquePluralString.substring(0, obliquePluralString.length()-1).equals(vocativePluralString)){
-                String vocativePluralStringUrdu =  obliquePluralStringUrdu.substring(0, obliquePluralStringUrdu.length()-1);
-                vocativePlural.setInflectedUrdu(vocativePluralStringUrdu);
-                LOGGER.info("the vocative plural {} has been supplemented in spell_check", vocativePluralStringUrdu);
-                spellCheckService.upsert(vocativePlural.getInflectedHindi(), vocativePluralStringUrdu);
-            }
-            return true;
+            stillEmpty.forEach(pr -> {
+                LOGGER.error("even after proposing, the hindi word {} is not in spell_check", pr.getLeft().getInflectedHindi());
+            });
+            return false;
         }
     }
 
+    private String extractInflectedHindi (Pair<Inflected, Optional<String>> pair){
+        return pair.getLeft().getInflectedHindi();
+    }
+
+    private String extractString(Pair<Inflected, Optional<String>> pair){
+        return pair.getRight().get();
+    }
+
     public List<Inflected> validateSpellCheckIngroup(List<Inflected> inflectedList){
-        List<Inflected> notInSpellCheck = inflectedList.stream().filter(inf -> spellCheckService.wordsDontExist(inf.getInflectedHindi())).collect(Collectors.toList());
+        List<Inflected> notInSpellCheck = inflectedList.stream().filter(inf -> spellCheckService.wordsDontExist(inf.getInflectedHindi())).collect(toList());
         notInSpellCheck.forEach(nisch -> LOGGER.info("the Hindi word {} does not have Urdu counterpart in spell_check", nisch.getInflectedHindi()));
         return notInSpellCheck;
     }
@@ -743,6 +814,22 @@ public class InflectedService {
 
     }
 
+    private List<Inflected> explodeFemininesInUU(Inflected origin){
+
+        List<Inflected> result = new ArrayList<>();
+        String hindiWord = origin.getInflectedHindi();
+
+        result.add(clone( origin, Lists.newArrayList(Accidence.DIRECT), Lists.newArrayList(Accidence.OBLIQUE), hindiWord));
+        result.add(clone( origin, Lists.newArrayList(Accidence.DIRECT), Lists.newArrayList(Accidence.VOCATIVE), hindiWord));
+        result.add(clone( origin, Lists.newArrayList(Accidence.SINGULAR), Lists.newArrayList(Accidence.PLURAL), 1, hindiWord.concat("ें")));
+        result.add(clone( origin, Lists.newArrayList(Accidence.SINGULAR, Accidence.DIRECT), Lists.newArrayList(Accidence.PLURAL, Accidence.OBLIQUE),  hindiWord.concat("ों")));
+        result.add(clone( origin, Lists.newArrayList(Accidence.SINGULAR, Accidence.DIRECT), Lists.newArrayList(Accidence.PLURAL, Accidence.VOCATIVE), hindiWord.concat("ो")));
+
+        return result;
+
+    }
+
+
     private List<Inflected> explodeFemininesInII(Inflected origin){
 
         List<Inflected> result = new ArrayList<>();
@@ -788,8 +875,47 @@ public class InflectedService {
         ScanResult scanResult = DynamoAccessor.client.scan(scanRequest);
         return scanResult.getItems()
                 .stream().map(InflectedConverter::fromAvMap)
-                .collect(Collectors.toList());
+                .collect(toList());
     }
+
+
+    public List<Inflected> findByMasterDictionaryId(@Nonnull int masterDicionaryId) {
+        Iterator<Item> inflectedIt = inflectedRepository.findByMasterDictionaryId(masterDicionaryId);
+        //just calling InflectedConverter on each Item won't work here, because the secondary index by "master_dictionary_id"
+        //only returns key valyes
+        List<Inflected> result = new ArrayList<>();
+        Lists.newArrayList(inflectedIt).forEach(item -> {
+            Inflected partial = InflectedConverter.convert(item);
+            Inflected full = inflectedRepository.findOne(partial.getInflectedHindi(), partial.getInflectedHindiIndex())
+                    .orElseThrow(() -> new RuntimeException(String.format("a form in inflected with hindiWord=%s and wordIndex=%s cannot be found again in the Inflecred table",
+                        partial.getInflectedHindi(), partial.getInflectedHindiIndex())));
+            result.add(full);
+        });
+
+        return  result;
+    }
+
+
+    /**
+     * From an original list of "proposed', substract those forms whose accidence is contained in the "existing" list.
+     * This is used for the "exploding" generators not to overwrite existing, previously inserted forms
+     * @param proposed      an initial list with forms we want to insert in InflectedRepositoryDB
+     * @param existing      a list with the form that already exists in the InflectedRepositoryDB database
+     * @return              a the original "proposed" list, minus those forms whose accidence is already contained in
+     *                      "existing"
+     */
+    public static List<Inflected> subtractByAccidence(List<Inflected> proposed, List<Inflected> existing){
+        return proposed.stream().filter(inflected -> !anyWithAccidence(existing, inflected.getAccidence()))
+                .collect(toList());
+    }
+
+    @VisibleForTesting
+    protected static boolean anyWithAccidence(List<Inflected> inflectedList, Set<Accidence> accidences){
+       Preconditions.checkArgument(accidences != null && !accidences.isEmpty(), "non-empty accidences parameter expected");
+       return inflectedList.stream().anyMatch( inflected -> accidences.equals(inflected.getAccidence()));
+    }
+
+
 
     public List<Inflected> findByCanonicalWord(@Nonnull String canonicalWord) {
 

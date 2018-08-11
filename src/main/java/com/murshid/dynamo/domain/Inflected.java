@@ -173,7 +173,7 @@ public class Inflected implements Cloneable {
 
     @Override
     public String toString() {
-        return "Inflected{" +
+        return "InflectedRepositoryDB{" +
                 "  masterDictonaryKey='" + masterDictionaryKey + '\'' +
                 "  inflectedHindi='" + inflectedHindi + '\'' +
                 ", inflectedUrdu='" + inflectedUrdu + '\'' +

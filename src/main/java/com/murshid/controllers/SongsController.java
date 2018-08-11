@@ -40,6 +40,18 @@ public class SongsController {
         }
     }
 
+    @PostMapping("/sortBySpanId")
+    public ResponseEntity<String> sortBySpanId(@RequestParam(name = "songLatinName") String songLatinName) {
+        songsService.sortBySpanId(songLatinName);
+        return ResponseEntity.status(HttpStatus.CREATED).build();
+    }
+
+    @PostMapping("/resequenceInflected")
+    public ResponseEntity<String> resequenceInflected(@RequestParam(name = "songLatinName") String songLatinName) {
+        songsService.resequenceSongWordsToInflected(songLatinName);
+        return ResponseEntity.status(HttpStatus.CREATED).build();
+    }
+
 
     @PostMapping("/generateSpans")
     public ResponseEntity<String> generateSoans(@RequestParam(name = "songLatinName") String songLatinName) {

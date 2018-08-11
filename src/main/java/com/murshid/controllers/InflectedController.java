@@ -73,7 +73,9 @@ public class InflectedController {
         }
 
         if (inflectedService.isValid(inflected)) {
-            inflected = inflectedService.complementMasterDictionaryId(inflected);
+            int masterDictionaryId = inflectedService.findMasterDictionaryId(inflected);
+            inflected.setMasterDictionaryId(masterDictionaryId);
+
             if (inflectedService.exists(inflected.getInflectedHindi(), inflected.getInflectedHindiIndex())){
                 LOGGER.info("inflected hindi word {} index {} already exists in inflected table in DynamoDB", inflected.getInflectedHindi(), inflected.getInflectedHindiIndex());
                 return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
@@ -101,11 +103,17 @@ public class InflectedController {
         if (!inflectedService.isValid(infinitive)) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
         }
-        infinitive = inflectedService.complementMasterDictionaryId(infinitive);
+
+        int masterDictionaryId = inflectedService.findMasterDictionaryId(infinitive);
+        infinitive.setMasterDictionaryId(masterDictionaryId);
+
+        List<Inflected> existing = inflectedService.findByMasterDictionaryId(infinitive.getMasterDictionaryId());
 
         List<Inflected> explodedVerbs = inflectedService.explodeAllVerbs(infinitive);
 
-        if (!inflectedService.validateSpellCheckIngroup(explodedVerbs).isEmpty()){
+        List<Inflected> remainder = InflectedService.subtractByAccidence(explodedVerbs, existing);
+
+        if (!inflectedService.validateSpellCheckIngroupWithSupplement(remainder, masterDictionaryId)){
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
         }
 
@@ -132,12 +140,13 @@ public class InflectedController {
         }
 
 
-        inflected = inflectedService.complementMasterDictionaryId(inflected);
+        int masterDictionaryId = inflectedService.findMasterDictionaryId(inflected);
+        inflected.setMasterDictionaryId(masterDictionaryId);
         List<Inflected> exploded = inflectedService.explode(inflected);
 
         spellCheckService.loadUrdus(exploded);
 
-        if (!inflectedService.validateSpellCheckIngroupWithSupplement(exploded)){
+        if (!inflectedService.validateSpellCheckIngroupWithSupplement(exploded, masterDictionaryId)){
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
         }
 
@@ -168,7 +177,8 @@ public class InflectedController {
         }
 
         if (inflectedService.isValid(inflected)) {
-            inflected =  inflectedService.complementMasterDictionaryId(inflected);
+            int masterDictionaryId =  inflectedService.findMasterDictionaryId(inflected);
+            inflected.setMasterDictionaryId(masterDictionaryId);
             boolean success = inflectedService.save(inflected);
             if (success) {
                 return ResponseEntity.status(HttpStatus.CREATED).build();

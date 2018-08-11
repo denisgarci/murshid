@@ -46,7 +46,7 @@ public class DictionaryService {
      */
     public Map<String, Map<DictionarySource, List<DictionaryEntryView>>> createDictionaryEntriesForInflected(Song song) {
 
-        //Inflected entries
+        //InflectedRepositoryDB entries
 
         LinkedTreeMap< String, LinkedTreeMap> inflectedEntries =  gson.fromJson(song.getInflectedEntries(), mapType);
 

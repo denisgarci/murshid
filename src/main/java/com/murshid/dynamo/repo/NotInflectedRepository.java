@@ -3,10 +3,8 @@ package com.murshid.dynamo.repo;
 import com.amazonaws.services.dynamodbv2.document.*;
 import com.amazonaws.services.dynamodbv2.document.spec.QuerySpec;
 import com.amazonaws.services.dynamodbv2.document.utils.ValueMap;
-import com.murshid.dynamo.domain.Inflected;
 import com.murshid.dynamo.domain.NotInflected;
 import com.murshid.models.converters.DynamoAccessor;
-import com.murshid.models.converters.InflectedConverter;
 import com.murshid.models.converters.NotInflectedConverter;
 
 import javax.inject.Named;

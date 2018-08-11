@@ -1,10 +1,12 @@
 package com.murshid.services;
 
 import com.google.common.collect.Sets;
-import com.murshid.dynamo.domain.Inflected;
 import com.murshid.models.enums.Accidence;
 import com.murshid.models.enums.PartOfSpeech;
+import com.murshid.persistence.domain.HasInflectedHindi;
+import com.murshid.persistence.domain.Inflected;
 import com.murshid.persistence.domain.SpellCheckEntry;
+import com.murshid.persistence.domain.views.InflectedView;
 import com.murshid.persistence.repo.SpellCheckRepository;
 import com.murshid.utils.WordUtils;
 import org.apache.commons.lang3.tuple.Pair;
@@ -12,8 +14,6 @@ import org.apache.commons.lang3.tuple.Pair;
 import javax.annotation.Nonnull;
 import javax.inject.Inject;
 import javax.inject.Named;
-import javax.swing.*;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
@@ -33,12 +33,12 @@ public class SpellCheckService {
     }
 
     public boolean existsWithReplacement(Inflected inflectedHindi){
-        if (spellCheckRepository.findOne(inflectedHindi.getInflectedHindi()) != null){
+        if (spellCheckRepository.findOne(inflectedHindi.getInflectedKey().getInflectedHindi()) != null){
             return true;
         }
 
-        String original = inflectedHindi.getInflectedHindi();
-        Set<Accidence> accidence = inflectedHindi.getAccidence();
+        String original = inflectedHindi.getInflectedKey().getInflectedHindi();
+        Set<Accidence> accidence = Sets.newHashSet(inflectedHindi.getAccidence());
         PartOfSpeech partOfSpeech = inflectedHindi.getPartOfSpeech();
         if (partOfSpeech == PartOfSpeech.INFINITIVE && accidence.equals(Sets.newHashSet(Accidence.FEMININE, Accidence.PLURAL, Accidence.DIRECT))){
             String beginning = original.substring(0, original.length()-3);
@@ -55,7 +55,7 @@ public class SpellCheckService {
 
     protected Pair<Inflected, Optional<String>> propose(Inflected inflected, List<Inflected> others){
         PartOfSpeech partOfSpeech = inflected.getPartOfSpeech();
-        Set<Accidence> accidence = inflected.getAccidence();
+        Set<Accidence> accidence = Sets.newHashSet(inflected.getAccidence());
 
         //feminine plural infinitives
         if (partOfSpeech == PartOfSpeech.INFINITIVE && accidence.equals(Sets.newHashSet(Accidence.FEMININE, Accidence.PLURAL, Accidence.DIRECT))){
@@ -77,7 +77,7 @@ public class SpellCheckService {
 
         //masculine participles in -ya
         if (partOfSpeech == PartOfSpeech.PARTICIPLE && accidence.equals(Sets.newHashSet(Accidence.MASCULINE, Accidence.PERFECTIVE, Accidence.SINGULAR, Accidence.DIRECT))
-              && inflected.getInflectedHindi().endsWith("या")){
+              && inflected.getInflectedKey().getInflectedHindi().endsWith("या")){
             Optional<Inflected> infinitiveMasculineSingularDirect = findBypartOfSpeechAndAccidence(others, PartOfSpeech.INFINITIVE,   Accidence.MASCULINE, Accidence.SINGULAR, Accidence.DIRECT);
             return substringFindConcat(infinitiveMasculineSingularDirect, inflected, 2, "تا");
         }
@@ -153,21 +153,21 @@ public class SpellCheckService {
             Optional<Inflected> infinitiveMasculineSingularDirect = findBypartOfSpeechAndAccidence(others, PartOfSpeech.INFINITIVE,   Accidence.MASCULINE, Accidence.SINGULAR, Accidence.DIRECT);
 
             //forms in -jiye
-            if (inflected.getInflectedHindi().endsWith("जिए")){
+            if (inflected.getInflectedKey().getInflectedHindi().endsWith("जिए")){
                 return substringFindConcat(infinitiveMasculineSingularDirect, inflected, 2, "جئے");
-            }else if (inflected.getInflectedHindi().endsWith("जिये")){
+            }else if (inflected.getInflectedKey().getInflectedHindi().endsWith("जिये")){
                 return substringFindConcat(infinitiveMasculineSingularDirect, inflected, 2, "جیئے");
             }
-            if (inflected.getInflectedHindi().endsWith("िये")){
+            if (inflected.getInflectedKey().getInflectedHindi().endsWith("िये")){
                 return substringFindConcat(infinitiveMasculineSingularDirect, inflected, 2, "یئے");
-            }else if (inflected.getInflectedHindi().endsWith("ए")){
+            }else if (inflected.getInflectedKey().getInflectedHindi().endsWith("ए")){
                 return substringFindConcat(infinitiveMasculineSingularDirect, inflected, 2, "ئے");
             }
 
             //forms in -aaiye
-            if (inflected.getInflectedHindi().endsWith("ाइए")){
+            if (inflected.getInflectedKey().getInflectedHindi().endsWith("ाइए")){
                 return substringFindConcat(infinitiveMasculineSingularDirect, inflected, 2, "ائے");
-            }else if (inflected.getInflectedHindi().endsWith("ाइये")){
+            }else if (inflected.getInflectedKey().getInflectedHindi().endsWith("ाइये")){
                 return substringFindConcat(infinitiveMasculineSingularDirect, inflected, 2, "ائیے");
             }
         }
@@ -176,23 +176,23 @@ public class SpellCheckService {
             //subjunctives root in -II
             Optional<Inflected> infinitiveMasculineSingularDirect = findBypartOfSpeechAndAccidence(others, PartOfSpeech.INFINITIVE, Accidence.MASCULINE, Accidence.SINGULAR, Accidence.DIRECT);
             // 1ps
-            if (partOfSpeech == PartOfSpeech.VERB && accidence.equals(Sets.newHashSet(Accidence._1ST, Accidence.SINGULAR, Accidence.SUBJUNCTIVE)) && inflected.getInflectedHindi().endsWith("ीऊँ")) {
+            if (partOfSpeech == PartOfSpeech.VERB && accidence.equals(Sets.newHashSet(Accidence._1ST, Accidence.SINGULAR, Accidence.SUBJUNCTIVE)) && inflected.getInflectedKey().getInflectedHindi().endsWith("ीऊँ")) {
                 return substringFindConcat(infinitiveMasculineSingularDirect, inflected, 3, "یؤں");
             }
             // 2ps, 3ps
-            if (partOfSpeech == PartOfSpeech.VERB && inflected.getInflectedHindi().endsWith("िए")) {
+            if (partOfSpeech == PartOfSpeech.VERB && inflected.getInflectedKey().getInflectedHindi().endsWith("िए")) {
                 if (accidence.equals(Sets.newHashSet(Accidence._2ND, Accidence.SINGULAR, Accidence.SUBJUNCTIVE)) || accidence.equals(Sets.newHashSet(Accidence._3RD, Accidence.SINGULAR, Accidence.SUBJUNCTIVE))) {
                     return substringFindConcat(infinitiveMasculineSingularDirect, inflected, 2, "ئے");
                 }
             }
             // 1pp, 3pp
-            if (partOfSpeech == PartOfSpeech.VERB &&  inflected.getInflectedHindi().endsWith("िएँ")) {
+            if (partOfSpeech == PartOfSpeech.VERB &&  inflected.getInflectedKey().getInflectedHindi().endsWith("िएँ")) {
                 if (accidence.equals(Sets.newHashSet(Accidence._1ST, Accidence.PLURAL, Accidence.SUBJUNCTIVE)) || accidence.equals(Sets.newHashSet(Accidence._3RD, Accidence.PLURAL, Accidence.SUBJUNCTIVE))){
                     return substringFindConcat(infinitiveMasculineSingularDirect, inflected, 3, "ئیں");
                 }
             }
             // 2pp
-            if (partOfSpeech == PartOfSpeech.VERB && accidence.equals(Sets.newHashSet(Accidence._2ND, Accidence.PLURAL, Accidence.SUBJUNCTIVE)) && inflected.getInflectedHindi().endsWith("िओ")) {
+            if (partOfSpeech == PartOfSpeech.VERB && accidence.equals(Sets.newHashSet(Accidence._2ND, Accidence.PLURAL, Accidence.SUBJUNCTIVE)) && inflected.getInflectedKey().getInflectedHindi().endsWith("िओ")) {
                 return substringFindConcat(infinitiveMasculineSingularDirect, inflected, 2, "یؤ");
             }
         }
@@ -201,23 +201,23 @@ public class SpellCheckService {
             //subjunctives root in -AA
             Optional<Inflected> infinitiveMasculineSingularDirect = findBypartOfSpeechAndAccidence(others, PartOfSpeech.INFINITIVE, Accidence.MASCULINE, Accidence.SINGULAR, Accidence.DIRECT);
             // 1ps
-            if (partOfSpeech == PartOfSpeech.VERB && accidence.equals(Sets.newHashSet(Accidence._1ST, Accidence.SINGULAR, Accidence.SUBJUNCTIVE)) && inflected.getInflectedHindi().endsWith("ाऊँ")) {
+            if (partOfSpeech == PartOfSpeech.VERB && accidence.equals(Sets.newHashSet(Accidence._1ST, Accidence.SINGULAR, Accidence.SUBJUNCTIVE)) && inflected.getInflectedKey().getInflectedHindi().endsWith("ाऊँ")) {
                 return substringFindConcat(infinitiveMasculineSingularDirect, inflected, 3, "اوں");
             }
             // 2ps, 3ps
-            if (partOfSpeech == PartOfSpeech.VERB && inflected.getInflectedHindi().endsWith("ाए")) {
+            if (partOfSpeech == PartOfSpeech.VERB && inflected.getInflectedKey().getInflectedHindi().endsWith("ाए")) {
                 if (accidence.equals(Sets.newHashSet(Accidence._2ND, Accidence.SINGULAR, Accidence.SUBJUNCTIVE)) || accidence.equals(Sets.newHashSet(Accidence._3RD, Accidence.SINGULAR, Accidence.SUBJUNCTIVE))) {
                     return substringFindConcat(infinitiveMasculineSingularDirect, inflected, 2, "اے");
                 }
             }
             // 1pp, 3pp
-            if (partOfSpeech == PartOfSpeech.VERB &&  inflected.getInflectedHindi().endsWith("ाएँ")) {
+            if (partOfSpeech == PartOfSpeech.VERB &&  inflected.getInflectedKey().getInflectedHindi().endsWith("ाएँ")) {
                 if (accidence.equals(Sets.newHashSet(Accidence._1ST, Accidence.PLURAL, Accidence.SUBJUNCTIVE)) || accidence.equals(Sets.newHashSet(Accidence._3RD, Accidence.PLURAL, Accidence.SUBJUNCTIVE))){
                     return substringFindConcat(infinitiveMasculineSingularDirect, inflected, 3, "ایں");
                 }
             }
             // 2pp
-            if (partOfSpeech == PartOfSpeech.VERB && accidence.equals(Sets.newHashSet(Accidence._2ND, Accidence.PLURAL, Accidence.SUBJUNCTIVE)) && inflected.getInflectedHindi().endsWith("ाओ")) {
+            if (partOfSpeech == PartOfSpeech.VERB && accidence.equals(Sets.newHashSet(Accidence._2ND, Accidence.PLURAL, Accidence.SUBJUNCTIVE)) && inflected.getInflectedKey().getInflectedHindi().endsWith("ाओ")) {
                 return substringFindConcat(infinitiveMasculineSingularDirect, inflected, 2, "او");
             }
         }
@@ -274,7 +274,7 @@ public class SpellCheckService {
     }
 
 
-    public void loadUrdus(List<Inflected> inflectedList){
+    public <T extends HasInflectedHindi> void loadUrdus(List<T> inflectedList){
         inflectedList.forEach( inf -> {
             SpellCheckEntry spellCheckEntry = spellCheckRepository.findByHindiWord(inf.getInflectedHindi());
             if (spellCheckEntry!= null){

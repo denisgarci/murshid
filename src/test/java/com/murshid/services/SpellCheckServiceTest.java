@@ -1,35 +1,49 @@
 package com.murshid.services;
 
-import com.murshid.dynamo.domain.Inflected;
 import com.murshid.models.enums.Accidence;
 import com.murshid.models.enums.PartOfSpeech;
-import com.murshid.persistence.domain.SpellCheckEntry;
-import com.murshid.persistence.repo.SpellCheckRepository;
+import com.murshid.persistence.domain.Inflected;
 import jersey.repackaged.com.google.common.collect.Lists;
 import jersey.repackaged.com.google.common.collect.Sets;
 import org.apache.commons.lang3.tuple.Pair;
 import org.junit.jupiter.api.Test;
 
 import java.util.Optional;
+import java.util.Set;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Matchers.eq;
+import static org.mockito.Matchers.refEq;
 import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
 
 class SpellCheckServiceTest {
+
+    private Inflected create(String inflectedHindi, Set<Accidence> accidence, PartOfSpeech partOfSpeech){
+        Inflected inflected = new Inflected();
+        Inflected.InflectedKey inflectedKey = new Inflected.InflectedKey();
+        inflected.setInflectedKey(inflectedKey);
+        inflectedKey.setInflectedHindi(inflectedHindi);
+
+        inflected.setInflectedKey(inflectedKey)
+                .setPartOfSpeech(partOfSpeech)
+                .setAccidence(Lists.newArrayList(accidence));
+
+        return inflected;
+    }
+
+    private Inflected create(String inflectedHindi, String inflectedUrdu, Set<Accidence> accidence, PartOfSpeech partOfSpeech){
+        Inflected inflected = create(inflectedHindi, accidence, partOfSpeech);
+        inflected.setInflectedUrdu(inflectedUrdu);
+        return inflected;
+    }
 
     @Test
     void supplementInfinitivePluralDirectFeminine() {
         SpellCheckService service = new SpellCheckService();
 
-        Inflected inflected = new Inflected().setInflectedHindi("बोलनीं")
-                .setAccidence(Sets.newHashSet(Accidence.PLURAL, Accidence.FEMININE, Accidence.DIRECT))
-                .setPartOfSpeech(PartOfSpeech.INFINITIVE);
+        Inflected inflected =  create("बोलनीं", Sets.newHashSet(Accidence.PLURAL, Accidence.FEMININE, Accidence.DIRECT), PartOfSpeech.INFINITIVE);
 
-        Inflected canonicalInfinitive = new Inflected().setInflectedHindi("बोलना").setInflectedUrdu("بولنا")
-                .setAccidence(Sets.newHashSet(Accidence.DIRECT, Accidence.SINGULAR, Accidence.MASCULINE))
-                .setPartOfSpeech(PartOfSpeech.INFINITIVE);
+        Inflected canonicalInfinitive = create("बोलना", "بولنا", Sets.newHashSet(Accidence.DIRECT, Accidence.SINGULAR, Accidence.MASCULINE), PartOfSpeech.INFINITIVE);
 
         Pair<Inflected, Optional<String>> proposed = service.propose(inflected, Lists.newArrayList(canonicalInfinitive));
 
@@ -41,13 +55,9 @@ class SpellCheckServiceTest {
     void supplementPerfectParticipleSingularDirectFemininie() {
         SpellCheckService service = new SpellCheckService();
 
-        Inflected inflected = new Inflected().setInflectedHindi("बोलीं")
-                .setAccidence(Sets.newHashSet(Accidence.PLURAL, Accidence.FEMININE, Accidence.DIRECT, Accidence.PERFECTIVE))
-                .setPartOfSpeech(PartOfSpeech.PARTICIPLE);
+        Inflected inflected = create("बोलीं", Sets.newHashSet(Accidence.PLURAL, Accidence.FEMININE, Accidence.DIRECT, Accidence.PERFECTIVE), PartOfSpeech.PARTICIPLE);
 
-        Inflected canonicalInfinitive = new Inflected().setInflectedHindi("बोलना").setInflectedUrdu("بولنا")
-                .setAccidence(Sets.newHashSet(Accidence.DIRECT, Accidence.SINGULAR, Accidence.MASCULINE))
-                .setPartOfSpeech(PartOfSpeech.INFINITIVE);
+        Inflected canonicalInfinitive = create("बोलना", "بولنا", Sets.newHashSet(Accidence.DIRECT, Accidence.SINGULAR, Accidence.MASCULINE), PartOfSpeech.INFINITIVE);
 
         Pair<Inflected, Optional<String>> proposed = service.propose(inflected, Lists.newArrayList(canonicalInfinitive));
 
@@ -60,14 +70,9 @@ class SpellCheckServiceTest {
 
         SpellCheckService service = new SpellCheckService();
 
-        Inflected inflected = new Inflected().setInflectedHindi("बेटीयो")
-                .setAccidence(Sets.newHashSet(Accidence.PLURAL, Accidence.FEMININE, Accidence.VOCATIVE))
-                .setPartOfSpeech(PartOfSpeech.NOUN);
+        Inflected inflected = create("बेटीयो", Sets.newHashSet(Accidence.PLURAL, Accidence.FEMININE, Accidence.VOCATIVE), PartOfSpeech.NOUN);
 
-        Inflected obliquePluralFeminine = new Inflected().setInflectedHindi("बेटीयों").setInflectedUrdu("بیٹیوں")
-                .setAccidence(Sets.newHashSet(Accidence.OBLIQUE, Accidence.PLURAL, Accidence.FEMININE))
-                .setPartOfSpeech(PartOfSpeech.NOUN);
-
+        Inflected obliquePluralFeminine =create("बेटीयों", "بیٹیوں", Sets.newHashSet(Accidence.OBLIQUE, Accidence.PLURAL, Accidence.FEMININE), PartOfSpeech.NOUN);
 
         Pair<Inflected, Optional<String>> proposed = service.propose(inflected, Lists.newArrayList(obliquePluralFeminine));
 
@@ -80,13 +85,9 @@ class SpellCheckServiceTest {
 
         SpellCheckService service = new SpellCheckService();
 
-        Inflected inflected = new Inflected().setInflectedHindi("बोलके")
-                .setAccidence(Sets.newHashSet(Accidence.ABSOLUTIVE))
-                .setPartOfSpeech(PartOfSpeech.VERB);
+        Inflected inflected = create("बोलके", Sets.newHashSet(Accidence.ABSOLUTIVE), PartOfSpeech.VERB);
 
-        Inflected infinitive = new Inflected().setInflectedHindi("बोलना").setInflectedUrdu("بولنا")
-                .setAccidence(Sets.newHashSet(Accidence.MASCULINE, Accidence.SINGULAR, Accidence.DIRECT))
-                .setPartOfSpeech(PartOfSpeech.INFINITIVE);
+        Inflected infinitive = create("बोलना", "بولنا", Sets.newHashSet(Accidence.MASCULINE, Accidence.SINGULAR, Accidence.DIRECT), PartOfSpeech.INFINITIVE);
 
         Pair<Inflected, Optional<String>> proposed = service.propose(inflected, Lists.newArrayList(infinitive));
 
@@ -99,13 +100,9 @@ class SpellCheckServiceTest {
 
         SpellCheckService service = new SpellCheckService();
 
-        Inflected inflected = new Inflected().setInflectedHindi("बोलूँगा")
-                .setAccidence(Sets.newHashSet(Accidence.MASCULINE, Accidence._1ST, Accidence.SINGULAR, Accidence.FUTURE))
-                .setPartOfSpeech(PartOfSpeech.VERB);
+        Inflected inflected = create("बोलूँगा", Sets.newHashSet(Accidence.MASCULINE, Accidence._1ST, Accidence.SINGULAR, Accidence.FUTURE), PartOfSpeech.VERB);
 
-        Inflected infinitive = new Inflected().setInflectedHindi("बोलना").setInflectedUrdu("بولنا")
-                .setAccidence(Sets.newHashSet(Accidence.MASCULINE, Accidence.SINGULAR, Accidence.DIRECT))
-                .setPartOfSpeech(PartOfSpeech.INFINITIVE);
+        Inflected infinitive = create("बोलना", "بولنا", Sets.newHashSet(Accidence.MASCULINE, Accidence.SINGULAR, Accidence.DIRECT), PartOfSpeech.INFINITIVE);
 
         Pair<Inflected, Optional<String>> proposed = service.propose(inflected, Lists.newArrayList(infinitive));
 
@@ -118,13 +115,9 @@ class SpellCheckServiceTest {
 
         SpellCheckService service = new SpellCheckService();
 
-        Inflected inflected = new Inflected().setInflectedHindi("बोलूँगी")
-                .setAccidence(Sets.newHashSet(Accidence.FEMININE, Accidence._1ST, Accidence.SINGULAR, Accidence.FUTURE))
-                .setPartOfSpeech(PartOfSpeech.VERB);
+        Inflected inflected = create("बोलूँगी", Sets.newHashSet(Accidence.FEMININE, Accidence._1ST, Accidence.SINGULAR, Accidence.FUTURE), PartOfSpeech.VERB);
 
-        Inflected infinitive = new Inflected().setInflectedHindi("बोलना").setInflectedUrdu("بولنا")
-                .setAccidence(Sets.newHashSet(Accidence.MASCULINE, Accidence.SINGULAR, Accidence.DIRECT))
-                .setPartOfSpeech(PartOfSpeech.INFINITIVE);
+        Inflected infinitive = create("बोलना", "بولنا" ,Sets.newHashSet(Accidence.MASCULINE, Accidence.SINGULAR, Accidence.DIRECT), PartOfSpeech.INFINITIVE);
 
         Pair<Inflected, Optional<String>> proposed = service.propose(inflected, Lists.newArrayList(infinitive));
 
@@ -138,13 +131,9 @@ class SpellCheckServiceTest {
 
         SpellCheckService service = new SpellCheckService();
 
-        Inflected inflected = new Inflected().setInflectedHindi("बोलेगा")
-                .setAccidence(Sets.newHashSet(Accidence.MASCULINE, Accidence._2ND, Accidence.SINGULAR, Accidence.FUTURE))
-                .setPartOfSpeech(PartOfSpeech.VERB);
+        Inflected inflected = create("बोलेगा", Sets.newHashSet(Accidence.MASCULINE, Accidence._2ND, Accidence.SINGULAR, Accidence.FUTURE), PartOfSpeech.VERB);
 
-        Inflected infinitive = new Inflected().setInflectedHindi("बोलना").setInflectedUrdu("بولنا")
-                .setAccidence(Sets.newHashSet(Accidence.MASCULINE, Accidence.SINGULAR, Accidence.DIRECT))
-                .setPartOfSpeech(PartOfSpeech.INFINITIVE);
+        Inflected infinitive = create("बोलना", "بولنا", Sets.newHashSet(Accidence.MASCULINE, Accidence.SINGULAR, Accidence.DIRECT), PartOfSpeech.INFINITIVE);
 
         Pair<Inflected, Optional<String>> proposed = service.propose(inflected, Lists.newArrayList(infinitive));
 
@@ -158,13 +147,9 @@ class SpellCheckServiceTest {
 
         SpellCheckService service = new SpellCheckService();
 
-        Inflected inflected = new Inflected().setInflectedHindi("बोलोगे")
-                .setAccidence(Sets.newHashSet(Accidence.MASCULINE, Accidence._2ND, Accidence.PLURAL, Accidence.FUTURE))
-                .setPartOfSpeech(PartOfSpeech.VERB);
+        Inflected inflected = create("बोलोगे", Sets.newHashSet(Accidence.MASCULINE, Accidence._2ND, Accidence.PLURAL, Accidence.FUTURE), PartOfSpeech.VERB);
 
-        Inflected infinitive = new Inflected().setInflectedHindi("बोलना").setInflectedUrdu("بولنا")
-                .setAccidence(Sets.newHashSet(Accidence.MASCULINE, Accidence.SINGULAR, Accidence.DIRECT))
-                .setPartOfSpeech(PartOfSpeech.INFINITIVE);
+        Inflected infinitive = create("बोलना", "بولنا", Sets.newHashSet(Accidence.MASCULINE, Accidence.SINGULAR, Accidence.DIRECT), PartOfSpeech.INFINITIVE);
 
         Pair<Inflected, Optional<String>> proposed = service.propose(inflected, Lists.newArrayList(infinitive));
 
@@ -177,13 +162,9 @@ class SpellCheckServiceTest {
 
         SpellCheckService service = new SpellCheckService();
 
-        Inflected inflected = new Inflected().setInflectedHindi("बोलेंगे")
-                .setAccidence(Sets.newHashSet(Accidence.MASCULINE, Accidence._1ST, Accidence.PLURAL, Accidence.FUTURE))
-                .setPartOfSpeech(PartOfSpeech.VERB);
+        Inflected inflected = create("बोलेंगे", Sets.newHashSet(Accidence.MASCULINE, Accidence._1ST, Accidence.PLURAL, Accidence.FUTURE), PartOfSpeech.VERB);
 
-        Inflected infinitive = new Inflected().setInflectedHindi("बोलना").setInflectedUrdu("بولنا")
-                .setAccidence(Sets.newHashSet(Accidence.MASCULINE, Accidence.SINGULAR, Accidence.DIRECT))
-                .setPartOfSpeech(PartOfSpeech.INFINITIVE);
+        Inflected infinitive = create("बोलना", "بولنا", Sets.newHashSet(Accidence.MASCULINE, Accidence.SINGULAR, Accidence.DIRECT), PartOfSpeech.INFINITIVE);
 
         Pair<Inflected, Optional<String>> proposed = service.propose(inflected, Lists.newArrayList(infinitive));
 
@@ -196,13 +177,9 @@ class SpellCheckServiceTest {
 
         SpellCheckService service = new SpellCheckService();
 
-        Inflected inflected = new Inflected().setInflectedHindi("बोलेंगी")
-                .setAccidence(Sets.newHashSet(Accidence.FEMININE, Accidence._1ST, Accidence.PLURAL, Accidence.FUTURE))
-                .setPartOfSpeech(PartOfSpeech.VERB);
+        Inflected inflected = create("बोलेंगी", Sets.newHashSet(Accidence.FEMININE, Accidence._1ST, Accidence.PLURAL, Accidence.FUTURE), PartOfSpeech.VERB);
 
-        Inflected infinitive = new Inflected().setInflectedHindi("बोलना").setInflectedUrdu("بولنا")
-                .setAccidence(Sets.newHashSet(Accidence.MASCULINE, Accidence.SINGULAR, Accidence.DIRECT))
-                .setPartOfSpeech(PartOfSpeech.INFINITIVE);
+        Inflected infinitive = create("बोलना", "بولنا", Sets.newHashSet(Accidence.MASCULINE, Accidence.SINGULAR, Accidence.DIRECT), PartOfSpeech.INFINITIVE);
 
         Pair<Inflected, Optional<String>> proposed = service.propose(inflected, Lists.newArrayList(infinitive));
 
@@ -215,13 +192,9 @@ class SpellCheckServiceTest {
 
         SpellCheckService service = new SpellCheckService();
 
-        Inflected inflected = new Inflected().setInflectedHindi("बोलेगी")
-                .setAccidence(Sets.newHashSet(Accidence.FEMININE, Accidence._2ND, Accidence.SINGULAR, Accidence.FUTURE))
-                .setPartOfSpeech(PartOfSpeech.VERB);
+        Inflected inflected = create("बोलेगी", Sets.newHashSet(Accidence.FEMININE, Accidence._2ND, Accidence.SINGULAR, Accidence.FUTURE), PartOfSpeech.VERB);
 
-        Inflected infinitive = new Inflected().setInflectedHindi("बोलना").setInflectedUrdu("بولنا")
-                .setAccidence(Sets.newHashSet(Accidence.MASCULINE, Accidence.SINGULAR, Accidence.DIRECT))
-                .setPartOfSpeech(PartOfSpeech.INFINITIVE);
+        Inflected infinitive = create("बोलना", "بولنا", Sets.newHashSet(Accidence.MASCULINE, Accidence.SINGULAR, Accidence.DIRECT), PartOfSpeech.INFINITIVE);
 
         Pair<Inflected, Optional<String>> proposed = service.propose(inflected, Lists.newArrayList(infinitive));
 
@@ -234,13 +207,9 @@ class SpellCheckServiceTest {
 
         SpellCheckService service = new SpellCheckService();
 
-        Inflected inflected = new Inflected().setInflectedHindi("बोलोगी")
-                .setAccidence(Sets.newHashSet(Accidence.FEMININE, Accidence._2ND, Accidence.PLURAL, Accidence.FUTURE))
-                .setPartOfSpeech(PartOfSpeech.VERB);
+        Inflected inflected = create("बोलोगी", Sets.newHashSet(Accidence.FEMININE, Accidence._2ND, Accidence.PLURAL, Accidence.FUTURE), PartOfSpeech.VERB);
 
-        Inflected infinitive = new Inflected().setInflectedHindi("बोलना").setInflectedUrdu("بولنا")
-                .setAccidence(Sets.newHashSet(Accidence.MASCULINE, Accidence.SINGULAR, Accidence.DIRECT))
-                .setPartOfSpeech(PartOfSpeech.INFINITIVE);
+        Inflected infinitive = create("बोलना", "بولنا", Sets.newHashSet(Accidence.MASCULINE, Accidence.SINGULAR, Accidence.DIRECT), PartOfSpeech.INFINITIVE);
 
         Pair<Inflected, Optional<String>> proposed = service.propose(inflected, Lists.newArrayList(infinitive));
 
@@ -253,13 +222,9 @@ class SpellCheckServiceTest {
 
         SpellCheckService service = new SpellCheckService();
 
-        Inflected inflected = new Inflected().setInflectedHindi("बोलिए")
-                .setAccidence(Sets.newHashSet( Accidence._3RD, Accidence.PLURAL, Accidence.IMPERATIVE))
-                .setPartOfSpeech(PartOfSpeech.VERB);
+        Inflected inflected = create("बोलिए", Sets.newHashSet(Accidence._3RD, Accidence.PLURAL, Accidence.IMPERATIVE), PartOfSpeech.VERB);
 
-        Inflected infinitive = new Inflected().setInflectedHindi("बोलना").setInflectedUrdu("بولنا")
-                .setAccidence(Sets.newHashSet(Accidence.MASCULINE, Accidence.SINGULAR, Accidence.DIRECT))
-                .setPartOfSpeech(PartOfSpeech.INFINITIVE);
+        Inflected infinitive = create("बोलना", "بولنا", Sets.newHashSet(Accidence.MASCULINE, Accidence.SINGULAR, Accidence.DIRECT), PartOfSpeech.INFINITIVE);
 
         Pair<Inflected, Optional<String>> proposed = service.propose(inflected, Lists.newArrayList(infinitive));
 
@@ -272,13 +237,9 @@ class SpellCheckServiceTest {
 
         SpellCheckService service = new SpellCheckService();
 
-        Inflected inflected = new Inflected().setInflectedHindi("बोलिये")
-                .setAccidence(Sets.newHashSet( Accidence._3RD, Accidence.PLURAL, Accidence.IMPERATIVE))
-                .setPartOfSpeech(PartOfSpeech.VERB);
+        Inflected inflected = create("बोलिये", Sets.newHashSet( Accidence._3RD, Accidence.PLURAL, Accidence.IMPERATIVE), PartOfSpeech.VERB);
 
-        Inflected infinitive = new Inflected().setInflectedHindi("बोलना").setInflectedUrdu("بولنا")
-                .setAccidence(Sets.newHashSet(Accidence.MASCULINE, Accidence.SINGULAR, Accidence.DIRECT))
-                .setPartOfSpeech(PartOfSpeech.INFINITIVE);
+        Inflected infinitive = create("बोलना", "بولنا", Sets.newHashSet(Accidence.MASCULINE, Accidence.SINGULAR, Accidence.DIRECT), PartOfSpeech.INFINITIVE);
 
         Pair<Inflected, Optional<String>> proposed = service.propose(inflected, Lists.newArrayList(infinitive));
 
@@ -291,13 +252,9 @@ class SpellCheckServiceTest {
 
         SpellCheckService service = new SpellCheckService();
 
-        Inflected inflected = new Inflected().setInflectedHindi("पीऊँ")
-                .setAccidence(Sets.newHashSet( Accidence._1ST, Accidence.SINGULAR, Accidence.SUBJUNCTIVE))
-                .setPartOfSpeech(PartOfSpeech.VERB);
+        Inflected inflected = create("पीऊँ", Sets.newHashSet( Accidence._1ST, Accidence.SINGULAR, Accidence.SUBJUNCTIVE), PartOfSpeech.VERB);
 
-        Inflected infinitive = new Inflected().setInflectedHindi("पीना").setInflectedUrdu("پینا")
-                .setAccidence(Sets.newHashSet(Accidence.MASCULINE, Accidence.SINGULAR, Accidence.DIRECT))
-                .setPartOfSpeech(PartOfSpeech.INFINITIVE);
+        Inflected infinitive = create("पीना", "پینا", Sets.newHashSet(Accidence.MASCULINE, Accidence.SINGULAR, Accidence.DIRECT), PartOfSpeech.INFINITIVE);
 
         Pair<Inflected, Optional<String>> proposed = service.propose(inflected, Lists.newArrayList(infinitive));
 

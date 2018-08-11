@@ -2,20 +2,13 @@ package com.murshid.models.converters;
 
 import com.amazonaws.services.dynamodbv2.document.Item;
 import com.amazonaws.services.dynamodbv2.model.AttributeValue;
-import com.murshid.dynamo.domain.Inflected;
 import com.murshid.dynamo.domain.NotInflected;
-import com.murshid.models.CanonicalKey;
 import com.murshid.models.DictionaryKey;
-import com.murshid.models.enums.Accidence;
 import com.murshid.models.enums.PartOfSpeech;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
-import java.util.Set;
-import java.util.stream.Collectors;
 
 public class NotInflectedConverter {
 

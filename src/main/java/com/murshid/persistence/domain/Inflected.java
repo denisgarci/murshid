@@ -1,16 +1,22 @@
 package com.murshid.persistence.domain;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.google.common.collect.Sets;
 import com.murshid.models.enums.Accidence;
 import com.murshid.models.enums.PartOfSpeech;
 import com.murshid.persistence.AccidenceColumnConverter;
+import org.apache.commons.lang3.builder.EqualsBuilder;
+import org.apache.commons.lang3.builder.HashCodeBuilder;
 
 import javax.persistence.*;
 import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 @Entity(name = "inflected")
-public class Inflected implements Serializable{
+public class Inflected implements Serializable, HasInflectedHindi<Inflected>, Cloneable{
 
     @Embeddable
     public static class InflectedKey implements Serializable {
@@ -40,7 +46,6 @@ public class Inflected implements Serializable{
             this.inflectedHindiIndex = inflectedHindiIndex;
             return this;
         }
-
     }
 
     @EmbeddedId
@@ -52,7 +57,7 @@ public class Inflected implements Serializable{
 
     @Column
     @Convert (converter = AccidenceColumnConverter.class)
-    private List<Accidence> accidence;
+    private List<Accidence> accidence = new ArrayList<>();
 
     @Enumerated(EnumType.STRING)
     @Column(name ="part_of_speech", nullable = false)
@@ -61,8 +66,16 @@ public class Inflected implements Serializable{
     @Column(name = "inflected_urdu", nullable = false)
     private String inflectedUrdu;
 
+    @Column(name = "canonical_hindi")
+    private String canonicalHindi;
+
     @Column(name = "own_meaning", nullable = true)
     private boolean ownMeaning;
+
+    public Inflected setCanonicalHindi(String canonicalHindi) {
+        this.canonicalHindi = canonicalHindi;
+        return this;
+    }
 
     public boolean isOwnMeaning() {
         return ownMeaning;
@@ -105,9 +118,18 @@ public class Inflected implements Serializable{
         return partOfSpeech;
     }
 
+    public String getCanonicalHindi() {
+        return canonicalHindi;
+    }
+
     public Inflected setPartOfSpeech(PartOfSpeech partOfSpeech) {
         this.partOfSpeech = partOfSpeech;
         return this;
+    }
+
+    @Override
+    public String getInflectedHindi() {
+        return inflectedKey.inflectedHindi;
     }
 
     public String getInflectedUrdu() {
@@ -119,6 +141,82 @@ public class Inflected implements Serializable{
         return this;
     }
 
+    @Override
+    public Object clone() {
+        try {
+            Inflected master = (Inflected) super.clone();
+            InflectedKey inflectedKey = new InflectedKey();
+            inflectedKey.setInflectedHindi(this.inflectedKey.inflectedHindi);
+            inflectedKey.setInflectedHindiIndex(this.inflectedKey.inflectedHindiIndex + 1);
+            master
+                    .setInflectedKey(inflectedKey)
+                    .setAccidence(this.accidence)
+                    .setPartOfSpeech(this.getPartOfSpeech())
+                    .setMasterDictionary(this.getMasterDictionary())
+                    .setInflectedUrdu(this.inflectedUrdu);
+            return master;
+        }catch (CloneNotSupportedException ex){
+            return null;
+        }
+
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) { return true; }
+
+        if (!(o instanceof Inflected)) { return false; }
+
+        Inflected master = (Inflected) o;
+
+        Set<Accidence> thisSet = null;
+        if (getAccidence() != null){
+            thisSet = Sets.newHashSet(getAccidence());
+        }
+
+        Set<Accidence> thatSet = null;
+        if (master.getAccidence() != null){
+            thatSet = Sets.newHashSet(master.getAccidence());
+        }
 
 
+
+        return new EqualsBuilder()
+                .append(getInflectedKey().getInflectedHindi(), master.getInflectedKey().inflectedHindi)
+                .append(thisSet, thatSet)
+                .append(getPartOfSpeech(), master.getPartOfSpeech())
+                .append(getMasterDictionary(), getMasterDictionary())
+                .isEquals();
+    }
+
+    @Override
+    public String toString() {
+        return "InflectedRepositoryDB{" +
+                "  masterDictonaryKey='" + getMasterDictionary() + '\'' +
+                "  inflectedHindi='" + inflectedKey.getInflectedHindi() + '\'' +
+                ", inflectedUrdu='" + inflectedUrdu + '\'' +
+                ", inflectedHindiIndex=" + inflectedKey.inflectedHindiIndex +
+                ", partOfSpeech=" + partOfSpeech +
+                ", accidence=" + accidence +
+                '}';
+    }
+
+    @Override
+    public int hashCode() {
+        return new HashCodeBuilder(17, 37)
+                .append(getInflectedKey().getInflectedHindi())
+                .append(getAccidence())
+                .append(getPartOfSpeech())
+                .append(getMasterDictionary())
+                .toHashCode();
+    }
+
+    public String getKey(){
+        return getInflectedKey().inflectedHindi.concat("_").concat(Integer.toString(getInflectedKey().inflectedHindiIndex));
+    }
+
+    @Override
+    public FluentModel self() {
+        return this;
+    }
 }

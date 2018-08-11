@@ -1,9 +1,12 @@
 package com.murshid.controllers;
 
 import com.google.common.collect.Lists;
-import com.murshid.dynamo.domain.Inflected;
 import com.murshid.dynamo.domain.Song;
+import com.murshid.persistence.domain.Inflected;
+import com.murshid.persistence.domain.MasterDictionary;
+import com.murshid.persistence.domain.views.InflectedView;
 import com.murshid.services.InflectedService;
+import com.murshid.services.MasterDictionaryService;
 import com.murshid.services.SongsService;
 import com.murshid.services.SpellCheckService;
 import org.slf4j.Logger;
@@ -25,6 +28,8 @@ public class InflectedController {
     private SongsService songsService;
     private InflectedService inflectedService;
     private SpellCheckService spellCheckService;
+    private MasterDictionaryService masterDictionaryService;
+
 
     @GetMapping("/tokensNotInInflected")
     public @ResponseBody
@@ -63,23 +68,23 @@ public class InflectedController {
     }
 
     @PostMapping("/insertNew")
-    public ResponseEntity<String> insertNew(@RequestBody Inflected inflected) {
-        inflected.setInflectedHindiIndex(inflectedService.suggestNewIndex(inflected.getInflectedHindi()));
+    public ResponseEntity<String> insertNew(@RequestBody InflectedView inflectedView) {
 
-        spellCheckService.loadUrdus(Lists.newArrayList(inflected));
-
-        if (!inflectedService.validateSpellCheckIngroup(Lists.newArrayList(inflected)).isEmpty()){
+        if (!inflectedService.validateSpellCheckIngroup(Lists.newArrayList(inflectedView)).isEmpty()){
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
         }
 
-        if (inflectedService.isValid(inflected)) {
-            int masterDictionaryId = inflectedService.findMasterDictionaryId(inflected);
-            inflected.setMasterDictionaryId(masterDictionaryId);
+        spellCheckService.loadUrdus(Lists.newArrayList(inflectedView));
 
-            if (inflectedService.exists(inflected.getInflectedHindi(), inflected.getInflectedHindiIndex())){
-                LOGGER.info("inflected hindi word {} index {} already exists in inflected table in DynamoDB", inflected.getInflectedHindi(), inflected.getInflectedHindiIndex());
-                return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
-            }
+        Optional<MasterDictionary> masterDictionary = masterDictionaryService.findByHindiWordAndWordIndex(inflectedView.getMasterDictionaryKey().hindiWord, inflectedView.getMasterDictionaryKey().wordIndex);
+        if (!masterDictionary.isPresent()){
+            LOGGER.info("master dictionary word {} index {} does not exist", inflectedView.getMasterDictionaryKey().hindiWord, inflectedView.getMasterDictionaryKey().wordIndex);
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
+        }
+
+        if (inflectedService.isValid(inflectedView)) {
+            Inflected inflected = inflectedService.fromView(inflectedView, masterDictionary.get());
+
             boolean success = inflectedService.save(inflected);
             if (success) {
                 return ResponseEntity.status(HttpStatus.CREATED).build();
@@ -92,34 +97,39 @@ public class InflectedController {
     }
 
     @PostMapping("/insertAllVerbsWithExplode")
-    public ResponseEntity<String> insertAllverbsWithExplode(@RequestBody Inflected infinitive) {
+    public ResponseEntity<String> insertAllverbsWithExplode(@RequestBody InflectedView inflectedView) {
 
-        spellCheckService.loadUrdus(Lists.newArrayList(infinitive));
+        spellCheckService.loadUrdus(Lists.newArrayList(inflectedView));
 
-        if (!inflectedService.isInfinitiveMasculineSingularDirect(infinitive)){
+        if (!inflectedService.isInfinitiveMasculineSingularDirect(inflectedView)){
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
         }
 
-        if (!inflectedService.isValid(infinitive)) {
+        if (!inflectedService.isValid(inflectedView)) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
         }
 
-        int masterDictionaryId = inflectedService.findMasterDictionaryId(infinitive);
-        infinitive.setMasterDictionaryId(masterDictionaryId);
+        Optional<MasterDictionary> masterDictionary = masterDictionaryService.findByHindiWordAndWordIndex(inflectedView.getMasterDictionaryKey().hindiWord, inflectedView.getMasterDictionaryKey().wordIndex);
+        if (!masterDictionary.isPresent()){
+            LOGGER.info("master dictionary word {} index {} does not exist", inflectedView.getMasterDictionaryKey().hindiWord, inflectedView.getMasterDictionaryKey().wordIndex);
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
+        }
 
-        List<Inflected> existing = inflectedService.findByMasterDictionaryId(infinitive.getMasterDictionaryId());
+        List<Inflected> existing = inflectedService.findByMasterDictionaryId(masterDictionary.get().getId());
+
+        Inflected infinitive = inflectedService.fromView(inflectedView, masterDictionary.get());
 
         List<Inflected> explodedVerbs = inflectedService.explodeAllVerbs(infinitive);
 
         List<Inflected> remainder = InflectedService.subtractByAccidence(explodedVerbs, existing);
 
-        if (!inflectedService.validateSpellCheckIngroupWithSupplement(remainder, masterDictionaryId)){
+        if (!inflectedService.validateSpellCheckIngroupWithSupplement(remainder, masterDictionary.get().getId())){
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
         }
 
         //first validate them all
         for (Inflected master: explodedVerbs) {
-            if (!inflectedService.isValid(master)) {
+            if (!inflectedService.isValid(inflectedView)) {
                 return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
             }
         }
@@ -133,26 +143,32 @@ public class InflectedController {
     }
 
     @PostMapping("/insertNewWithExplode")
-    public ResponseEntity<String> insertNewWithExplode(@RequestBody Inflected inflected) {
+    public ResponseEntity<String> insertNewWithExplode(@RequestBody InflectedView inflectedView) {
 
-        if (!inflectedService.isValid(inflected)) {
+        if (!inflectedService.isValid(inflectedView)) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
         }
 
 
-        int masterDictionaryId = inflectedService.findMasterDictionaryId(inflected);
-        inflected.setMasterDictionaryId(masterDictionaryId);
+        Optional<MasterDictionary> masterDictionary = masterDictionaryService.findByHindiWordAndWordIndex(inflectedView.getMasterDictionaryKey().hindiWord, inflectedView.getMasterDictionaryKey().wordIndex);
+        if (!masterDictionary.isPresent()){
+            LOGGER.info("master dictionary word {} index {} does not exist", inflectedView.getMasterDictionaryKey().hindiWord, inflectedView.getMasterDictionaryKey().wordIndex);
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
+        }
+
+        Inflected inflected = inflectedService.fromView(inflectedView, masterDictionary.get());
+
         List<Inflected> exploded = inflectedService.explode(inflected);
 
         spellCheckService.loadUrdus(exploded);
 
-        if (!inflectedService.validateSpellCheckIngroupWithSupplement(exploded, masterDictionaryId)){
+        if (!inflectedService.validateSpellCheckIngroupWithSupplement(exploded, masterDictionary.get().getId())){
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
         }
 
         //first validate them all
         for (Inflected master: exploded) {
-            if (!inflectedService.isValid(master)) {
+            if (!inflectedService.isValid(inflectedView)) {
                 return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
             }
         }
@@ -168,17 +184,25 @@ public class InflectedController {
 
 
     @PostMapping("/upsert")
-    public ResponseEntity<String> upsert(@RequestBody Inflected inflected) {
+    public ResponseEntity<String> upsert(@RequestBody InflectedView inflectedView) {
 
-        spellCheckService.loadUrdus(Lists.newArrayList(inflected));
+        spellCheckService.loadUrdus(Lists.newArrayList(inflectedView));
 
-        if (!inflectedService.validateSpellCheckIngroup(Lists.newArrayList(inflected)).isEmpty()){
+        if (!inflectedService.validateSpellCheckIngroup(Lists.newArrayList(inflectedView)).isEmpty()){
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
         }
 
-        if (inflectedService.isValid(inflected)) {
-            int masterDictionaryId =  inflectedService.findMasterDictionaryId(inflected);
-            inflected.setMasterDictionaryId(masterDictionaryId);
+        if (inflectedService.isValid(inflectedView)) {
+
+            Optional<MasterDictionary> masterDictionary = masterDictionaryService.findByHindiWordAndWordIndex(inflectedView.getMasterDictionaryKey().hindiWord, inflectedView.getMasterDictionaryKey().wordIndex);
+            if (!masterDictionary.isPresent()){
+                LOGGER.info("master dictionary word {} index {} does not exist", inflectedView.getMasterDictionaryKey().hindiWord, inflectedView.getMasterDictionaryKey().wordIndex);
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
+            }
+
+            Inflected inflected = inflectedService.fromView(inflectedView, masterDictionary.get());
+            inflected.getInflectedKey().setInflectedHindiIndex(inflectedView.getInflectedHindiIndex());
+
             boolean success = inflectedService.save(inflected);
             if (success) {
                 return ResponseEntity.status(HttpStatus.CREATED).build();
@@ -203,6 +227,12 @@ public class InflectedController {
     @Inject
     public void setSpellCheckService(SpellCheckService spellCheckService) {
         this.spellCheckService = spellCheckService;
+    }
+
+    @Inject
+    public InflectedController setMasterDictionaryService(MasterDictionaryService masterDictionaryService) {
+        this.masterDictionaryService = masterDictionaryService;
+        return this;
     }
 
 

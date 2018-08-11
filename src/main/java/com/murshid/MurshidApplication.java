@@ -2,7 +2,6 @@ package com.murshid;
 
 
 import com.google.common.collect.Lists;
-import com.murshid.dynamo.domain.Inflected;
 import com.murshid.dynamo.domain.Song;
 import com.murshid.dynamo.repo.SongRepository;
 import com.murshid.persistence.domain.MasterDictionary;
@@ -29,31 +28,32 @@ public class MurshidApplication {
 	public static void main(String[] args) throws Exception{
 		context = SpringApplication.run(MurshidApplication.class, args);
 
-        dumpInflected();
+        //dumpInflected();
 
 	}
 
-    private static void dumpInflected() {
-        InflectedRepositoryDB inflectedRepositoryDB = context.getBean(InflectedRepositoryDB.class);
-        MasterDictionaryRepository masterDictionaryRepository = context.getBean(MasterDictionaryRepository.class);
-        InflectedService masterService = context.getBean(InflectedService.class);
-        List<Inflected> all = masterService.getAll();
-        all.forEach(inf -> {
-            com.murshid.persistence.domain.Inflected dbInf = new com.murshid.persistence.domain.Inflected();
-            dbInf.setAccidence(inf.getAccidence() != null? Lists.newArrayList(inf.getAccidence()): null);
-            MasterDictionary masterDictionary = masterDictionaryRepository.findOne(inf.getMasterDictionaryId());
-            dbInf.setMasterDictionary(masterDictionary);
-            dbInf.setPartOfSpeech(inf.getPartOfSpeech());
-            dbInf.setOwnMeaning(inf.isOwnMeaning());
-            dbInf.setInflectedUrdu(inf.getInflectedUrdu());
-            com.murshid.persistence.domain.Inflected.InflectedKey key = new com.murshid.persistence.domain.Inflected.InflectedKey();
-            key.setInflectedHindi(inf.getInflectedHindi());
-            key.setInflectedHindiIndex(inf.getInflectedHindiIndex());
-            dbInf.setInflectedKey(key);
-            inflectedRepositoryDB.save(dbInf);
-        });
-        LOGGER.info("finished passing inflected");
-    }
+//    private static void dumpInflected() {
+//        InflectedRepositoryDB inflectedRepositoryDB = context.getBean(InflectedRepositoryDB.class);
+//        MasterDictionaryRepository masterDictionaryRepository = context.getBean(MasterDictionaryRepository.class);
+//        InflectedService masterService = context.getBean(InflectedService.class);
+//        List<Inflected> all = masterService.getAll();
+//        all.forEach(inf -> {
+//            com.murshid.persistence.domain.Inflected dbInf = new com.murshid.persistence.domain.Inflected();
+//            dbInf.setAccidence(inf.getAccidence() != null? Lists.newArrayList(inf.getAccidence()): null);
+//            MasterDictionary masterDictionary = masterDictionaryRepository.findOne(inf.getMasterDictionaryId());
+//            dbInf.setMasterDictionary(masterDictionary);
+//            dbInf.setPartOfSpeech(inf.getPartOfSpeech());
+//            dbInf.setOwnMeaning(inf.isOwnMeaning());
+//            dbInf.setInflectedUrdu(inf.getInflectedUrdu());
+//            dbInf.setCanonicalHindi(inf.getCanonicalHindi());
+//            com.murshid.persistence.domain.Inflected.InflectedKey key = new com.murshid.persistence.domain.Inflected.InflectedKey();
+//            key.setInflectedHindi(inf.getInflectedHindi());
+//            key.setInflectedHindiIndex(inf.getInflectedHindiIndex());
+//            dbInf.setInflectedKey(key);
+//            inflectedRepositoryDB.save(dbInf);
+//        });
+//        LOGGER.info("finished passing inflected");
+//    }
 
 
 
@@ -70,18 +70,18 @@ public class MurshidApplication {
     }
 
 
-    private static void validateAll() throws InterruptedException{
-        InflectedService masterService = context.getBean(InflectedService.class);
-        List<Inflected> all = masterService.getAll();
-        all.forEach(inf -> {
-            if (inf.isOwnMeaning() && StringUtils.isEmpty(inf.getCanonicalHindi())){
-                LOGGER.info("{}-{} doesn't have canonical_hindi", inf.getInflectedHindi(), inf.getInflectedHindiIndex());
-            }
-        });
-
-        masterService.validateAll();
-        LOGGER.info("finished validating");
-    }
+//    private static void validateAll() throws InterruptedException{
+//        InflectedService masterService = context.getBean(InflectedService.class);
+//        List<Inflected> all = masterService.getAll();
+//        all.forEach(inf -> {
+//            if (inf.isOwnMeaning() && StringUtils.isEmpty(inf.getCanonicalHindi())){
+//                LOGGER.info("{}-{} doesn't have canonical_hindi", inf.getInflectedHindi(), inf.getInflectedHindiIndex());
+//            }
+//        });
+//
+//        masterService.validateAll();
+//        LOGGER.info("finished validating");
+//    }
 
 
     private static void songRepo(){

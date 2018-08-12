@@ -2,7 +2,7 @@ package com.murshid.persistence.domain;
 
 public interface HasInflectedHindi <T> extends FluentModel {
 
-    String getInflectedHindi();
+    String getHindi();
 
-    T setInflectedUrdu(String inflectedUrdu);
+    T setUrdu(String urdu);
 }

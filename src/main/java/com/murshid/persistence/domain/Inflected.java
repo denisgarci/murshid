@@ -11,7 +11,6 @@ import org.apache.commons.lang3.builder.HashCodeBuilder;
 import javax.persistence.*;
 import java.io.Serializable;
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
@@ -66,23 +65,11 @@ public class Inflected implements Serializable, HasInflectedHindi<Inflected>, Cl
     @Column(name = "inflected_urdu", nullable = false)
     private String inflectedUrdu;
 
-    @Column(name = "canonical_hindi")
-    private String canonicalHindi;
+    @Column(name = "own_canonical")
+    private String ownCanonical;
 
-    @Column(name = "own_meaning", nullable = true)
-    private boolean ownMeaning;
-
-    public Inflected setCanonicalHindi(String canonicalHindi) {
-        this.canonicalHindi = canonicalHindi;
-        return this;
-    }
-
-    public boolean isOwnMeaning() {
-        return ownMeaning;
-    }
-
-    public Inflected setOwnMeaning(boolean ownMeaning) {
-        this.ownMeaning = ownMeaning;
+    public Inflected setOwnCanonical(String ownCanonical) {
+        this.ownCanonical = ownCanonical;
         return this;
     }
 
@@ -118,8 +105,8 @@ public class Inflected implements Serializable, HasInflectedHindi<Inflected>, Cl
         return partOfSpeech;
     }
 
-    public String getCanonicalHindi() {
-        return canonicalHindi;
+    public String getOwnCanonical() {
+        return ownCanonical;
     }
 
     public Inflected setPartOfSpeech(PartOfSpeech partOfSpeech) {
@@ -128,7 +115,7 @@ public class Inflected implements Serializable, HasInflectedHindi<Inflected>, Cl
     }
 
     @Override
-    public String getInflectedHindi() {
+    public String getHindi() {
         return inflectedKey.inflectedHindi;
     }
 
@@ -136,8 +123,8 @@ public class Inflected implements Serializable, HasInflectedHindi<Inflected>, Cl
         return inflectedUrdu;
     }
 
-    public Inflected setInflectedUrdu(String inflectedUrdu) {
-        this.inflectedUrdu = inflectedUrdu;
+    public Inflected setUrdu(String urdu) {
+        this.inflectedUrdu = urdu;
         return this;
     }
 
@@ -153,7 +140,7 @@ public class Inflected implements Serializable, HasInflectedHindi<Inflected>, Cl
                     .setAccidence(this.accidence)
                     .setPartOfSpeech(this.getPartOfSpeech())
                     .setMasterDictionary(this.getMasterDictionary())
-                    .setInflectedUrdu(this.inflectedUrdu);
+                    .setUrdu(this.inflectedUrdu);
             return master;
         }catch (CloneNotSupportedException ex){
             return null;

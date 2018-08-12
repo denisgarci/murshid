@@ -13,7 +13,6 @@ import java.util.Set;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Matchers.eq;
-import static org.mockito.Matchers.refEq;
 import static org.mockito.Mockito.mock;
 
 class SpellCheckServiceTest {
@@ -33,7 +32,7 @@ class SpellCheckServiceTest {
 
     private Inflected create(String inflectedHindi, String inflectedUrdu, Set<Accidence> accidence, PartOfSpeech partOfSpeech){
         Inflected inflected = create(inflectedHindi, accidence, partOfSpeech);
-        inflected.setInflectedUrdu(inflectedUrdu);
+        inflected.setUrdu(inflectedUrdu);
         return inflected;
     }
 

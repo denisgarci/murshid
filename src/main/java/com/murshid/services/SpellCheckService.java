@@ -6,7 +6,6 @@ import com.murshid.models.enums.PartOfSpeech;
 import com.murshid.persistence.domain.HasInflectedHindi;
 import com.murshid.persistence.domain.Inflected;
 import com.murshid.persistence.domain.SpellCheckEntry;
-import com.murshid.persistence.domain.views.InflectedView;
 import com.murshid.persistence.repo.SpellCheckRepository;
 import com.murshid.utils.WordUtils;
 import org.apache.commons.lang3.tuple.Pair;
@@ -227,7 +226,7 @@ public class SpellCheckService {
 
     protected Optional<Inflected> findBypartOfSpeechAndAccidence(List<Inflected> inflecteds, PartOfSpeech partOfSpeech,  Accidence ... accidence ){
         Set<Accidence> setAccidences = Sets.newHashSet(accidence);
-        return inflecteds.stream().filter( i -> i.getPartOfSpeech() == partOfSpeech &&  i.getAccidence().equals(setAccidences)).findFirst();
+        return inflecteds.stream().filter( i -> i.getPartOfSpeech() == partOfSpeech &&  Sets.newHashSet(i.getAccidence()).equals(setAccidences)).findFirst();
     }
 
 
@@ -276,9 +275,9 @@ public class SpellCheckService {
 
     public <T extends HasInflectedHindi> void loadUrdus(List<T> inflectedList){
         inflectedList.forEach( inf -> {
-            SpellCheckEntry spellCheckEntry = spellCheckRepository.findByHindiWord(inf.getInflectedHindi());
+            SpellCheckEntry spellCheckEntry = spellCheckRepository.findByHindiWord(inf.getHindi());
             if (spellCheckEntry!= null){
-                inf.setInflectedUrdu(spellCheckEntry.getUrduWord());
+                inf.setUrdu(spellCheckEntry.getUrduWord());
             }
         });
     }

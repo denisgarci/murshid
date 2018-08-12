@@ -72,14 +72,15 @@ public class InflectedService {
             value.put("inflected_urdu", inflected.getInflectedUrdu());
             value.put("accidence", inflected.getAccidence());
             value.put("part_of_speech", inflected.getPartOfSpeech());
-            value.put("master_dictionary_key", ImmutableMap.of(
-                    "hindi_word", inflected.getInflectedKey().getInflectedHindi(),
-                    "word_index", inflected.getInflectedKey().inflectedHindiIndex));
 
-            if (!inflected.isOwnMeaning()) {
+            value.put("master_dictionary_key", ImmutableMap.of(
+                    "hindi_word", inflected.getMasterDictionary().getHindiWord(),
+                    "word_index", inflected.getMasterDictionary().getWordIndex()));
+
+            if (inflected.getOwnCanonical() == null) {
                 value.put("canonical_hindi", inflected.getMasterDictionary().getHindiWord());
             }else{
-                value.put("canonical_hindi", inflected.getCanonicalHindi());
+                value.put("canonical_hindi", inflected.getOwnCanonical());
             }
 
             result.put(inflected.getKey(), value);
@@ -107,7 +108,7 @@ public class InflectedService {
                 .collect(toSet());
 
         return mks.stream()
-                .map(mk -> inflectedRepository.findByInflectedKey_InflectedHindiAndInflectedKey_InflectedHindiIndex(mk.getInflectedHindi(), mk.getInflectedHindiIndex())
+                .map(mk -> inflectedRepository.findOne(mk.getInflectedHindi(), mk.getInflectedHindiIndex())
                         .orElseThrow(() ->
                                 new IllegalArgumentException(
                                         String.format("the inflected entry %s-%s in the song, is not in the inflected repository ", mk.getInflectedHindi(), mk.getInflectedHindiIndex())))
@@ -563,8 +564,8 @@ public class InflectedService {
     }
 
     public <T extends HasInflectedHindi> List<T> validateSpellCheckIngroup(List<T> inflectedList){
-        List<T> notInSpellCheck = inflectedList.stream().filter(inf -> spellCheckService.wordsDontExist(inf.getInflectedHindi())).collect(toList());
-        notInSpellCheck.forEach(nisch -> LOGGER.info("the Hindi word {} does not have Urdu counterpart in spell_check", nisch.getInflectedHindi()));
+        List<T> notInSpellCheck = inflectedList.stream().filter(inf -> spellCheckService.wordsDontExist(inf.getHindi())).collect(toList());
+        notInSpellCheck.forEach(nisch -> LOGGER.info("the Hindi word {} does not have Urdu counterpart in spell_check", nisch.getHindi()));
         return notInSpellCheck;
     }
 
@@ -873,12 +874,12 @@ public class InflectedService {
     }
 
     public boolean exists(String hindiWord, int index){
-        return inflectedRepository.findByInflectedKey_InflectedHindiAndInflectedKey_InflectedHindiIndex(hindiWord, index).isPresent();
+        return inflectedRepository.findOne(hindiWord, index).isPresent();
     }
 
     public boolean save(Inflected master){
         try {
-            master.setInflectedUrdu(spellCheckService.passMultipleWordsToUrdu(master.getInflectedKey().inflectedHindi));
+            master.setUrdu(spellCheckService.passMultipleWordsToUrdu(master.getInflectedKey().inflectedHindi));
 
             inflectedRepository.save(master);
         }catch (RuntimeException ex){
@@ -962,15 +963,12 @@ public class InflectedService {
         Inflected inflected = new Inflected();
         inflected.setMasterDictionary(masterDictionary);
         Inflected.InflectedKey inflectedKey = new Inflected.InflectedKey();
-        inflectedKey.setInflectedHindi(inflectedView.getInflectedHindi());
-        inflectedKey.setInflectedHindiIndex(suggestNewIndex(inflectedView.getInflectedHindi()));
+        inflectedKey.setInflectedHindi(inflectedView.getHindi());
+        inflectedKey.setInflectedHindiIndex(suggestNewIndex(inflectedView.getHindi()));
         inflected.setInflectedKey(inflectedKey);
         inflected.setAccidence(inflectedView.getAccidence());
-        if (inflectedView.isOwnMeaning()) {
-            inflected.setOwnMeaning(true);
-            inflected.setCanonicalHindi(inflectedView.getCanonicalHindi());
-        }
-        inflected.setInflectedUrdu(inflectedView.getInflectedUrdu());
+        inflected.setOwnCanonical(inflectedView.getOwnCanonical());
+        inflected.setUrdu(inflectedView.getInflectedUrdu());
         inflected.setPartOfSpeech(inflectedView.getPartOfSpeech());
         return inflected;
     }
@@ -981,7 +979,7 @@ public class InflectedService {
             return false;
         }
 
-        if (inflected.getInflectedHindi() == null) {
+        if (inflected.getHindi() == null) {
             LOGGER.info("inflected hindi cannot be null");
             return false;
         }

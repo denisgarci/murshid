@@ -44,12 +44,12 @@ public class MurshidApplication {
 //            dbInf.setMasterDictionary(masterDictionary);
 //            dbInf.setPartOfSpeech(inf.getPartOfSpeech());
 //            dbInf.setOwnMeaning(inf.isOwnMeaning());
-//            dbInf.setInflectedUrdu(inf.getInflectedUrdu());
-//            dbInf.setCanonicalHindi(inf.getCanonicalHindi());
+//            dbInf.setUrdu(inf.getUrdu());
+//            dbInf.setOwnCanonical(inf.getOwnCanonical());
 //            com.murshid.persistence.domain.Inflected.InflectedKey key = new com.murshid.persistence.domain.Inflected.InflectedKey();
-//            key.setInflectedHindi(inf.getInflectedHindi());
-//            key.setInflectedHindiIndex(inf.getInflectedHindiIndex());
-//            dbInf.setInflectedKey(key);
+//            key.setHindi(inf.getHindi());
+//            key.setInflectedHindiIndex(inf.getHindiIndex());
+//            dbInf.setNotInflectedKey(key);
 //            inflectedRepositoryDB.save(dbInf);
 //        });
 //        LOGGER.info("finished passing inflected");
@@ -74,8 +74,8 @@ public class MurshidApplication {
 //        InflectedService masterService = context.getBean(InflectedService.class);
 //        List<Inflected> all = masterService.getAll();
 //        all.forEach(inf -> {
-//            if (inf.isOwnMeaning() && StringUtils.isEmpty(inf.getCanonicalHindi())){
-//                LOGGER.info("{}-{} doesn't have canonical_hindi", inf.getInflectedHindi(), inf.getInflectedHindiIndex());
+//            if (inf.isOwnMeaning() && StringUtils.isEmpty(inf.getOwnCanonical())){
+//                LOGGER.info("{}-{} doesn't have canonical_hindi", inf.getHindi(), inf.getHindiIndex());
 //            }
 //        });
 //

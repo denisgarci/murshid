@@ -1,18 +1,15 @@
 package com.murshid.services;
 
-import com.amazonaws.services.dynamodbv2.document.Item;
-import com.amazonaws.services.dynamodbv2.model.AttributeValue;
-import com.amazonaws.services.dynamodbv2.model.ScanRequest;
-import com.amazonaws.services.dynamodbv2.model.ScanResult;
+import com.google.common.collect.ImmutableMap;
 import com.google.gson.Gson;
-import com.murshid.dynamo.domain.NotInflected;
 import com.murshid.dynamo.domain.Song;
-import com.murshid.dynamo.repo.NotInflectedRepository;
 import com.murshid.dynamo.repo.SongRepository;
-import com.murshid.models.converters.DynamoAccessor;
-import com.murshid.models.converters.NotInflectedConverter;
+import com.murshid.persistence.domain.MasterDictionary;
+import com.murshid.persistence.domain.NotInflected;
 import com.murshid.persistence.domain.views.NotInflectedKey;
+import com.murshid.persistence.domain.views.NotInflectedView;
 import com.murshid.persistence.domain.views.SongWordsToNotInflectedTable;
+import com.murshid.persistence.repo.NotInflectedRepositoryDB;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -28,20 +25,9 @@ public class NotInflectedService {
 
     private static Gson gsonMapper = new Gson();
 
-    private NotInflectedRepository notInflectedRepository;
+    private NotInflectedRepositoryDB notInflectedRepository;
     private SongRepository songRepository;
     private SpellCheckService spellCheckService;
-
-
-    public List<NotInflected> getAll(){
-
-        ScanRequest scanRequest = new ScanRequest().withTableName("not_inflected");
-
-        ScanResult scanResult = DynamoAccessor.client.scan(scanRequest);
-        return scanResult.getItems()
-                .stream().map(NotInflectedConverter::fromAvMap)
-                .collect(Collectors.toList());
-    }
 
     /**
      * retrieves all NotInflected entries relevant for a song, but instead of in List form, in a Map<String, Object> form
@@ -58,10 +44,13 @@ public class NotInflectedService {
         Map<String, Object> result = new HashMap<>();
         notInflectedList.forEach(notInflected -> {
             Map<String, Object> value = new HashMap<>();
-            value.put("hindi", notInflected.getHindi());
+            value.put("hindi", notInflected.getNotInflectedKey().getHindi());
             value.put("urdu", notInflected.getUrdu());
             value.put("part_of_speech", notInflected.getPartOfSpeech());
-            value.put("master_dictionary_key", notInflected.getMasterDictionaryKey().toMap());
+            value.put("master_dictionary_key", ImmutableMap.of(
+                    "hindi_word",  notInflected.getNotInflectedKey().hindi,
+                    "word_index",  notInflected.getNotInflectedKey().hindiIndex
+            ));
 
             result.put(notInflected.getKey(), value);
         });
@@ -87,7 +76,7 @@ public class NotInflectedService {
                     .collect(Collectors.toSet());
 
             return mks.stream()
-                    .map(mk -> notInflectedRepository.findOne(mk.getHindi(), mk.getHindiIndex())
+                    .map(mk -> notInflectedRepository.findByNotInflectedKey_HindiAndNotInflectedKey_HindiIndex(mk.getHindi(), mk.getHindiIndex())
                         .orElseThrow(() ->
                                 new IllegalArgumentException(
                                         String.format("the not-inflected entry %s-%s in the song, is not in the not_inflected repository ", mk.getHindi(), mk.getHindiIndex())))
@@ -102,10 +91,10 @@ public class NotInflectedService {
      */
     public int suggestNewIndex(String hindi){
         int index = -1;
-        Iterator<Item> it = notInflectedRepository.findByHindi(hindi);
+        Iterator<NotInflected> it = notInflectedRepository.findByNotInflectedKey_Hindi(hindi).iterator();
         while(it.hasNext()){
-            Item item = it.next();
-            index = Math.max(index, item.getInt("hindi_index"));
+            NotInflected item = it.next();
+            index = Math.max(index, item.getNotInflectedKey().hindiIndex);
         }
         return index + 1;
     }
@@ -113,28 +102,17 @@ public class NotInflectedService {
 
 
     public List<NotInflected> getByHindi(@Nonnull String hindi) {
-
-        Map<String, AttributeValue> expressionAttributeValues =  new HashMap<>();
-        expressionAttributeValues.put(":hindi", new AttributeValue().withS(hindi));
-
-        ScanRequest scanRequest = new ScanRequest()
-        .withTableName("inflected").withFilterExpression( "hindi = :hindi")
-                .withExpressionAttributeValues(expressionAttributeValues);
-
-        ScanResult scanResult = DynamoAccessor.client.scan(scanRequest);
-        return scanResult.getItems()
-                .stream().map(NotInflectedConverter::fromAvMap)
-                .collect(Collectors.toList());
+        return notInflectedRepository.findByNotInflectedKey_Hindi(hindi);
     }
 
 
     public boolean exists(String hindiWord, int index){
-        return notInflectedRepository.findOne(hindiWord, index).isPresent();
+        return notInflectedRepository.findByNotInflectedKey_HindiAndNotInflectedKey_HindiIndex(hindiWord, index).isPresent();
     }
 
     public boolean save(NotInflected notInflected){
         try {
-            notInflected.setUrdu(spellCheckService.passMultipleWordsToUrdu(notInflected.getHindi()));
+            notInflected.setUrdu(spellCheckService.passMultipleWordsToUrdu(notInflected.getNotInflectedKey().hindi));
             notInflectedRepository.save(notInflected);
         }catch (RuntimeException ex){
             LOGGER.error("error saving NotInflected entry {}", ex.getMessage());
@@ -143,8 +121,20 @@ public class NotInflectedService {
         return true;
     }
 
+    public NotInflected fromView(NotInflectedView notInflectedView, MasterDictionary masterDictionary){
+        NotInflected notInflected = new NotInflected();
+        notInflected.setMasterDictionary(masterDictionary);
+        NotInflected.NotInflectedKey inflectedKey = new NotInflected.NotInflectedKey();
+        inflectedKey.setHindi(notInflectedView.getHindi());
+        inflectedKey.setHindiIndex(suggestNewIndex(notInflectedView.getHindi()));
+        notInflected.setNotInflectedKey(inflectedKey);
+        notInflected.setUrdu(notInflectedView.getUrdu());
+        notInflected.setPartOfSpeech(notInflectedView.getPartOfSpeech());
+        return notInflected;
+    }
 
-    public boolean isValid(NotInflected master) {
+
+    public boolean isValid(NotInflectedView master) {
         if (master.getPartOfSpeech() == null) {
             LOGGER.info("partOfSpeech cannot be null");
             return false;
@@ -169,7 +159,7 @@ public class NotInflectedService {
     }
 
     @Inject
-    public void setNotInflectedRepository(NotInflectedRepository notInflectedRepository) {
+    public void setNotInflectedRepository(NotInflectedRepositoryDB notInflectedRepository) {
         this.notInflectedRepository = notInflectedRepository;
     }
 

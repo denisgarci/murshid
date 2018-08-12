@@ -41,7 +41,7 @@ public class InflectedServiceTest {
 
     private Inflected create(String canonicalHindi,  String inflectedHindi, Set<Accidence> accidences, PartOfSpeech partOfSpeech){
         Inflected inflected = create(inflectedHindi, accidences, partOfSpeech);
-        inflected.setCanonicalHindi(canonicalHindi);
+        inflected.setOwnCanonical(canonicalHindi);
         return inflected;
     }
 

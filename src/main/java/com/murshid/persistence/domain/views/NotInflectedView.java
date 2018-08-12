@@ -2,34 +2,27 @@ package com.murshid.persistence.domain.views;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.murshid.models.DictionaryKey;
-import com.murshid.models.enums.Accidence;
 import com.murshid.models.enums.PartOfSpeech;
 import com.murshid.persistence.domain.FluentModel;
 import com.murshid.persistence.domain.HasInflectedHindi;
 
 import java.util.List;
 
-public class InflectedView implements HasInflectedHindi {
+public class NotInflectedView implements HasInflectedHindi {
 
-    @JsonProperty("inflected_hindi")
-    private String inflectedHindi;
+    @JsonProperty("hindi")
+    private String hindi;
 
-    @JsonProperty("inflected_hindi_index")
+    @JsonProperty("hindi_index")
     private int inflectedHindiIndex;
 
-    private String inflectedUrdu;
+    private String urdu;
 
     @JsonProperty("part_of_speech")
     private PartOfSpeech partOfSpeech;
 
     @JsonProperty("master_dictionary_key")
     private DictionaryKey masterDictionaryKey;
-
-    @JsonProperty("accidence")
-    private List<Accidence> accidence;
-
-    @JsonProperty("own_canonical")
-    private String ownCanonical;
 
     public int getInflectedHindiIndex() {
         return inflectedHindiIndex;
@@ -40,11 +33,11 @@ public class InflectedView implements HasInflectedHindi {
     }
 
     public String getHindi() {
-        return inflectedHindi;
+        return hindi;
     }
 
-    public InflectedView setInflectedHindi(String inflectedHindi) {
-        this.inflectedHindi = inflectedHindi;
+    public NotInflectedView setHindi(String hindi) {
+        this.hindi = hindi;
         return this;
     }
 
@@ -52,7 +45,7 @@ public class InflectedView implements HasInflectedHindi {
         return partOfSpeech;
     }
 
-    public InflectedView setPartOfSpeech(PartOfSpeech partOfSpeech) {
+    public NotInflectedView setPartOfSpeech(PartOfSpeech partOfSpeech) {
         this.partOfSpeech = partOfSpeech;
         return this;
     }
@@ -61,36 +54,18 @@ public class InflectedView implements HasInflectedHindi {
         return masterDictionaryKey;
     }
 
-    public InflectedView setMasterDictionaryKey(DictionaryKey masterDictionaryKey) {
+    public NotInflectedView setMasterDictionaryKey(DictionaryKey masterDictionaryKey) {
         this.masterDictionaryKey = masterDictionaryKey;
         return this;
     }
 
-    public List<Accidence> getAccidence() {
-        return accidence;
+    public String getUrdu() {
+        return urdu;
     }
 
-    public InflectedView setAccidence(List<Accidence> accidence) {
-        this.accidence = accidence;
+    public NotInflectedView setUrdu(String urdu) {
+        this.urdu = urdu;
         return this;
-    }
-
-
-    public String getInflectedUrdu() {
-        return inflectedUrdu;
-    }
-
-    public InflectedView setUrdu(String urdu) {
-        this.inflectedUrdu = urdu;
-        return this;
-    }
-
-    public String getOwnCanonical() {
-        return ownCanonical;
-    }
-
-    public void setOwnCanonical(String ownCanonical) {
-        this.ownCanonical = ownCanonical;
     }
 
     @Override

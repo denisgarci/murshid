@@ -693,7 +693,7 @@ public class InflectedService {
         result.add(clone( origin, Lists.newArrayList(Accidence.DIRECT), Lists.newArrayList(Accidence.VOCATIVE), hindiWord));
         result.add(clone( origin, Lists.newArrayList(Accidence.SINGULAR), Lists.newArrayList(Accidence.PLURAL), hindiWord));
         result.add(clone( origin, Lists.newArrayList(Accidence.SINGULAR, Accidence.DIRECT), Lists.newArrayList(Accidence.PLURAL, Accidence.OBLIQUE), hindiWord.concat("ों")));
-        result.add(clone( origin, Lists.newArrayList(Accidence.SINGULAR, Accidence.DIRECT), Lists.newArrayList(Accidence.PLURAL, Accidence.OBLIQUE), hindiWord.concat("ो")));
+        result.add(clone( origin, Lists.newArrayList(Accidence.SINGULAR, Accidence.DIRECT), Lists.newArrayList(Accidence.PLURAL, Accidence.VOCATIVE), hindiWord.concat("ो")));
 
         return result;
 
@@ -892,7 +892,7 @@ public class InflectedService {
 
     private boolean validateAccidence(InflectedView inflected){
 
-        Set<Accidence> accidence = Sets.newHashSet(inflected.getAccidence());
+        Set<Accidence> accidence = inflected.getAccidence() != null? Sets.newHashSet(inflected.getAccidence()) : null;
         PartOfSpeech partOfSpeech = inflected.getPartOfSpeech();
 
         if (accidence == null){

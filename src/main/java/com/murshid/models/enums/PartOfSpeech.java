@@ -10,7 +10,8 @@ public enum PartOfSpeech {
     INFINITIVE("Infinitive"), PARTICIPLE("Participle"), VERBAL_NOUN("Verbal noun"),
     SUFFIX("Suffix"), PREFIX("Prefix"),
     ACRONYM("Acronym"), DETERMINER("Determiner"), PROVERB("Proverb"), VERB_FORM("Verb form"), PARTICLE("Particle"),
-    DIACRITIC("Diacritical mark"), PREPOSITION("Preposition"), ADVERBIAL_PHRASE("Adverbial phrase"), ADJECTIVAL_PHRASE("Adjectival phrase"), NOMINAL_PHRASE("Nominal phrase"),
+    DIACRITIC("Diacritical mark"), PREPOSITION("Preposition"),
+    ADVERBIAL_PHRASE("Adverbial phrase"), ADJECTIVAL_PHRASE("Adjectival phrase"), NOMINAL_PHRASE("Nominal phrase"), VERBAL_PHRASE("Verbal phrase"),
     PHRASE("Phrase"),
     COMPOUND_POSTPOSITION("Compound postposition");
 

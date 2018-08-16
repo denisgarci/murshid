@@ -9,6 +9,7 @@ import com.murshid.persistence.AccidenceColumnConverter;
 import com.murshid.services.IDictionaryEntry;
 
 import javax.persistence.*;
+import java.util.ArrayList;
 import java.util.List;
 
 @Entity(name = "master_dictionary")
@@ -16,6 +17,7 @@ public class MasterDictionary  {
 
 
     @Id
+    @GeneratedValue(strategy = GenerationType.AUTO)
     @Column(name ="id")
     private int id;
 
@@ -29,6 +31,9 @@ public class MasterDictionary  {
     @Column(name ="part_of_speech", nullable = true)
     private PartOfSpeech partOfSpeech;
 
+    @OneToMany(mappedBy = "masterDictionary", cascade = CascadeType.ALL)
+    private List<DictionaryEntry> dictionaryEntries = new ArrayList<>();
+
     public PartOfSpeech getPartOfSpeech() {
         return partOfSpeech;
     }
@@ -37,6 +42,19 @@ public class MasterDictionary  {
         this.partOfSpeech = partOfSpeech;
         return this;
     }
+
+    public MasterDictionary     addDictionaryEntry(DictionaryEntry dictionaryEntry) {
+        dictionaryEntry.setMasterDictionary(this);
+        dictionaryEntries.add(dictionaryEntry);
+        return this;
+    }
+
+    public MasterDictionary removeDictionaryEntry(DictionaryEntry dictionaryEntry) {
+        dictionaryEntry.setMasterDictionary(null);
+        dictionaryEntries.remove(dictionaryEntry);
+        return this;
+    }
+
 
     public int getId() {
         return id;

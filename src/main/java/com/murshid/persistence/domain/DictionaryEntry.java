@@ -13,11 +13,12 @@ import javax.persistence.*;
 public class DictionaryEntry {
 
     @Id
+    @GeneratedValue(strategy = GenerationType.AUTO)
     @Column(name ="id")
     private int id;
 
     @ManyToOne
-    @JoinColumn(name = "master_dictionary_id")
+    @JoinColumn(name="master_dictionary_id")
     public MasterDictionary masterDictionary;
 
     @Column(name ="word_index")

@@ -614,13 +614,17 @@ public class InflectedService {
 
             result.addAll(explodeFemininesInIIIsolated(origin));
 
+        } else if (origin.getPartOfSpeech() == PartOfSpeech.NOUN  && isFeminineSingularDirect(origin) && hindiWord.endsWith("ी") ){
+
+            result.addAll(explodeFemininesInII(origin));
+
+        } else if (origin.getPartOfSpeech() == PartOfSpeech.NOUN  && isFeminineSingularDirect(origin) &&  hindiWord.endsWith("िया") ){
+
+            result.addAll(explodeFemininesInIYA(origin));
+
         } else if (origin.getPartOfSpeech() == PartOfSpeech.NOUN  && isFeminineSingularDirect(origin) && (!hindiWord.endsWith("ी") ) ){
 
             result.addAll(explodeFemininesNotInII(origin));
-
-        } else if (origin.getPartOfSpeech() == PartOfSpeech.NOUN  && isFeminineSingularDirect(origin) && (hindiWord.endsWith("ी")) ){
-
-            result.addAll(explodeFemininesInII(origin));
 
         } else if (origin.getPartOfSpeech() == PartOfSpeech.VERB  && origin.getAccidence().containsAll(Lists.newArrayList(Accidence._1ST, Accidence.SINGULAR, Accidence.SUBJUNCTIVE)) && (hindiWord.endsWith("ूँ") || hindiWord.endsWith("ऊँ")) ){
             result.addAll(  explodeSubjunctive(origin));
@@ -806,6 +810,21 @@ public class InflectedService {
         result.add(clone( origin, Lists.newArrayList(Accidence.SINGULAR), Lists.newArrayList(Accidence.PLURAL), 1, "ियाँ"));
         result.add(clone( origin, Lists.newArrayList(Accidence.SINGULAR, Accidence.DIRECT), Lists.newArrayList(Accidence.PLURAL, Accidence.OBLIQUE), 1, "ियों"));
         result.add(clone( origin, Lists.newArrayList(Accidence.SINGULAR, Accidence.DIRECT), Lists.newArrayList(Accidence.PLURAL, Accidence.VOCATIVE), 1, "ियो"));
+
+        return result;
+
+    }
+
+    private List<Inflected> explodeFemininesInIYA(Inflected origin){
+
+        List<Inflected> result = new ArrayList<>();
+        String hindiWord = origin.getInflectedKey().getInflectedHindi();
+
+        result.add(clone( origin, Lists.newArrayList(Accidence.DIRECT), Lists.newArrayList(Accidence.OBLIQUE), hindiWord));
+        result.add(clone( origin, Lists.newArrayList(Accidence.DIRECT), Lists.newArrayList(Accidence.VOCATIVE), hindiWord));
+        result.add(clone( origin, Lists.newArrayList(Accidence.SINGULAR), Lists.newArrayList(Accidence.PLURAL), 0, "ँ"));
+        result.add(clone( origin, Lists.newArrayList(Accidence.SINGULAR, Accidence.DIRECT), Lists.newArrayList(Accidence.PLURAL, Accidence.OBLIQUE), 1, "ों"));
+        result.add(clone( origin, Lists.newArrayList(Accidence.SINGULAR, Accidence.DIRECT), Lists.newArrayList(Accidence.PLURAL, Accidence.VOCATIVE), 1, "ो"));
 
         return result;
 

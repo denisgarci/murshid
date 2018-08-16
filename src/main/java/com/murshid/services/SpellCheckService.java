@@ -56,6 +56,42 @@ public class SpellCheckService {
         PartOfSpeech partOfSpeech = inflected.getPartOfSpeech();
         Set<Accidence> accidence = Sets.newHashSet(inflected.getAccidence());
 
+
+        //feminine words in -iya
+        {
+            if (inflected.getInflectedKey().getInflectedHindi().endsWith("याँ") && partOfSpeech == PartOfSpeech.NOUN && accidence.equals(Sets.newHashSet(Accidence.FEMININE, Accidence.PLURAL, Accidence.DIRECT))) {
+                Optional<Inflected> feminineSingularDirect = findBypartOfSpeechAndAccidence(others, PartOfSpeech.NOUN, Accidence.FEMININE, Accidence.SINGULAR, Accidence.DIRECT);
+                if (feminineSingularDirect.isPresent()) {
+                    Inflected fsd = feminineSingularDirect.get();
+                    if (fsd.getInflectedKey().getInflectedHindi().endsWith("िया") && fsd.getInflectedUrdu() != null && fsd.getInflectedUrdu().endsWith("یا")) {
+                        return substringFindConcat(feminineSingularDirect, inflected, 0, "ں");
+                    }
+                }
+            }
+
+            if (inflected.getInflectedKey().getInflectedHindi().endsWith("यों") && partOfSpeech == PartOfSpeech.NOUN && accidence.equals(Sets.newHashSet(Accidence.FEMININE, Accidence.PLURAL, Accidence.OBLIQUE))) {
+                Optional<Inflected> feminineSingularDirect = findBypartOfSpeechAndAccidence(others, PartOfSpeech.NOUN, Accidence.FEMININE, Accidence.SINGULAR, Accidence.DIRECT);
+                if (feminineSingularDirect.isPresent()) {
+                    Inflected fsd = feminineSingularDirect.get();
+                    if (fsd.getInflectedKey().getInflectedHindi().endsWith("िया") && fsd.getInflectedUrdu() != null && fsd.getInflectedUrdu().endsWith("یا")) {
+                        return substringFindConcat(feminineSingularDirect, inflected, 1, "وں");
+                    }
+                }
+            }
+
+            if (inflected.getInflectedKey().getInflectedHindi().endsWith("यो") && partOfSpeech == PartOfSpeech.NOUN && accidence.equals(Sets.newHashSet(Accidence.FEMININE, Accidence.PLURAL, Accidence.VOCATIVE))) {
+                Optional<Inflected> feminineSingularDirect = findBypartOfSpeechAndAccidence(others, PartOfSpeech.NOUN, Accidence.FEMININE, Accidence.SINGULAR, Accidence.DIRECT);
+                if (feminineSingularDirect.isPresent()) {
+                    Inflected fsd = feminineSingularDirect.get();
+                    if (fsd.getInflectedKey().getInflectedHindi().endsWith("िया") && fsd.getInflectedUrdu() != null && fsd.getInflectedUrdu().endsWith("یا")) {
+                        return substringFindConcat(feminineSingularDirect, inflected, 1, "و");
+                    }
+                }
+            }
+
+        }
+
+
         {
             //different accidences of verbs in -aa with urdu counterpart in -ع
             //masculine words

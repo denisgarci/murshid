@@ -8,11 +8,12 @@ import com.murshid.persistence.domain.MasterDictionary;
 import org.springframework.data.repository.CrudRepository;
 
 import java.util.List;
+import java.util.Optional;
 
 public interface DictionaryEntryRepository extends CrudRepository<DictionaryEntry, Integer> {
 
     List<DictionaryEntry> findByMasterDictionary(MasterDictionary masterDictionary);
 
-    List<DictionaryEntry> findByMasterDictionaryAndDictionarySource(MasterDictionary masterDictionary, DictionarySource dictionarySource);
+    Optional<DictionaryEntry> findByMasterDictionaryAndDictionarySource(MasterDictionary masterDictionary, DictionarySource dictionarySource);
 
 }
